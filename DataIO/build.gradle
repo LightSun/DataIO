@@ -1,0 +1,15 @@
+/*dependencies {
+	compile project(':my-lib')
+} */
+apply plugin: 'java'
+//apply plugin: 'eclipse'
+
+repositories {
+   jcenter()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.8.2'
+    
+    compile 'com.heaven7.java.visitor:Visitor:1.1.8'
+}
