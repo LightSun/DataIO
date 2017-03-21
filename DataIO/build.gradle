@@ -1,15 +1,39 @@
 /*dependencies {
 	compile project(':my-lib')
 } */
-apply plugin: 'java'
 //apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'com.novoda.bintray-release'
 
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.novoda:bintray-release:0.4.0'
+	}
+}
 repositories {
-   jcenter()
+		jcenter()
+}
+
+allprojects {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
 }
 
 dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.8.2'
     
     compile 'com.heaven7.java.visitor:Visitor:1.1.8'
+}
+
+publish {
+    userOrg = 'lightsun' //bintray user name
+    groupId = 'com.heaven7.java.data.io'
+    artifactId = 'DataIO'
+    publishVersion = '1.0'
+    desc = 'this is a lib of poi. '
+    website = 'https://github.com/LightSun/DataIO'
 }

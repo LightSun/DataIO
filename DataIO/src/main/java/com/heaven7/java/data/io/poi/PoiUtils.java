@@ -35,7 +35,7 @@ public final class PoiUtils {
 	 * @param outService
 	 *            the output service.
 	 */
-	public static void readExcelAndWrite(String excelFilename, Object sheetParam, ExcelDataService outService) {
+	public static void readExcelAndWrite(String excelFilename, Object sheetParam, final ExcelDataService outService) {
 		new ExcelInputImpl(excelFilename).readService(sheetParam).fireBatch(new FireBatchVisitor<ExcelRow>() {
 			@Override
 			public Void visit(Collection<ExcelRow> coll, Object param) {
