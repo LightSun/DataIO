@@ -21,7 +21,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
  * @author heaven7
  *
  */
-/*public*/ final class ExcelInputImpl implements ExcelInput {
+public class ExcelInputImpl implements ExcelInput {
 
 	private final String mFileName;
 
