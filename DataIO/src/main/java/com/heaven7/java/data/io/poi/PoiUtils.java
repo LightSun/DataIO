@@ -8,13 +8,15 @@ import com.heaven7.java.visitor.util.Collections2;
 
 /**
  * the poi utils.
+ * 
  * @author heaven7
  *
  */
 public final class PoiUtils {
 
 	/**
-	 * read the local excel file and write to target data service with the sheet parameter.
+	 * read the local excel file and write to target data service with the sheet
+	 * parameter.
 	 * 
 	 * @param excelFilename
 	 *            the local excel filename . absolute path
@@ -36,7 +38,7 @@ public final class PoiUtils {
 	 *            the output service.
 	 */
 	public static void readExcelAndWrite(String excelFilename, Object sheetParam, final ExcelDataService outService) {
-		new ExcelInputImpl(excelFilename).readService(sheetParam).fireBatch(new FireBatchVisitor<ExcelRow>() {
+		readExcel(excelFilename, sheetParam).fireBatch(new FireBatchVisitor<ExcelRow>() {
 			@Override
 			public Void visit(Collection<ExcelRow> coll, Object param) {
 				new ExcelOutputImpl(outService).writeBatch(Collections2.asList(coll));
@@ -44,7 +46,7 @@ public final class PoiUtils {
 			}
 		});
 	}
-	
+
 	/**
 	 * read the local excel file by target sheet index = 0.
 	 * 
@@ -54,7 +56,7 @@ public final class PoiUtils {
 	public static ListVisitService<ExcelRow> readExcel(String excelFilename) {
 		return readExcel(excelFilename, 0);
 	}
-	
+
 	/**
 	 * read the local excel file by target sheet parameter.
 	 * 
@@ -66,5 +68,6 @@ public final class PoiUtils {
 	public static ListVisitService<ExcelRow> readExcel(String excelFilename, Object sheetParam) {
 		return new ExcelInputImpl(excelFilename).readService(sheetParam);
 	}
-	
+
+
 }

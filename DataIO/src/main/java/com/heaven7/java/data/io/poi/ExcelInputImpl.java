@@ -36,11 +36,11 @@ public class ExcelInputImpl implements ExcelInput {
 	}
 	
 	@Override
-	public List<ExcelRow> read(Object param) {
+	public List<ExcelRow> read(Object sheetParam) {
 		InputStream in = null;
 		try {
 			in = new FileInputStream(mFileName);
-			final HSSFSheet sh = getSheet(new HSSFWorkbook(new POIFSFileSystem(in)), param);
+			final HSSFSheet sh = getSheet(new HSSFWorkbook(new POIFSFileSystem(in)), sheetParam);
 			final List<ExcelRow> rows = new ArrayList<ExcelRow>();
 			final Iterator<Row> it = sh.rowIterator();
 
@@ -79,4 +79,5 @@ public class ExcelInputImpl implements ExcelInput {
 		throw new IllegalStateException();
 	}
 
+	
 }

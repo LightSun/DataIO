@@ -5,6 +5,13 @@ import java.util.List;
 import com.heaven7.java.visitor.collection.ListVisitService;
 
 public interface ExcelInput {
+	
+	
+	/*
+	 * prepare the input of excel
+	 * @param in the input of excel
+	 */
+	//void prepare(InputStream in);
 
 	/**
 	 * read the excel with default sheet index = 0.
@@ -14,10 +21,10 @@ public interface ExcelInput {
 
 	/**
 	 * read the excel file as rows result.
-	 * @param param the sheet param, can be the sheet name or the sheet index.
+	 * @param sheetParam the sheet parameter, can be the sheet name or the sheet index.
 	 * @return the rows.
 	 */
-	List<ExcelRow> read(Object param);
+	List<ExcelRow> read(Object sheetParam);
 
 	
 	/**
