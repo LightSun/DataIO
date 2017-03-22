@@ -38,7 +38,7 @@ publish {
     userOrg = 'lightsun' //bintray user name
     groupId = 'com.heaven7.java.data.io'
     artifactId = 'DataIO'
-    publishVersion = '1.0'
+    publishVersion = '1.0.1'
     desc = 'this is a lib of poi. '
     website = 'https://github.com/LightSun/DataIO'
 }
