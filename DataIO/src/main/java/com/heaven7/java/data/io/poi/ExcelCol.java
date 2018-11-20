@@ -21,7 +21,14 @@ public final class ExcelCol implements Comparable<ExcelCol> {
 	}
 	
 	public final String getColumnString() {
-		return cell.toString();
+		return cell.getStringCellValue();
+	}
+
+	public final int getColumnInt() {
+		return Integer.parseInt(cell.getStringCellValue());
+	}
+	public final float getColumnFloat() {
+		return Float.valueOf(cell.getStringCellValue());
 	}
 
 	public final Cell getCell() {

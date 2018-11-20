@@ -1,3 +1,4 @@
+/*
 package com.heaven7.java.data.io.test;
 
 import java.sql.Connection;
@@ -10,9 +11,11 @@ import org.apache.commons.dbutils.QueryRunner;
 
 public class TestMysqlConnection {
 
-	/**
+	*/
+/**
 	 * @param args
-	 */
+	 *//*
+
 	public static void main(String[] args) {
 		final String table = "class100";
 		Connection conn = null;
@@ -55,4 +58,4 @@ public class TestMysqlConnection {
 
 	}
 
-}
+}*/

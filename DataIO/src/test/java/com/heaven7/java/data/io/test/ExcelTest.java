@@ -1,22 +1,21 @@
 package com.heaven7.java.data.io.test;
 
-import java.util.List;
-import java.util.TreeMap;
-
-import com.heaven7.java.data.io.ExcelHelper;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.poi.PoiUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-
 import junit.framework.TestCase;
 
+import java.util.List;
+
 public class ExcelTest extends TestCase{
-	
-	private final String mFilename = "E:/tmp/strings_zh.xls";
-	
+
+  // private final String mFilename = "E:/tmp/strings_zh.xls";
+  private final String mFilename =
+      "E:\\study\\github\\research-institute\\python\\Py_work\\Lib\\site-packages\\pandas\\tests\\io\\data\\test1.xls";
+
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -42,7 +41,7 @@ public class ExcelTest extends TestCase{
 			}
 		});
 	}
-	protected void fire(List<ExcelRow> t){
+	public static void fire(List<ExcelRow> t){
 		VisitServices.from(t).fire(new FireVisitor<ExcelRow>() {
 			@Override
 			public Boolean visit(ExcelRow t, Object param) {
@@ -52,13 +51,9 @@ public class ExcelTest extends TestCase{
 			}
 		});
 	}
-	
-	protected void fireColumn(List<ExcelCol> columns) {
+
+	public static void fireColumn(List<ExcelCol> columns) {
 		System.out.println(columns);
 	}
 
-	public void testOldExcelHelper(){
-		TreeMap<String, String> map = ExcelHelper.readFromExcel(mFilename, new int[]{1});
-		System.out.println(map);
-	}
 }

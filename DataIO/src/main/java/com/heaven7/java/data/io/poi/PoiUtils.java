@@ -1,10 +1,12 @@
 package com.heaven7.java.data.io.poi;
 
-import java.util.Collection;
-
 import com.heaven7.java.visitor.FireBatchVisitor;
 import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.util.Collections2;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import java.util.Collection;
 
 /**
  * the poi utils.
@@ -13,6 +15,18 @@ import com.heaven7.java.visitor.util.Collections2;
  *
  */
 public final class PoiUtils {
+
+	public static Sheet getSheet(Workbook book, Object param) {
+		if (param == null) {
+			return book.getSheetAt(0);
+		}
+		if (param instanceof Integer) {
+			return book.getSheetAt((Integer) param);
+		} else if (param instanceof String) {
+			return book.getSheet((String) param);
+		}
+		throw new IllegalStateException();
+	}
 
 	/**
 	 * read the local excel file and write to target data service with the sheet
@@ -66,7 +80,7 @@ public final class PoiUtils {
 	 *            the sheet parameter of excel. must be sheet name or index.
 	 */
 	public static ListVisitService<ExcelRow> readExcel(String excelFilename, Object sheetParam) {
-		return new ExcelInputImpl(excelFilename).readService(sheetParam);
+		return new HSSFExcelInput().filePath(excelFilename).readService(sheetParam);
 	}
 
 

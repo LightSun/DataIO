@@ -14,6 +14,25 @@ public interface ExcelInput {
 	//void prepare(InputStream in);
 
 	/**
+	 * skip to the target row
+	 * @param rowIndex the row index.
+	 */
+	ExcelInput skipToRow(int rowIndex);
+
+
+	/**
+	 * the row interceptor
+	 * @param interceptor the row interceptor
+	 */
+	ExcelInput rowInterceptor(RowInterceptor interceptor);
+
+	/**
+	 * assign the excel file path
+	 * @param filePath the file path
+	 */
+	ExcelInput filePath(String filePath);
+
+	/**
 	 * read the excel with default sheet index = 0.
 	 * @return the all rows.
 	 */
