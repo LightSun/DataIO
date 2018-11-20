@@ -2,6 +2,7 @@ package com.heaven7.java.data.io.bean;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.heaven7.java.base.util.Predicates;
 
 import java.util.List;
 
@@ -111,5 +112,10 @@ public class MusicItem {
     }
     public int getLineNumber(){
         return rowIndex;
+    }
+
+    public boolean isAllAreaEmpty() {
+        return Predicates.isEmpty(slow_speed_areas) && Predicates.isEmpty(middle_speed_areas)
+                && Predicates.isEmpty(high_speed_areas);
     }
 }

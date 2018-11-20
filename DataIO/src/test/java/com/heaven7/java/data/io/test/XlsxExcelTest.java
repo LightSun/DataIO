@@ -15,9 +15,9 @@ import static com.heaven7.java.data.io.test.ExcelTest.fire;
  */
 public class XlsxExcelTest {
 
-// private static final String PATH =
-// "E:\\study\\github\\research-institute\\python\\Py_work\\Lib\\site-packages\\pandas\\tests\\io\\data\\test1.xlsx";
-private static final String PATH = "E:\\test\\music.xlsx";
+    // private static final String PATH =
+    // "E:\\study\\github\\research-institute\\python\\Py_work\\Lib\\site-packages\\pandas\\tests\\io\\data\\test1.xlsx";
+    private static final String PATH = "E:\\tmp\\bugfinds\\music2.xlsx";
 
 @Test
 public void testRead(){
@@ -38,8 +38,8 @@ public void testRead(){
 
 @Test
 public void testReadAndWriteToJson(){
-        String outFile = "E:\\tmp\\music.json";
-        String warnFile = "E:\\tmp\\music_warn.txt";
+        String outDir = "E:\\tmp\\bugfinds";
+        String warnFile = "E:\\tmp\\bugfinds\\music2_warn.txt";
         String cuts =
                 "0.000000,"
                         + "4.992000,"
@@ -112,8 +112,7 @@ public void testReadAndWriteToJson(){
                         + "190.369000,"
                         + "193.387000,"
                         + "195.600000";
-    ExcelToJsonAdapter adapter = new ExcelToJsonAdapter(outFile, cuts);
-    adapter.setWarnFile(warnFile);
+    ExcelToJsonAdapter adapter = new ExcelToJsonAdapter(outDir, "music2",cuts);
     new ExcelHelper.Builder()
                 .setUseXlsx(true)
                 .setSheetIndex(0)

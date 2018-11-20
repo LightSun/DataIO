@@ -10,6 +10,8 @@ import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,8 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     static {
         sDomain_map.put("运动", "sport");
         sDomain_map.put("旅行", "travel");
+        sDomain_map.put("人物", "person");
+        sDomain_map.put("聚会", "party");
 
         sMood_map.put("标准的", 1);
         sMood_map.put("多变的", 2);
@@ -44,27 +48,59 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         sRhythm_map.put("慢节奏", 0);
     }
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-    private final String outJsonFilename;
-    private final List<Float> cuts;
-    private String warnFile;
+    private final String simpleFileName;
+    private final String outDir;
 
-    public ExcelToJsonAdapter(String outJsonFilename, MusicCutProvider musicCutProvider) {
-       this(outJsonFilename, musicCutProvider.getCuts());
+    private final MusicCutProvider cutProvider;
+    private final HashMap<String, List<Float>> cutMap = new HashMap<>();
+
+    /**
+     * create excel to json adapter
+     * <p>this just used for test.</p>
+     * @param simpleFileName the out json file name
+     * @param cuts the cuts
+     */
+    @Deprecated
+    public ExcelToJsonAdapter(String outDir, String simpleFileName,final String cuts) {
+       this(outDir, simpleFileName, new MusicCutProvider() {
+           @Override
+           public String getCuts(String rowName) {
+               return cuts;
+           }
+       });
     }
-    public ExcelToJsonAdapter(String outJsonFilename, String cuts) {
-        this.outJsonFilename = outJsonFilename;
-        this.cuts = VisitServices.from(Arrays.asList(cuts.split(",")))
-                .map(new ResultVisitor<String, Float>() {
-                    @Override
-                    public Float visit(String s, Object param) {
-                        return Float.parseFloat(s);
-                    }
-                }).getAsList();
+    /**
+     * create excel to json adapter
+     * <p>this just used for test.</p>
+     * @param outDir
+     * @param simpleFileName the out json file name
+     * @param provider the cuts provider
+     */
+    public ExcelToJsonAdapter(String outDir, String simpleFileName, MusicCutProvider provider) {
+        this.outDir = outDir;
+        this.simpleFileName = simpleFileName;
+        this.cutProvider = provider;
     }
 
-    public void setWarnFile(String warnFile) {
-        this.warnFile = warnFile;
+    public List<Float> getCuts(String rowName){
+        List<Float> cuts = cutMap.get(rowName);
+        if(cuts == null){
+            String cutStr = cutProvider.getCuts(rowName);
+            if(cutStr == null){
+                return null;
+            }
+            cuts = VisitServices.from(Arrays.asList(cutStr.split(",")))
+                    .map(new ResultVisitor<String, Float>() {
+                        @Override
+                        public Float visit(String s, Object param) {
+                            return Float.valueOf(s);
+                        }
+                    }).getAsList();
+            cutMap.put(rowName, cuts);
+        }
+        return cuts;
     }
+
     @Override
     public int insertBatch(List<ExcelRow> t) {
         final StringBuilder sb_warn = new StringBuilder();
@@ -72,37 +108,78 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
             @Override
             public MusicItem visit(ExcelRow row, Object param) {
                 List<ExcelCol> columns = row.getColumns();
-                String value = columns.get(0).getColumnString();
-                String value2 = columns.get(1).getColumnString();
+                String value = columns.get(INDEX_NAME).getColumnString();
+                String value2 = columns.get(INDEX_DOMAIN).getColumnString();
                 if (value == null || value.length() == 0) {
                     return null; //filter
                 }
                 if (value2 == null || value2.length() == 0) {
                     return null; //filter
                 }
+
+
                 MusicItem item = new MusicItem();
-                item.setLineNumber(row.getRowIndex() + 1);
                 item.setName(columns.get(INDEX_NAME).getColumnString());
+                List<Float> cuts = getCuts(item.getName());
+                //ignore
+                if(cuts == null){
+                    return null;
+                }
+                item.setLineNumber(row.getRowIndex() + 1);
                 item.setDomains(parseDomain(columns.get(INDEX_DOMAIN).getColumnString()));
                 item.setMatter(parseMood(columns.get(INDEX_MOOD).getColumnString()));
                 item.setMatter(parseRhythm(columns.get(INDEX_RHYTHM).getColumnString()));
-                item.setSlow_speed_areas(parseTimeAreas(columns.get(INDEX_SLOW_SPEED_AREAS).getColumnString()));
-                item.setMiddle_speed_areas(parseTimeAreas(columns.get(INDEX_MIDDLE_SPEED_AREAS).getColumnString()));
-                item.setHigh_speed_areas(parseTimeAreas(columns.get(INDEX_HIGH_SPEED_AREAS).getColumnString()));
+                item.setSlow_speed_areas(parseTimeAreas(item.getName(), columns.get(INDEX_SLOW_SPEED_AREAS).getColumnString()));
+                item.setMiddle_speed_areas(parseTimeAreas(item.getName(),columns.get(INDEX_MIDDLE_SPEED_AREAS).getColumnString()));
+                item.setHigh_speed_areas(parseTimeAreas(item.getName(),columns.get(INDEX_HIGH_SPEED_AREAS).getColumnString()));
+                item.setId(item.getName());
+                //check
+                if(item.isAllAreaEmpty()){
+                    return null;
+                }
                 //check
                 ErrorVerifier.check(item, cuts.get(cuts.size()-1) , sb_warn);
                 return item;
             }
         }).getAsList();
-        String json = mGson.toJson(musicItems);
-        FileUtils.writeTo(outJsonFilename, json);
-        if(warnFile != null){
-            FileUtils.writeTo(warnFile, sb_warn.toString());
+        //按照领域输出不同文件
+        List<MusicItem> travels = new ArrayList<>();
+        List<MusicItem> sports = new ArrayList<>();
+        List<MusicItem> parties = new ArrayList<>();
+        List<MusicItem> persons = new ArrayList<>();
+        for(MusicItem mi :musicItems){
+            if(mi.getDomains().contains("sport")){
+                sports.add(mi);
+            }
+            if(mi.getDomains().contains("travel")){
+                travels.add(mi);
+            }
+            if(mi.getDomains().contains("party")){
+                parties.add(mi);
+            }
+            if(mi.getDomains().contains("person")){
+                persons.add(mi);
+            }
         }
+        String travelPath = outDir + File.separator + simpleFileName + "_travel.json";
+        String sportPath = outDir + File.separator + simpleFileName + "_sport.json";
+        String personPath = outDir + File.separator + simpleFileName + "_person.json";
+        String partyPath = outDir + File.separator + simpleFileName + "_party.json";
+        FileUtils.writeTo(travelPath, mGson.toJson(travels));
+        FileUtils.writeTo(sportPath, mGson.toJson(sports));
+        FileUtils.writeTo(personPath, mGson.toJson(persons));
+        FileUtils.writeTo(partyPath, mGson.toJson(parties));
+        //total
+        String json = mGson.toJson(musicItems);
+        String outJsonFile = outDir + File.separator + simpleFileName + ".json";
+        FileUtils.writeTo(outJsonFile, json);
+        //warn
+        String warnPath = outDir + File.separator + simpleFileName + "_warn.txt";
+        FileUtils.writeTo(warnPath, sb_warn.toString());
         return t.size();
     }
 
-    private List<List<Float>> parseTimeAreas(String str) {
+    private List<List<Float>> parseTimeAreas(final String rowName, String str) {
         if(str == null || str.length() == 0){
             return null;
         }
@@ -110,15 +187,15 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, List<Float>>() {
             @Override
             public List<Float> visit(String s, Object param) {
-                return parseTimeArea(s).asList();
+                return parseTimeArea(rowName, s).asList();
             }
         }).getAsList();
     }
 
-    private float findNearest(float src) {
+    private float findNearest(String rowName, float src) {
         float delta = Float.MAX_VALUE;
         float nearest = src;
-        for(Float val : cuts){
+        for(Float val :  getCuts(rowName)){
             float del = Math.abs(val - src);
             if(del < delta){
                 delta = del;
@@ -127,7 +204,7 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         }
         return nearest;
     }
-    private TimeArea parseTimeArea(String str){
+    private TimeArea parseTimeArea(String rowName, String str){
         if(!str.contains("-")){
             throw new IllegalStateException(str);
         }
@@ -135,8 +212,8 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         float start = parseFloatTime(ss[0]);
         float end = parseFloatTime(ss[1]);
         TimeArea ta = new TimeArea();
-        ta.setBegin(findNearest(start));
-        ta.setEnd(findNearest(end));
+        ta.setBegin(findNearest(rowName, start));
+        ta.setEnd(findNearest(rowName, end));
         return ta;
     }
 

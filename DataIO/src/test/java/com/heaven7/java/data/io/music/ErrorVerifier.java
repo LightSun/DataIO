@@ -28,6 +28,9 @@ public class ErrorVerifier {
         addIfNotEmpty(item.getSlow_speed_areas(), all);
         addIfNotEmpty(item.getMiddle_speed_areas(), all);
         addIfNotEmpty(item.getHigh_speed_areas(), all);
+        if(all.isEmpty()){
+            System.err.println("Name: " + item.getName());
+        }
         Collections.sort(all, new Comparator<List<Float>>() {
             @Override
             public int compare(List<Float> o1, List<Float> o2) {
