@@ -22,7 +22,7 @@ public class MusicItem {
     private List<Float> times;
     @Expose
     @SerializedName("property")
-    private int matter;
+    private int property;
     @Expose
     private int rhythm;
 
@@ -67,12 +67,12 @@ public class MusicItem {
         this.times = times;
     }
 
-    public int getMatter() {
-        return matter;
+    public int getProperty() {
+        return property;
     }
 
-    public void setMatter(int matter) {
-        this.matter = matter;
+    public void setProperty(int property) {
+        this.property = property;
     }
 
     public int getRhythm() {

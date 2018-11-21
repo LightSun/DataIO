@@ -4,6 +4,7 @@ import com.heaven7.java.data.io.poi.ExcelHelper;
 import com.heaven7.java.data.io.utils.FileUtils;
 
 /**
+ * 一首歌存一个json. 不同领域只存id
  * @author heaven7
  */
 public class ExcelToJsonUtils {

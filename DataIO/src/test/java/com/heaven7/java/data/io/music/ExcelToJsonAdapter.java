@@ -7,14 +7,16 @@ import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.utils.FileUtils;
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.heaven7.java.data.io.music.Configs.*;
 
 /**
  * @author heaven7
@@ -29,24 +31,6 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     public static final int INDEX_MIDDLE_SPEED_AREAS = 5;
     public static final int INDEX_HIGH_SPEED_AREAS = 6;
 
-    private static final HashMap<String, String> sDomain_map = new HashMap<>();
-    private static final HashMap<String, Integer> sMood_map = new HashMap<>();
-    private static final HashMap<String, Integer> sRhythm_map = new HashMap<>();
-
-    static {
-        sDomain_map.put("运动", "sport");
-        sDomain_map.put("旅行", "travel");
-        sDomain_map.put("人物", "person");
-        sDomain_map.put("聚会", "party");
-
-        sMood_map.put("标准的", 1);
-        sMood_map.put("多变的", 2);
-        sMood_map.put("单调的", 0);
-
-        sRhythm_map.put("快节奏", 2);
-        sRhythm_map.put("中节奏", 1);
-        sRhythm_map.put("慢节奏", 0);
-    }
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     private final String simpleFileName;
     private final String outDir;
@@ -104,7 +88,7 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     @Override
     public int insertBatch(List<ExcelRow> t) {
         final StringBuilder sb_warn = new StringBuilder();
-        List<MusicItem> musicItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
+        final List<MusicItem> musicItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
             @Override
             public MusicItem visit(ExcelRow row, Object param) {
                 List<ExcelCol> columns = row.getColumns();
@@ -125,10 +109,11 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
                 if(cuts == null){
                     return null;
                 }
+                item.setTimes(cuts);
                 item.setLineNumber(row.getRowIndex() + 1);
                 item.setDomains(parseDomain(columns.get(INDEX_DOMAIN).getColumnString()));
-                item.setMatter(parseMood(columns.get(INDEX_MOOD).getColumnString()));
-                item.setMatter(parseRhythm(columns.get(INDEX_RHYTHM).getColumnString()));
+                item.setProperty(parseMood(columns.get(INDEX_MOOD).getColumnString()));
+                item.setRhythm(parseRhythm(columns.get(INDEX_RHYTHM).getColumnString()));
                 item.setSlow_speed_areas(parseTimeAreas(item.getName(), columns.get(INDEX_SLOW_SPEED_AREAS).getColumnString()));
                 item.setMiddle_speed_areas(parseTimeAreas(item.getName(),columns.get(INDEX_MIDDLE_SPEED_AREAS).getColumnString()));
                 item.setHigh_speed_areas(parseTimeAreas(item.getName(),columns.get(INDEX_HIGH_SPEED_AREAS).getColumnString()));
@@ -142,33 +127,24 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
                 return item;
             }
         }).getAsList();
-        //按照领域输出不同文件
-        List<MusicItem> travels = new ArrayList<>();
-        List<MusicItem> sports = new ArrayList<>();
-        List<MusicItem> parties = new ArrayList<>();
-        List<MusicItem> persons = new ArrayList<>();
-        for(MusicItem mi :musicItems){
-            if(mi.getDomains().contains("sport")){
-                sports.add(mi);
+        //part outputs
+        VisitServices.from(Configs.getAllParts()).fire(new FireVisitor<PartOutput>() {
+            @Override
+            public Boolean visit(PartOutput part, Object param) {
+                List<String> list = VisitServices.from(part.collect(musicItems))
+                        .map(new ResultVisitor<MusicItem, String>() {
+                    @Override
+                    public String visit(MusicItem item, Object param) {
+                        return item.getName();
+                    }
+                }).getAsList();
+                String partPath = outDir + File.separator + part.getPartDomain() + "_music_"
+                        + part.getPartProperty()  + ".json";
+                FileUtils.writeTo(partPath, mGson.toJson(list));
+                return null;
             }
-            if(mi.getDomains().contains("travel")){
-                travels.add(mi);
-            }
-            if(mi.getDomains().contains("party")){
-                parties.add(mi);
-            }
-            if(mi.getDomains().contains("person")){
-                persons.add(mi);
-            }
-        }
-        String travelPath = outDir + File.separator + simpleFileName + "_travel.json";
-        String sportPath = outDir + File.separator + simpleFileName + "_sport.json";
-        String personPath = outDir + File.separator + simpleFileName + "_person.json";
-        String partyPath = outDir + File.separator + simpleFileName + "_party.json";
-        FileUtils.writeTo(travelPath, mGson.toJson(travels));
-        FileUtils.writeTo(sportPath, mGson.toJson(sports));
-        FileUtils.writeTo(personPath, mGson.toJson(persons));
-        FileUtils.writeTo(partyPath, mGson.toJson(parties));
+        });
+
         //total
         String json = mGson.toJson(musicItems);
         String outJsonFile = outDir + File.separator + simpleFileName + ".json";
@@ -176,6 +152,16 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         //warn
         String warnPath = outDir + File.separator + simpleFileName + "_warn.txt";
         FileUtils.writeTo(warnPath, sb_warn.toString());
+        //one music-> one json
+        VisitServices.from(musicItems).fire(new FireVisitor<MusicItem>() {
+            @Override
+            public Boolean visit(MusicItem item, Object param) {
+                String path = outDir + File.separator + item.getName() + ".json";
+                FileUtils.writeTo(path,  mGson.toJson(item));
+                return null;
+            }
+        });
+
         return t.size();
     }
 
@@ -252,21 +238,4 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         return Integer.parseInt(s);
     }
 
-    private static int parseRhythm(String str) {
-        return sRhythm_map.get(str);
-    }
-
-    private static List<String> parseDomain(String str) {
-        String[] strs = str.split(";");
-        return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, String>() {
-            @Override
-            public String visit(String s, Object param) {
-                return sDomain_map.get(s);
-            }
-        }).getAsList();
-    }
-
-    private static int parseMood(String str) {
-        return sMood_map.get(str);
-    }
 }
