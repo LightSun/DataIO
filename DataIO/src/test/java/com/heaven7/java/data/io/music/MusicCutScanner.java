@@ -46,8 +46,11 @@ public class MusicCutScanner {
     }
 
     public static void main(String[] args) {
-        String dir = "E:\\tmp\\bugfinds\\music_cuts";
+      /*  String dir = "E:\\tmp\\bugfinds\\music_cuts";
         String configPath = "E:\\tmp\\bugfinds\\music_cuts\\cuts.txt";
+        new MusicCutScanner(dir).serialize(configPath);*/
+        String dir = "E:\\tmp\\bugfinds\\music_cuts\\vida_demo_1122";
+        String configPath = "E:\\tmp\\bugfinds\\music_cuts\\vida_demo_1122\\cuts.txt";
         new MusicCutScanner(dir).serialize(configPath);
     }
 }

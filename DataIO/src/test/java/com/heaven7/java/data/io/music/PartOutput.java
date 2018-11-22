@@ -15,6 +15,10 @@ public abstract class PartOutput {
 
     public abstract int getPartProperty();
 
+    public String getFormatFilename(){
+        return getPartDomain() + "_music_" + getPartProperty();
+    }
+
     public final List<MusicItem> collect(List<MusicItem> rawItems){
         List<MusicItem> matchItems = new ArrayList<>();
         String domain = getPartDomain();
