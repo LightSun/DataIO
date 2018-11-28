@@ -38,6 +38,14 @@ public class FileUtils {
         return path.substring(index + 1, path.lastIndexOf("."));
     }
 
+    public static String getSimpleName(String path){
+        String extension = getFileExtension(path);
+        if(extension != null){
+            return getFileName(path) + "." + extension;
+        }
+        return getFileName(path);
+    }
+
     /**
      * 视频文件的关键目录 为2级目录模式,比如:
      empty/dinner/xxx.mp4 , empty/white/xxx2.mp4.

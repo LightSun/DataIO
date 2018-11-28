@@ -8,6 +8,8 @@ import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,27 +24,42 @@ public class MusicCutScanner {
     }
 
     public void serialize(String targetFilePath){
-        List<String> files = FileUtils.getFiles(new File(dir), "csv");
+        List<String> files = new ArrayList<>();
+        FileUtils.getFiles(new File(dir), "csv", new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return !pathname.isHidden();
+            }
+        }, files);
+        files = filter(files);
         List<CutConfigBean.CutItem> items = VisitServices.from(files).map(new ResultVisitor<String, CutConfigBean.CutItem>() {
             @Override
             public CutConfigBean.CutItem visit(String csvPath, Object param) {
-                String fileName = FileUtils.getFileName(csvPath);
-                TextReadHelper<Float> readHelper = new TextReadHelper<>(new TextReadHelper.Callback<Float>() {
-                    @Override
-                    public Float parse(String line) {
-                        return Float.valueOf(line.split(",")[0]);
-                    }
-                });
-                List<Float> floats = readHelper.read(null, csvPath);
-                CutConfigBean.CutItem item = new CutConfigBean.CutItem();
-                item.setName(fileName);
-                item.setCuts(VisitServices.from(floats).joinToString(","));
-                return item;
+                try {
+                    String fileName = FileUtils.getFileName(csvPath);
+                    TextReadHelper<Float> readHelper = new TextReadHelper<>(new TextReadHelper.Callback<Float>() {
+                        @Override
+                        public Float parse(String line) {
+                            return Float.valueOf(line.split(",")[0]);
+                        }
+                    });
+                    List<Float> floats = readHelper.read(null, csvPath);
+                    CutConfigBean.CutItem item = new CutConfigBean.CutItem();
+                    item.setName(fileName);
+                    item.setCuts(VisitServices.from(floats).joinToString(","));
+                    return item;
+                }catch (Exception e){
+                    throw new RuntimeException(csvPath, e);
+                }
             }
         }).getAsList();
         CutConfigBean bean = new CutConfigBean();
         bean.setCutItems(items);
         FileUtils.writeTo(targetFilePath, new Gson().toJson(bean));
+    }
+
+    protected List<String> filter(List<String> files) {
+        return files;
     }
 
     public static void main(String[] args) {

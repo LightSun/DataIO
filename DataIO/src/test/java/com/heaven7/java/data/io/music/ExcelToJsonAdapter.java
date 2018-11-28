@@ -8,6 +8,7 @@ import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
@@ -32,6 +33,8 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     private final String simpleFileName;
     private final String outDir;
+    private String musicInputDir;
+    private String musicOutputDir;
 
     private final MusicCutProvider cutProvider;
     private final HashMap<String, List<Float>> cutMap = new HashMap<>();
@@ -168,8 +171,37 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
                 return null;
             }
         });
-
+        //copy music to one dir
+        if(musicInputDir != null){
+            List<String> mp3s = FileUtils.getFiles(new File(musicInputDir), "mp3");
+            final File out = new File(outDir, "musics");
+            FileUtils.deleteDir(out);
+            out.mkdirs();
+            VisitServices.from(mp3s).filter(new PredicateVisitor<String>() {
+                @Override
+                public Boolean visit(String s, Object param) {
+                    String fileName = FileUtils.getFileName(s);
+                    for(MusicItem mi : musicItems){
+                        if(fileName.equals(mi.getName())){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }).fire(new FireVisitor<String>() {
+                @Override
+                public Boolean visit(String s, Object param) {
+                    File dst = new File(out, FileUtils.getSimpleName(s));
+                    FileUtils.copyFile(new File(s), dst);
+                    return null;
+                }
+            });
+        }
         return t.size();
+    }
+
+    public void setInputMusicDir(String musicDir) {
+        this.musicInputDir = musicDir;
     }
 
     private void writeMappingFile(MusicItem item, List<TimeArea> areas) {
@@ -260,5 +292,4 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         }
         return Integer.parseInt(s);
     }
-
 }
