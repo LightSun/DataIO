@@ -198,12 +198,15 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
             List<MusicMappingItem> maps = VisitServices.from(musicItems).map(new ResultVisitor<MusicItem, MusicMappingItem>() {
                 @Override
                 public MusicMappingItem visit(MusicItem item, Object param) {
+                    List<Float> times = item.getTimes();
+                    Float val = times.get(times.size() - 1);
                     File dst = new File(out, item.getId() + "." + FileUtils.getFileExtension(item.getRawFile()));
                     MusicMappingItem mmi = new MusicMappingItem();
                     mmi.setMusicName(item.getName());
                     mmi.setId(item.getId());
                     mmi.setFullId(dst.getAbsolutePath());
                     mmi.setFilename(item.getRawFile());
+                    mmi.setDuration(val);
                     return mmi;
                 }
             }).fire(new FireVisitor<MusicMappingItem>() {

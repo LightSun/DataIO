@@ -15,6 +15,8 @@ public class MusicMappingItem {
     private String fullId;
     @Expose
     private String id;
+    @Expose
+    private float duration;
 
     public String getFilename() {
         return filename;
@@ -45,5 +47,12 @@ public class MusicMappingItem {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+    public float getDuration() {
+        return duration;
     }
 }
