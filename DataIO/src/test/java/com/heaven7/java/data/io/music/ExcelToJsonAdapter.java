@@ -36,7 +36,6 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     private final String simpleFileName;
     private final String outDir;
     private String musicInputDir;
-    private String musicOutputDir;
 
     private final MusicCutProvider cutProvider;
     private final HashMap<String, List<Float>> cutMap = new HashMap<>();
