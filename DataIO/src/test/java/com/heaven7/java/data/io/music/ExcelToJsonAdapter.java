@@ -226,7 +226,7 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
 
     private void writeMappingFile(MusicItem item, List<TimeArea> areas) {
         //write mapping
-        String outFile = outDir + File.separator + item.getName() + "___mapping.txt";
+        String outFile = outDir + File.separator + item.getId() + "___mapping.txt";
         StringBuilder sb_mapping = new StringBuilder();
         Collections.sort(areas);
         for (TimeArea ta : areas){
