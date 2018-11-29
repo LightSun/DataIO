@@ -3,9 +3,11 @@ package com.heaven7.java.data.io.music;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.heaven7.java.data.io.bean.MusicItem;
+import com.heaven7.java.data.io.bean.MusicMappingItem;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelRow;
+import com.heaven7.java.data.io.utils.FileMd5Helper;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
@@ -90,9 +92,9 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
     }
 
     @Override
-    public int insertBatch(List<ExcelRow> t) {
+    public int insertBatch(final List<ExcelRow> t) {
         final StringBuilder sb_warn = new StringBuilder();
-        final List<MusicItem> musicItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
+        final List<MusicItem> expectItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
             @Override
             public MusicItem visit(ExcelRow row, Object param) {
                 List<ExcelCol> columns = row.getColumns();
@@ -134,6 +136,24 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
                 return item;
             }
         }).getAsList();
+        // for map raw mp3 file
+        final List<String> mp3s = FileUtils.getFiles(new File(musicInputDir), "mp3");
+        final List<MusicItem> musicItems = VisitServices.from(expectItems).filter(new PredicateVisitor<MusicItem>() {
+            @Override
+            public Boolean visit(MusicItem item, Object param) {
+                String name = item.getName();
+                for(String mp3 : mp3s){
+                    if(FileUtils.getFileName(mp3).equals(name)){
+                        item.setId(FileMd5Helper.getMD5Three(mp3));
+                        item.setRawFile(mp3);
+                        return true;
+                    }
+                }
+                System.out.println("can't find mp3 file for '"+ item.getName() +"'");
+                return false;
+            }
+        }).getAsList();
+
         //part outputs
         VisitServices.from(Configs.getAllParts()).fire(new FireVisitor<PartOutput>() {
             @Override
@@ -142,7 +162,7 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
                         .map(new ResultVisitor<MusicItem, String>() {
                             @Override
                             public String visit(MusicItem item, Object param) {
-                                return item.getName();
+                                return item.getId();
                             }
                         }).getAsList();
                 if (list.isEmpty()) {
@@ -166,36 +186,36 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         VisitServices.from(musicItems).fire(new FireVisitor<MusicItem>() {
             @Override
             public Boolean visit(MusicItem item, Object param) {
-                String path = outDir + File.separator + item.getName() + ".json";
+                String path = outDir + File.separator + item.getId() + ".json";
                 FileUtils.writeTo(path, mGson.toJson(item));
                 return null;
             }
         });
         //copy music to one dir
         if(musicInputDir != null){
-            List<String> mp3s = FileUtils.getFiles(new File(musicInputDir), "mp3");
             final File out = new File(outDir, "musics");
             FileUtils.deleteDir(out);
             out.mkdirs();
-            VisitServices.from(mp3s).filter(new PredicateVisitor<String>() {
+            List<MusicMappingItem> maps = VisitServices.from(musicItems).map(new ResultVisitor<MusicItem, MusicMappingItem>() {
                 @Override
-                public Boolean visit(String s, Object param) {
-                    String fileName = FileUtils.getFileName(s);
-                    for(MusicItem mi : musicItems){
-                        if(fileName.equals(mi.getName())){
-                            return true;
-                        }
-                    }
-                    return false;
+                public MusicMappingItem visit(MusicItem item, Object param) {
+                    File dst = new File(out, item.getId() + "." + FileUtils.getFileExtension(item.getRawFile()));
+                    MusicMappingItem mmi = new MusicMappingItem();
+                    mmi.setMusicName(item.getName());
+                    mmi.setId(item.getId());
+                    mmi.setFullId(dst.getAbsolutePath());
+                    mmi.setFilename(item.getRawFile());
+                    return mmi;
                 }
-            }).fire(new FireVisitor<String>() {
+            }).fire(new FireVisitor<MusicMappingItem>() {
                 @Override
-                public Boolean visit(String s, Object param) {
-                    File dst = new File(out, FileUtils.getSimpleName(s));
-                    FileUtils.copyFile(new File(s), dst);
+                public Boolean visit(MusicMappingItem mmi, Object param) {
+                    FileUtils.copyFile(new File(mmi.getFilename()), new File(mmi.getFullId()));
                     return null;
                 }
-            });
+            }).getAsList();
+            final File file_mapping = new File(outDir, "name_id_mapping.txt");
+            FileUtils.writeTo(file_mapping, mGson.toJson(maps));
         }
         return t.size();
     }

@@ -13,7 +13,7 @@ public class MusicItem {
 
     @Expose
     private String id = "default";
-    @Expose
+    @Expose(serialize = false)
     private String name;
     @Expose
     private List<String> domains;
@@ -35,6 +35,8 @@ public class MusicItem {
 
     @Expose(serialize = false, deserialize = false)
     private int rowIndex;
+    @Expose(serialize = false)
+    private String filePath;
 
     public String getId() {
         return id;
@@ -117,5 +119,12 @@ public class MusicItem {
     public boolean isAllAreaEmpty() {
         return Predicates.isEmpty(slow_speed_areas) && Predicates.isEmpty(middle_speed_areas)
                 && Predicates.isEmpty(high_speed_areas);
+    }
+
+    public void setRawFile(String musicName) {
+        filePath = musicName;
+    }
+    public String getRawFile(){
+        return filePath;
     }
 }

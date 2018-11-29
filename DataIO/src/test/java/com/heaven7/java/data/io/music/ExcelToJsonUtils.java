@@ -14,7 +14,7 @@ public class ExcelToJsonUtils {
     //E:\tmp\bugfinds\music2.xlsx 0 E:\tmp\bugfinds\music_cuts\cuts.txt E:\tmp\bugfinds\out 2
     //E:\tmp\bugfinds\music3.xlsx 0 E:\tmp\bugfinds\music_cuts\vida_demo_1122\cuts.txt E:\tmp\bugfinds\out_music3 39
     //E:\tmp\bugfinds\music3.xlsx 0 E:\tmp\bugfinds\music_cuts2\cuts.txt E:\tmp\bugfinds\out_music4 2
-    //E:\tmp\bugfinds\music3.xlsx 0 E:\tmp\bugfinds\music_cuts2\cuts.txt E:\tmp\bugfinds\out_music4 E:\tmp\bugfinds\music_cuts2 2
+    //E:\tmp\bugfinds\music3.xlsx 0 E:\tmp\bugfinds\music_cuts2\cuts.txt E:\tmp\bugfinds\out_music5 E:\tmp\bugfinds\music_cuts2 2
     public static void main(String[] args) {
         //$excelpath $sheet_name $cut_config_path $outDir $input_music_dir $ship_to_row_index
         if(args.length < 5){
