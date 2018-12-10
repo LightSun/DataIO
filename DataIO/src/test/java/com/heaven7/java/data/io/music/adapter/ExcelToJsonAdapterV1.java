@@ -1,15 +1,16 @@
-package com.heaven7.java.data.io.music;
+package com.heaven7.java.data.io.music.adapter;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.heaven7.java.data.io.bean.MusicItem;
-import com.heaven7.java.data.io.bean.MusicMappingItem;
+import com.heaven7.java.data.io.bean.TimeArea;
+import com.heaven7.java.data.io.music.ErrorVerifier;
+import com.heaven7.java.data.io.music.out.MusicOutDelegate;
+import com.heaven7.java.data.io.music.provider.MusicCutProvider;
+import com.heaven7.java.data.io.music.provider.SpeedMusicCutProvider;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.utils.FileMd5Helper;
 import com.heaven7.java.data.io.utils.FileUtils;
-import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -22,23 +23,16 @@ import static com.heaven7.java.data.io.music.Configs.*;
 /**
  * @author heaven7
  */
-public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
+public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
 
-    public static final int INDEX_NAME = 0;
-    public static final int INDEX_DOMAIN = 1;
-    public static final int INDEX_MOOD = 2;
-    public static final int INDEX_RHYTHM = 3;
-    public static final int INDEX_SLOW_SPEED_AREAS = 4;
-    public static final int INDEX_MIDDLE_SPEED_AREAS = 5;
-    public static final int INDEX_HIGH_SPEED_AREAS = 6;
-
-    private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
     private final String simpleFileName;
     private final String outDir;
     private String musicInputDir;
 
-    private final MusicCutProvider cutProvider;
     private final HashMap<String, List<Float>> cutMap = new HashMap<>();
+    private final MusicCutProvider cutProvider;
+    private final IndexDelegate mIndexDelegate;
+    private MusicOutDelegate mMusicOutDelegate;
 
     /**
      * create excel to json adapter
@@ -48,15 +42,9 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
      * @param cuts           the cuts
      */
     @Deprecated
-    public ExcelToJsonAdapter(String outDir, String simpleFileName, final String cuts) {
-        this(outDir, simpleFileName, new MusicCutProvider() {
-            @Override
-            public String getCuts(String rowName) {
-                return cuts;
-            }
-        });
+    public ExcelToJsonAdapterV1(String outDir, String simpleFileName, final String cuts) {
+        this(outDir, simpleFileName, new MusicCutProvider.DefaultMusicCutProvider(cuts));
     }
-
     /**
      * create excel to json adapter
      * <p>this just used for test.</p>
@@ -65,10 +53,23 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
      * @param simpleFileName the out json file name
      * @param provider       the cuts provider
      */
-    public ExcelToJsonAdapter(String outDir, String simpleFileName, MusicCutProvider provider) {
+    public ExcelToJsonAdapterV1(String outDir, String simpleFileName, MusicCutProvider provider) {
+        this(outDir, simpleFileName, provider, new IndexDelegate());
+    }
+    /**
+     * create excel to json adapter
+     * <p>this just used for test.</p>
+     *
+     * @param outDir
+     * @param simpleFileName the out json file name
+     * @param provider       the cuts provider
+     */
+    protected ExcelToJsonAdapterV1(String outDir, String simpleFileName, MusicCutProvider provider, IndexDelegate indexDelegate) {
+        super();
         this.outDir = outDir;
         this.simpleFileName = simpleFileName;
         this.cutProvider = provider;
+        this.mIndexDelegate = indexDelegate;
     }
 
     public List<Float> getCuts(String rowName) {
@@ -96,19 +97,13 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         final List<MusicItem> expectItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
             @Override
             public MusicItem visit(ExcelRow row, Object param) {
+                if(filter(row)){
+                    return null;
+                }
                 List<ExcelCol> columns = row.getColumns();
-                String value = columns.get(INDEX_NAME).getColumnString();
-                String value2 = columns.get(INDEX_DOMAIN).getColumnString();
-                if (value == null || value.length() == 0) {
-                    return null; //filter
-                }
-                if (value2 == null || value2.length() == 0) {
-                    return null; //filter
-                }
-
 
                 MusicItem item = new MusicItem();
-                item.setName(columns.get(INDEX_NAME).getColumnString());
+                item.setName(columns.get(mIndexDelegate.getNameIndex()).getColumnString());
                 List<Float> cuts = getCuts(item.getName());
                 //ignore
                 if (cuts == null) {
@@ -118,20 +113,25 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
 
                 item.setTimes(cuts);
                 item.setLineNumber(row.getRowIndex() + 1);
-                item.setDomains(parseDomain(columns.get(INDEX_DOMAIN).getColumnString()));
-                item.setProperty(parseMood(columns.get(INDEX_MOOD).getColumnString()));
-                item.setRhythm(parseRhythm(columns.get(INDEX_RHYTHM).getColumnString()));
-                item.setSlow_speed_areas(parseTimeAreas(item.getName(), columns.get(INDEX_SLOW_SPEED_AREAS).getColumnString(), areas));
-                item.setMiddle_speed_areas(parseTimeAreas(item.getName(), columns.get(INDEX_MIDDLE_SPEED_AREAS).getColumnString(), areas));
-                item.setHigh_speed_areas(parseTimeAreas(item.getName(), columns.get(INDEX_HIGH_SPEED_AREAS).getColumnString(),areas));
+                item.setDomains(parseDomain(columns.get(mIndexDelegate.getDomainIndex()).getColumnString()));
+                item.setProperty(parseMood(columns.get(mIndexDelegate.getMoodIndex()).getColumnString()));
+                item.setRhythm(parseRhythm(columns.get(mIndexDelegate.getRhythmIndex()).getColumnString()));
                 item.setId(item.getName());
+
+                if(!(cutProvider instanceof SpeedMusicCutProvider) ||
+                        !((SpeedMusicCutProvider) cutProvider).fillSpeedAreasForMusicItem(item.getName(), item)){
+                    item.setSlow_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
+                    item.setMiddle_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getMiddleSpeedIndex()).getColumnString(), areas));
+                    item.setHigh_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getHighSpeedIndex()).getColumnString(),areas));
+                    //old need mapping
+                    writeMappingFile(item, areas);
+                    //old need check
+                    ErrorVerifier.check(item, cuts.get(cuts.size() - 1), sb_warn);
+                }
                 //check
                 if (item.isAllAreaEmpty()) {
                     return null;
                 }
-                writeMappingFile(item, areas);
-                //check
-                ErrorVerifier.check(item, cuts.get(cuts.size() - 1), sb_warn);
                 return item;
             }
         }).getAsList();
@@ -154,81 +154,57 @@ public class ExcelToJsonAdapter extends ExcelDataServiceAdapter {
         }).getAsList();
 
         //part outputs
-        VisitServices.from(Configs.getAllParts()).fire(new FireVisitor<PartOutput>() {
-            @Override
-            public Boolean visit(PartOutput part, Object param) {
-                List<String> list = VisitServices.from(part.collect(musicItems))
-                        .map(new ResultVisitor<MusicItem, String>() {
-                            @Override
-                            public String visit(MusicItem item, Object param) {
-                                return item.getId();
-                            }
-                        }).getAsList();
-                if (list.isEmpty()) {
-                    System.out.println("no items for '"+ part.getFormatFilename() + ".json'");
-                    return false;
-                }
-                String partPath = outDir + File.separator + part.getFormatFilename() + ".json";
-                FileUtils.writeTo(partPath, mGson.toJson(list));
-                return null;
-            }
-        });
-
+        mMusicOutDelegate.writePart(outDir, musicItems);
         //total
-        String json = mGson.toJson(musicItems);
-        String outJsonFile = outDir + File.separator + simpleFileName + ".json";
-        FileUtils.writeTo(outJsonFile, json);
+        mMusicOutDelegate.writeTotal(outDir, simpleFileName, musicItems);
         //warn
-        String warnPath = outDir + File.separator + simpleFileName + "_warn.txt";
-        FileUtils.writeTo(warnPath, sb_warn.toString());
+        mMusicOutDelegate.writeWarn(outDir, simpleFileName, sb_warn.toString());
         //one music-> one json
-        VisitServices.from(musicItems).fire(new FireVisitor<MusicItem>() {
-            @Override
-            public Boolean visit(MusicItem item, Object param) {
-                String path = outDir + File.separator + item.getId() + ".json";
-                FileUtils.writeTo(path, mGson.toJson(item));
-                return null;
-            }
-        });
+        mMusicOutDelegate.writeItem(outDir, musicItems);
         //copy music to one dir
         if(musicInputDir != null){
-            final File out = new File(outDir, "musics");
-            FileUtils.deleteDir(out);
-            out.mkdirs();
-            List<MusicMappingItem> maps = VisitServices.from(musicItems).map(new ResultVisitor<MusicItem, MusicMappingItem>() {
-                @Override
-                public MusicMappingItem visit(MusicItem item, Object param) {
-                    List<Float> times = item.getTimes();
-                    Float val = times.get(times.size() - 1);
-                    File dst = new File(out, item.getId() + "." + FileUtils.getFileExtension(item.getRawFile()));
-                    MusicMappingItem mmi = new MusicMappingItem();
-                    mmi.setMusicName(item.getName());
-                    mmi.setId(item.getId());
-                    mmi.setFullId(dst.getAbsolutePath());
-                    mmi.setFilename(item.getRawFile());
-                    mmi.setDuration(val);
-                    return mmi;
-                }
-            }).fire(new FireVisitor<MusicMappingItem>() {
-                @Override
-                public Boolean visit(MusicMappingItem mmi, Object param) {
-                    FileUtils.copyFile(new File(mmi.getFilename()), new File(mmi.getFullId()));
-                    return null;
-                }
-            }).getAsList();
-            final File file_mapping = new File(outDir, "name_id_mapping.txt");
-            FileUtils.writeTo(file_mapping, mGson.toJson(maps));
+            mMusicOutDelegate.copyValidMusics(outDir, musicItems);
         }
         return t.size();
+    }
+
+    public void setMusicOutDelegate(MusicOutDelegate delegate) {
+        this.mMusicOutDelegate = delegate;
+    }
+
+    protected IndexDelegate getIndexDelegate(){
+        return mIndexDelegate;
     }
 
     public void setInputMusicDir(String musicDir) {
         this.musicInputDir = musicDir;
     }
 
+    /** return true, if filtered */
+    protected boolean filter(ExcelRow row){
+        List<ExcelCol> columns = row.getColumns();
+        String name = columns.get(mIndexDelegate.getNameIndex()).getColumnString();
+        String domain = columns.get(mIndexDelegate.getDomainIndex()).getColumnString();
+        String mood = columns.get(mIndexDelegate.getMoodIndex()).getColumnString();
+        String rhythm = columns.get(mIndexDelegate.getRhythmIndex()).getColumnString();
+        if(name == null || name.trim().isEmpty()){
+            return true;
+        }
+        if(domain == null || domain.trim().isEmpty()){
+            return true;
+        }
+        if(mood == null || mood.trim().isEmpty()){
+            return true;
+        }
+        if(rhythm == null || rhythm.trim().isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
     private void writeMappingFile(MusicItem item, List<TimeArea> areas) {
         //write mapping
-        String outFile = outDir + File.separator + item.getId() + "___mapping.txt";
+        String outFile = outDir + File.separator + item.getName() + "___mapping.txt";
         StringBuilder sb_mapping = new StringBuilder();
         Collections.sort(areas);
         for (TimeArea ta : areas){

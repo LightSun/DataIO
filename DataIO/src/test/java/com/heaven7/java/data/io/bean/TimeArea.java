@@ -1,4 +1,4 @@
-package com.heaven7.java.data.io.music;
+package com.heaven7.java.data.io.bean;
 
 import java.util.Arrays;
 import java.util.List;

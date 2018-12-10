@@ -1,4 +1,4 @@
-package com.heaven7.java.data.io.music;
+package com.heaven7.java.data.io.music.scan;
 
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.data.io.poi.ExcelCol;
@@ -11,13 +11,12 @@ import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author heaven7
  */
-public class FilterMusicCutScanner extends MusicCutScanner{
+public class FilterMusicCutScanner extends MusicCutScanner {
 
     private static final String TAG = "FilterMusicCutScanner";
     private final List<Item> mDoneItems = new ArrayList<>();

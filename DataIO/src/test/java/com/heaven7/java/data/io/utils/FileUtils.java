@@ -46,6 +46,14 @@ public class FileUtils {
         return getFileName(path);
     }
 
+    public static String getLastPath(String path){
+        int index = path.lastIndexOf("/");
+        if(index == -1){
+            index = path.lastIndexOf("\\");
+        }
+        return path.substring(0, index);
+    }
+
     /**
      * 视频文件的关键目录 为2级目录模式,比如:
      empty/dinner/xxx.mp4 , empty/white/xxx2.mp4.

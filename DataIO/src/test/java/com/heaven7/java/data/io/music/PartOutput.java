@@ -15,11 +15,17 @@ public abstract class PartOutput {
 
     public abstract int getPartProperty();
 
-    public String getFormatFilename(){
+    public abstract int getPartRhythm(); //节奏
+
+/*    public String getFormatFilename(){
         return getPartDomain() + "_music_" + getPartProperty();
+    }*/
+
+    public String getFormatFilename(){
+        return getPartDomain() + "_music_" + getPartRhythm();
     }
 
-    public final List<MusicItem> collect(List<MusicItem> rawItems){
+    public final List<MusicItem> collectDomainWithProperty(List<MusicItem> rawItems){
         List<MusicItem> matchItems = new ArrayList<>();
         String domain = getPartDomain();
         int property = getPartProperty();
@@ -30,14 +36,27 @@ public abstract class PartOutput {
         }
         return matchItems;
     }
+    public final List<MusicItem> collectDomainWithRhythm(List<MusicItem> rawItems){
+        List<MusicItem> matchItems = new ArrayList<>();
+        String domain = getPartDomain();
+        int rhythm = getPartRhythm();
+        for(MusicItem item : rawItems){
+            if(item.getDomains().contains(domain) && item.getRhythm() == rhythm){
+                matchItems.add(item);
+            }
+        }
+        return matchItems;
+    }
 
     public static class SimplePartOutput extends PartOutput{
          private String domain;
          private int property;
+         private int rhythm;
 
-        public SimplePartOutput(String domain, int property) {
+        public SimplePartOutput(String domain, int property, int rhythm) {
             this.domain = domain;
             this.property = property;
+            this.rhythm = rhythm;
         }
         @Override
         public String getPartDomain() {
@@ -46,6 +65,10 @@ public abstract class PartOutput {
         @Override
         public int getPartProperty() {
             return property;
+        }
+        @Override
+        public int getPartRhythm() {
+            return rhythm;
         }
     }
 }

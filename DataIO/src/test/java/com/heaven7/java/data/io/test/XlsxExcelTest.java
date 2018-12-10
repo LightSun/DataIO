@@ -1,6 +1,6 @@
 package com.heaven7.java.data.io.test;
 
-import com.heaven7.java.data.io.music.ExcelToJsonAdapter;
+import com.heaven7.java.data.io.music.adapter.ExcelToJsonAdapterV1;
 import com.heaven7.java.data.io.poi.ExcelDataServiceAdapter;
 import com.heaven7.java.data.io.poi.ExcelHelper;
 import com.heaven7.java.data.io.poi.ExcelRow;
@@ -112,7 +112,7 @@ public void testReadAndWriteToJson(){
                         + "190.369000,"
                         + "193.387000,"
                         + "195.600000";
-    ExcelToJsonAdapter adapter = new ExcelToJsonAdapter(outDir, "music2",cuts);
+    ExcelToJsonAdapterV1 adapter = new ExcelToJsonAdapterV1(outDir, "music2",cuts);
     new ExcelHelper.Builder()
                 .setUseXlsx(true)
                 .setSheetIndex(0)

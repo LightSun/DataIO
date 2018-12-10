@@ -43,15 +43,25 @@ public class Configs {
         }).getAsList();
     }
     public static int parseMood(String str) {
-        return sMood_map.get(str);
+        try {
+            return sMood_map.get(str);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
     public static List<PartOutput> getAllParts(){
         List<PartOutput> out = new ArrayList<>();
         Collection<String> domains = sDomain_map.values();
         Collection<Integer> properties = sMood_map.values();
+        Collection<Integer> rhythms = sRhythm_map.values();
         for(String domain : domains){
-            for (Integer prop : properties){
-                out.add(new PartOutput.SimplePartOutput(domain, prop));
+           /* for (Integer prop : properties){
+                for (Integer rhythm : rhythms){
+                    out.add(new PartOutput.SimplePartOutput(domain, prop, rhythm));
+                }
+            }*/
+            for (Integer rhythm : rhythms){
+                out.add(new PartOutput.SimplePartOutput(domain, -1, rhythm));
             }
         }
         return out;
