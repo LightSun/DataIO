@@ -111,12 +111,20 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
                 }
                 List<TimeArea> areas = new ArrayList<>();
 
+                if(item.getName().equals("346_short3_rose-burn_0061_preview")){
+                    System.out.println();
+                }
+
                 item.setTimes(cuts);
                 item.setLineNumber(row.getRowIndex() + 1);
                 item.setDomains(parseDomain(columns.get(mIndexDelegate.getDomainIndex()).getColumnString()));
                 item.setProperty(parseMood(columns.get(mIndexDelegate.getMoodIndex()).getColumnString()));
                 item.setRhythm(parseRhythm(columns.get(mIndexDelegate.getRhythmIndex()).getColumnString()));
                 item.setId(item.getName());
+
+                if(item.getName().equals("346_short3_rose-burn_0061_preview")){
+                    System.out.println();
+                }
 
                 if(!(cutProvider instanceof SpeedMusicCutProvider) ||
                         !((SpeedMusicCutProvider) cutProvider).fillSpeedAreasForMusicItem(item.getName(), item)){

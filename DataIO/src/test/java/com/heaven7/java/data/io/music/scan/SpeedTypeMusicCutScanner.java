@@ -47,7 +47,7 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                     line1.setCut(cut);
                     if(index >= 0) {
                         String str = line.substring(index + 1).trim();
-                        boolean handledSpeed = true;
+                        boolean handledSpeed = false;
                         if (str.startsWith("{")) {
                             index = str.indexOf("}");
                             String mark = str.substring(str.indexOf("{") + 1, index);
@@ -55,18 +55,18 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                             switch (mark) {
                                 case "低":
                                     line1.setSpeedType(CutConfigBeanV2.SPEED_TYPE_SLOW);
+                                    handledSpeed = true;
                                     break;
 
                                 case "中":
                                     line1.setSpeedType(CutConfigBeanV2.SPEED_TYPE_MIDDLE);
+                                    handledSpeed = true;
                                     break;
 
                                 case "高":
                                     line1.setSpeedType(CutConfigBeanV2.SPEED_TYPE_HIGH);
+                                    handledSpeed = true;
                                     break;
-
-                                default:
-                                    handledSpeed = false;
                             }
                         }
                         if(handledSpeed){
