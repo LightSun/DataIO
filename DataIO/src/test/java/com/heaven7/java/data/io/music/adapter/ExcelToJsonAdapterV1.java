@@ -72,25 +72,6 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         this.mIndexDelegate = indexDelegate;
     }
 
-    public List<Float> getCuts(String rowName) {
-        List<Float> cuts = cutMap.get(rowName);
-        if (cuts == null) {
-            String cutStr = cutProvider.getCuts(rowName);
-            if (cutStr == null) {
-                return null;
-            }
-            cuts = VisitServices.from(Arrays.asList(cutStr.split(",")))
-                    .map(new ResultVisitor<String, Float>() {
-                        @Override
-                        public Float visit(String s, Object param) {
-                            return Float.valueOf(s);
-                        }
-                    }).getAsList();
-            cutMap.put(rowName, cuts);
-        }
-        return cuts;
-    }
-
     @Override
     public int insertBatch(final List<ExcelRow> t) {
         final StringBuilder sb_warn = new StringBuilder();
@@ -103,34 +84,23 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
                 List<ExcelCol> columns = row.getColumns();
 
                 MusicItem item = new MusicItem();
-                item.setName(columns.get(mIndexDelegate.getNameIndex()).getColumnString());
-                List<Float> cuts = getCuts(item.getName());
+                //parse base
+                parseBaseInfo(columns, item);
+                item.setLineNumber(row.getRowIndex() + 1);
+                item.setId(item.getName());
+                List<Float> cuts = getCuts(item);
                 //ignore
                 if (cuts == null) {
                     return null;
                 }
-                List<TimeArea> areas = new ArrayList<>();
-
-                if(item.getName().equals("346_short3_rose-burn_0061_preview")){
-                    System.out.println();
-                }
-
                 item.setTimes(cuts);
-                item.setLineNumber(row.getRowIndex() + 1);
-                item.setDomains(parseDomain(columns.get(mIndexDelegate.getDomainIndex()).getColumnString()));
-                item.setProperty(parseMood(columns.get(mIndexDelegate.getMoodIndex()).getColumnString()));
-                item.setRhythm(parseRhythm(columns.get(mIndexDelegate.getRhythmIndex()).getColumnString()));
-                item.setId(item.getName());
-
-                if(item.getName().equals("346_short3_rose-burn_0061_preview")){
-                    System.out.println();
-                }
 
                 if(!(cutProvider instanceof SpeedMusicCutProvider) ||
                         !((SpeedMusicCutProvider) cutProvider).fillSpeedAreasForMusicItem(item.getName(), item)){
-                    item.setSlow_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
-                    item.setMiddle_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getMiddleSpeedIndex()).getColumnString(), areas));
-                    item.setHigh_speed_areas(parseTimeAreas(item.getName(), columns.get(mIndexDelegate.getHighSpeedIndex()).getColumnString(),areas));
+                    List<TimeArea> areas = new ArrayList<>();
+                    item.setSlow_speed_areas(parseTimeAreas(item, columns.get(mIndexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
+                    item.setMiddle_speed_areas(parseTimeAreas(item, columns.get(mIndexDelegate.getMiddleSpeedIndex()).getColumnString(), areas));
+                    item.setHigh_speed_areas(parseTimeAreas(item, columns.get(mIndexDelegate.getHighSpeedIndex()).getColumnString(),areas));
                     //old need mapping
                     writeMappingFile(item, areas);
                     //old need check
@@ -188,6 +158,63 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         this.musicInputDir = musicDir;
     }
 
+    /**
+     * get cuts from an item. which contains the base info
+     * @param item the music item
+     * @return the cuts.
+     */
+    private List<Float> getCuts(MusicItem item) {
+        String key = getKey(item);
+        List<Float> cuts = cutMap.get(key);
+        if (cuts == null) {
+            //String cutStr = cutProvider.getCuts(item.getName());
+            String cutStr = getCuts(item, cutProvider);
+            if (cutStr == null) {
+                return null;
+            }
+            cuts = VisitServices.from(Arrays.asList(cutStr.split(",")))
+                    .map(new ResultVisitor<String, Float>() {
+                        @Override
+                        public Float visit(String s, Object param) {
+                            return Float.valueOf(s);
+                        }
+                    }).getAsList();
+            cutMap.put(key, cuts);
+        }
+        return cuts;
+    }
+
+    /**
+     * get the key to save cut info . which used for cache
+     * @param item the music item
+     * @return the key of save cut info
+     */
+    protected String getKey(MusicItem item){
+        return item.getName();
+    }
+
+    /**
+     * get the cuts from item and cut provider
+     * @param item the music item
+     * @param provider the cut provider
+     * @return the cuts . such as "1,2,3,4"
+     */
+    protected String getCuts(MusicItem item, MusicCutProvider provider){
+        return provider.getCuts(item.getName());
+    }
+
+    /**
+     * parse the base infos from columns.
+     * @param columns the columns
+     * @param item the music item
+     */
+    protected void parseBaseInfo(List<ExcelCol> columns, MusicItem item){
+        item.setName(columns.get(mIndexDelegate.getNameIndex()).getColumnString());
+        item.setDomains(parseDomain(columns.get(mIndexDelegate.getDomainIndex()).getColumnString()));
+        item.setProperty(parseMood(columns.get(mIndexDelegate.getMoodIndex()).getColumnString()));
+        item.setRhythm(parseRhythm(columns.get(mIndexDelegate.getRhythmIndex()).getColumnString()));
+    }
+
     /** return true, if filtered */
     protected boolean filter(ExcelRow row){
         List<ExcelCol> columns = row.getColumns();
@@ -221,7 +248,7 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         FileUtils.writeTo(outFile, sb_mapping.toString());
     }
 
-    private List<List<Float>> parseTimeAreas(final String rowName, String str, final List<TimeArea> tas) {
+    private List<List<Float>> parseTimeAreas(final MusicItem item, String str, final List<TimeArea> tas) {
         if (str == null || str.length() == 0) {
             return null;
         }
@@ -229,27 +256,14 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, List<Float>>() {
             @Override
             public List<Float> visit(String s, Object param) {
-                TimeArea timeArea = parseTimeArea(rowName, s);
+                TimeArea timeArea = parseTimeArea(item, s);
                 tas.add(timeArea);
                 return timeArea.asList();
             }
         }).getAsList();
     }
 
-    private float findNearest(String rowName, float src) {
-        float delta = Float.MAX_VALUE;
-        float nearest = src;
-        for (Float val : getCuts(rowName)) {
-            float del = Math.abs(val - src);
-            if (del < delta) {
-                delta = del;
-                nearest = val;
-            }
-        }
-        return nearest;
-    }
-
-    private TimeArea parseTimeArea(String rowName, String str) {
+    private TimeArea parseTimeArea(final MusicItem item, String str) {
         if (!str.contains("-")) {
             throw new IllegalStateException(str);
         }
@@ -257,11 +271,24 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         float start = parseFloatTime(ss[0]);
         float end = parseFloatTime(ss[1]);
         TimeArea ta = new TimeArea();
-        ta.setBegin(findNearest(rowName, start));
-        ta.setEnd(findNearest(rowName, end));
+        ta.setBegin(findNearest(item, start));
+        ta.setEnd(findNearest(item, end));
         ta.setRawBegin(ss[0]);
         ta.setRawEnd(ss[1]);
         return ta;
+    }
+
+    private float findNearest(MusicItem item, float src) {
+        float delta = Float.MAX_VALUE;
+        float nearest = src;
+        for (Float val : getCuts(item)) {
+            float del = Math.abs(val - src);
+            if (del < delta) {
+                delta = del;
+                nearest = val;
+            }
+        }
+        return nearest;
     }
 
     private static float parseFloatTime(String s) {

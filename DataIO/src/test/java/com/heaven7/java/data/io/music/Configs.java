@@ -52,16 +52,14 @@ public class Configs {
     public static List<PartOutput> getAllParts(){
         List<PartOutput> out = new ArrayList<>();
         Collection<String> domains = sDomain_map.values();
-        Collection<Integer> properties = sMood_map.values();
+       // Collection<Integer> properties = sMood_map.values();
         Collection<Integer> rhythms = sRhythm_map.values();
+        List<Integer> durations = Arrays.asList(10, 60); //10s, 60s
         for(String domain : domains){
-           /* for (Integer prop : properties){
-                for (Integer rhythm : rhythms){
-                    out.add(new PartOutput.SimplePartOutput(domain, prop, rhythm));
-                }
-            }*/
             for (Integer rhythm : rhythms){
-                out.add(new PartOutput.SimplePartOutput(domain, -1, rhythm));
+                for (Integer duration : durations){
+                    out.add(new PartOutput.SimplePartOutput(domain, -1, rhythm, duration));
+                }
             }
         }
         return out;

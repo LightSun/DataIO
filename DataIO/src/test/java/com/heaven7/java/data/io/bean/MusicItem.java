@@ -19,6 +19,9 @@ public class MusicItem {
     private List<String> domains;
 
     @Expose
+    private int duration; //in seconds
+
+    @Expose
     private List<Float> times;
     @Expose
     @SerializedName("property")
@@ -33,10 +36,19 @@ public class MusicItem {
     @Expose
     private List<List<Float>> high_speed_areas;
 
+    //----------------------------------------------------
+
     @Expose(serialize = false, deserialize = false)
     private int rowIndex;
     @Expose(serialize = false)
     private String filePath;
+
+    public int getDuration() {
+        return duration;
+    }
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
     public String getId() {
         return id;
@@ -126,5 +138,9 @@ public class MusicItem {
     }
     public String getRawFile(){
         return filePath;
+    }
+
+    public String getUniqueKey(){
+        return getName() + ": " + getDuration();
     }
 }

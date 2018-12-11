@@ -1,7 +1,12 @@
 package com.heaven7.java.data.io.music.adapter;
 
+import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.music.provider.MusicCutProvider;
+import com.heaven7.java.data.io.music.provider.SpeedMusicCutProvider;
+import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
+
+import java.util.List;
 
 /**
  * @author heaven7
@@ -28,5 +33,27 @@ public class ExcelToJsonAdapterV2 extends ExcelToJsonAdapterV1 {
             return true;
         }
         return false;
+    }
+
+    protected void parseBaseInfo(List<ExcelCol> columns, MusicItem item){
+        super.parseBaseInfo(columns, item);
+        IndexDelegateV2 indexDelegate = (IndexDelegateV2) getIndexDelegate();
+        String str = columns.get(indexDelegate.getDurationIndex()).getColumnString().trim();
+        if(str.endsWith("s")){
+            str = str.substring(0, str.length() -1);
+        }
+        item.setDuration(Integer.parseInt(str));
+    }
+
+    @Override
+    protected String getKey(MusicItem item) {
+        return item.getUniqueKey();
+    }
+    @Override
+    protected String getCuts(MusicItem item, MusicCutProvider provider) {
+        if(!(provider instanceof SpeedMusicCutProvider)){
+            throw new IllegalStateException();
+        }
+        return ((SpeedMusicCutProvider) provider).getCuts(item);
     }
 }

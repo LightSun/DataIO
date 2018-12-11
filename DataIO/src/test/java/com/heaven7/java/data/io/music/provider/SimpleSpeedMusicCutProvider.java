@@ -4,6 +4,7 @@ import com.heaven7.java.data.io.bean.CutConfigBeanV2;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.visitor.FireMultiVisitor2;
 import com.heaven7.java.visitor.MapFireVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.SparseArray;
@@ -23,7 +24,7 @@ public class SimpleSpeedMusicCutProvider extends MusicCutProviderV2 implements S
 
     @Override
     public boolean fillSpeedAreasForMusicItem(final String rowName, final MusicItem item) {
-        CutConfigBeanV2.CutItem cutItem = mBean.getCutItem(rowName);
+        CutConfigBeanV2.CutItem cutItem = mBean.getCutItem(item.getName(), item.getDuration());
         final SparseArray<List<List<Float>>> map = new SparseArray<>();
         VisitServices.from(cutItem.getCutLines()).fireMulti2(2, 1, null,
                 new FireMultiVisitor2<CutConfigBeanV2.CutLine>() {
@@ -62,6 +63,21 @@ public class SimpleSpeedMusicCutProvider extends MusicCutProviderV2 implements S
             }
         });
         return true;
+    }
+
+    @Override
+    public String getCuts(MusicItem item) {
+        CutConfigBeanV2.CutItem cutItem = mBean.getCutItem(item.getName(), item.getDuration());
+        if(cutItem == null){
+            return null;
+        }
+        return VisitServices.from(cutItem.getCutLines()).map(
+                new ResultVisitor<CutConfigBeanV2.CutLine, Float>() {
+            @Override
+            public Float visit(CutConfigBeanV2.CutLine cutLine, Object param) {
+                return cutLine.getCut();
+            }
+        }).asListService().joinToString(",");
     }
 
     private void addSpeedArea(SparseArray<List<List<Float>>> map,int speedType, float cut1, float cut2) {

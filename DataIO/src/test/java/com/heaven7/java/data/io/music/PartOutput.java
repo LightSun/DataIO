@@ -17,31 +17,20 @@ public abstract class PartOutput {
 
     public abstract int getPartRhythm(); //节奏
 
-/*    public String getFormatFilename(){
-        return getPartDomain() + "_music_" + getPartProperty();
-    }*/
+    public abstract int getDuration();   //时长
 
     public String getFormatFilename(){
-        return getPartDomain() + "_music_" + getPartRhythm();
+        return getPartDomain() + "_music_" + getPartRhythm() + "_" + getDuration() + "s";
     }
 
-    public final List<MusicItem> collectDomainWithProperty(List<MusicItem> rawItems){
-        List<MusicItem> matchItems = new ArrayList<>();
-        String domain = getPartDomain();
-        int property = getPartProperty();
-        for(MusicItem item : rawItems){
-            if(item.getDomains().contains(domain) && item.getProperty() == property){
-                matchItems.add(item);
-            }
-        }
-        return matchItems;
-    }
     public final List<MusicItem> collectDomainWithRhythm(List<MusicItem> rawItems){
         List<MusicItem> matchItems = new ArrayList<>();
         String domain = getPartDomain();
         int rhythm = getPartRhythm();
+        int duration = getDuration();
         for(MusicItem item : rawItems){
-            if(item.getDomains().contains(domain) && item.getRhythm() == rhythm){
+            if(item.getDomains().contains(domain) && item.getRhythm() == rhythm
+                    && item.getDuration() == duration){
                 matchItems.add(item);
             }
         }
@@ -52,11 +41,13 @@ public abstract class PartOutput {
          private String domain;
          private int property;
          private int rhythm;
+         private int duration;
 
-        public SimplePartOutput(String domain, int property, int rhythm) {
+        public SimplePartOutput(String domain, int property, int rhythm, int duration) {
             this.domain = domain;
             this.property = property;
             this.rhythm = rhythm;
+            this.duration = duration;
         }
         @Override
         public String getPartDomain() {
@@ -69,6 +60,10 @@ public abstract class PartOutput {
         @Override
         public int getPartRhythm() {
             return rhythm;
+        }
+        @Override
+        public int getDuration() {
+            return duration;
         }
     }
 }

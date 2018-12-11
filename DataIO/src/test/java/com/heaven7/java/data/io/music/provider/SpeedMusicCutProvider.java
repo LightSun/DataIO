@@ -9,4 +9,11 @@ public interface SpeedMusicCutProvider extends MusicCutProvider {
 
      boolean fillSpeedAreasForMusicItem(String rowName, MusicItem item);
 
+     /**
+      * get cuts from base music item
+      * @param item the music item
+      * @return the cuts
+      */
+     String getCuts(MusicItem item);
+
 }

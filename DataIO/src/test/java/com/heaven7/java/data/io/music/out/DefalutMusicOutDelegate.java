@@ -62,7 +62,8 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         VisitServices.from(items).fire(new FireVisitor<MusicItem>() {
             @Override
             public Boolean visit(MusicItem item, Object param) {
-                String path = outDir + File.separator + item.getId() + ".json";
+                //id_duration
+                String path = outDir + File.separator + getSingleFilename(item) + ".json";
                 FileUtils.writeTo(path, mGson.toJson(item));
                 return null;
             }
@@ -98,5 +99,9 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         //save mapping
         final File file_mapping = new File(outDir, "name_id_mapping.txt");
         FileUtils.writeTo(file_mapping, mGson.toJson(maps));
+    }
+
+    private String getSingleFilename(MusicItem item){
+        return item.getId() + "_" + item.getDuration() + "s";
     }
 }

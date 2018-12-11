@@ -29,6 +29,16 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
 
     @Override
     protected CutConfigBeanV2.CutItem readCutItem(final String csvPath) {
+        String dirName = FileUtils.getFileDir(csvPath, 1, false);
+        if(dirName == null || !dirName.endsWith("s")){
+            throw new IllegalStateException("for version 2. csv path must used duration as direct dir. path like '30s', csvPath = " + csvPath);
+        }
+        final int duration;
+        try{
+            duration = Integer.valueOf(dirName.substring(0, dirName.length() - 1));
+        }catch (NumberFormatException e){
+            throw new IllegalStateException("for version 2. csv path must used duration as direct dir. path like '30s', csvPath = " + csvPath);
+        }
         try {
             String fileName = FileUtils.getFileName(csvPath);
             TextReadHelper<CutConfigBeanV2.CutLine> readHelper = new TextReadHelper<>(
@@ -51,7 +61,11 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                         if (str.startsWith("{")) {
                             index = str.indexOf("}");
                             String mark = str.substring(str.indexOf("{") + 1, index);
-                            mark = mark.split(",")[0];
+                            if(mark.contains(",")) {
+                                mark = mark.split(",")[0];
+                            }else if(mark.contains("-")){
+                                mark = mark.split("-")[0];
+                            }
                             switch (mark) {
                                 case "低":
                                     line1.setSpeedType(CutConfigBeanV2.SPEED_TYPE_SLOW);
@@ -90,6 +104,7 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
             List<CutConfigBeanV2.CutLine> lines = readHelper.read(null, csvPath);
             CutConfigBeanV2.CutItem item = new CutConfigBeanV2.CutItem();
             item.setName(fileName);
+            item.setDuration(duration);
             item.setCutLines(lines);
             return item;
         }catch (Exception e){

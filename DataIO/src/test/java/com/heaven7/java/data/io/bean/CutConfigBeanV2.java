@@ -24,21 +24,29 @@ public class CutConfigBeanV2 {
         this.cutItems = cutItems;
     }
 
-    public CutItem getCutItem(final String rowName) {
+    public CutItem getCutItem(final String rowName, final int duration) {
         if(cutItems == null){
             return null;
         }
         return VisitServices.from(cutItems).query(new PredicateVisitor<CutItem>() {
             @Override
             public Boolean visit(CutItem cutItem, Object param) {
-                return rowName.equals(cutItem.getName());
+                return rowName.equals(cutItem.getName()) && duration == cutItem.getDuration();
             }
         });
     }
 
     public static class CutItem{
         private String name;
+        private int duration;
         private List<CutLine> cutLines;
+
+        public int getDuration() {
+            return duration;
+        }
+        public void setDuration(int duration) {
+            this.duration = duration;
+        }
 
         public String getName() {
             return name;

@@ -20,17 +20,7 @@ public class MusicCutProviderV2 implements MusicCutProvider {
     }
     @Override
     public String getCuts(String rowName) {
-        CutConfigBeanV2.CutItem item = mBean.getCutItem(rowName);
-        if(item == null){
-            System.err.println("cant find cuts for row name = " + rowName);
-            return null;
-        }
-        return VisitServices.from(item.getCutLines()).map(new ResultVisitor<CutConfigBeanV2.CutLine, Float>() {
-            @Override
-            public Float visit(CutConfigBeanV2.CutLine cutLine, Object param) {
-                return cutLine.getCut();
-            }
-        }).asListService().joinToString(",");
+        throw new UnsupportedOperationException();
     }
 
 }

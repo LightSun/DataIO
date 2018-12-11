@@ -12,6 +12,7 @@ public interface MusicCutProvider {
      */
     String getCuts(String rowName);
 
+
     class DefaultMusicCutProvider implements MusicCutProvider{
 
         private final String cuts;
