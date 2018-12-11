@@ -11,6 +11,7 @@ import com.heaven7.java.data.io.utils.FileUtils;
 public abstract class ExcelToJsonBridge {
 
     private final Parameters mParam;
+    private MusicOutDelegate mMusicOutDelegate;
 
     public ExcelToJsonBridge(String[] args) {
         this.mParam = new Parameters(args);
@@ -19,15 +20,21 @@ public abstract class ExcelToJsonBridge {
         this.mParam = mParam;
     }
 
+    public void setMusicOutDelegate(MusicOutDelegate outDelegate) {
+        this.mMusicOutDelegate = outDelegate;
+    }
+    public MusicOutDelegate getMusicOutDelegate(){
+        return mMusicOutDelegate;
+    }
+
     public Parameters getParameters() {
         return mParam;
     }
 
     public void execute() {
-        execute(new DefalutMusicOutDelegate());
-    }
-
-    public void execute(MusicOutDelegate delegate) {
+        if(mMusicOutDelegate == null){
+            mMusicOutDelegate = new DefalutMusicOutDelegate();
+        }
         ExcelHelper.Builder builder = new ExcelHelper.Builder()
                 .setUseXlsx("xlsx".equals(mParam.extension))
                 .setExcelPath(mParam.excelPath)
@@ -39,7 +46,7 @@ public abstract class ExcelToJsonBridge {
             builder.setSheetName(mParam.sheet_param);
         }
 
-        launchBridge(builder.build(), delegate, mParam);
+        launchBridge(builder.build(), mMusicOutDelegate, mParam);
 
         // ExcelToJsonAdapter adapter = new ExcelToJsonAdapter(outDir, filename, new MusicCutProviderV2(cutConfigFile));
        /* ExcelToJsonAdapter adapter = new ExcelToJsonAdapter(outDir, filename, new SimpleSpeedMusicCutProvider(cutConfigFile));

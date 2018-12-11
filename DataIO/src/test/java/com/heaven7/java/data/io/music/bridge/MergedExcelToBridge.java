@@ -17,20 +17,26 @@ public class MergedExcelToBridge extends ExcelToJsonBridge {
     public MergedExcelToBridge(String outDir,String simpleFileName, List<ExcelToJsonBridge> bridges) {
         super(new Parameters(outDir, simpleFileName));
         this.bridges = bridges;
+        super.setMusicOutDelegate(new MergedMusicOutDelegate(outDir, simpleFileName));
     }
     public MergedExcelToBridge(String outDir,String simpleFileName, ExcelToJsonBridge... bridges){
         this(outDir, simpleFileName, Arrays.asList(bridges));
     }
 
     @Override
-    public void execute(MusicOutDelegate delegate) {
-        Parameters param = getParameters();
-        MergedMusicOutDelegate mmod = new MergedMusicOutDelegate(param.outDir, param.filename);
+    public void setMusicOutDelegate(MusicOutDelegate outDelegate) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void execute() {
+        MergedMusicOutDelegate delegate = (MergedMusicOutDelegate) getMusicOutDelegate();
         for (ExcelToJsonBridge bridge : bridges){
-            bridge.execute(mmod);
+            bridge.setMusicOutDelegate(delegate);
+            bridge.execute();
         }
         //final out
-        mmod.mergeOut();
+        delegate.mergeOut();
     }
 
     @Override
