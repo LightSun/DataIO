@@ -1,6 +1,7 @@
 package com.heaven7.java.data.io.music.scan;
 
 import com.google.gson.Gson;
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Platforms;
 import com.heaven7.java.base.util.TextReadHelper;
 import com.heaven7.java.data.io.bean.CutConfigBeanV2;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigBeanV2.CutItem> {
 
+    private static final String TAG = "SpeedMusicCutScanner";
     private final List<String> wrongFormatCsvs = new ArrayList<>();
     private final List<String> wrongInfos = new ArrayList<>();
     private int mLastSpeedType = CutConfigBeanV2.SPEED_TYPE_UNKNOWN;
@@ -81,6 +83,10 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                                     line1.setSpeedType(CutConfigBeanV2.SPEED_TYPE_HIGH);
                                     handledSpeed = true;
                                     break;
+
+                                default:
+                                    Logger.w(TAG, "readCutItem", "wrong line in csv ("+ csvPath
+                                            + "). line : " + line);
                             }
                         }
                         if(handledSpeed){
