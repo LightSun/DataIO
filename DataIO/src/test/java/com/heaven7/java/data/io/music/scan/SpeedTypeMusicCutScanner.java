@@ -78,9 +78,9 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                             }
                             CutConfigBeanV2.CutLine line1 = new CutConfigBeanV2.CutLine();
                             line1.setCut(cut);
+                            boolean handledSpeed = false;
                             if (index >= 0) {
                                 String str = line.substring(index + 1).trim();
-                                boolean handledSpeed = false;
                                 if (str.startsWith("{")) {
                                     index = str.indexOf("}");
                                     String mark = str.substring(str.indexOf("{") + 1, index);
@@ -110,15 +110,9 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                                                     + "). line : " + line);
                                     }
                                 }
-                                if (handledSpeed) {
-                                    mLastSpeedType = line1.getSpeedType();
-                                } else {
-                                    if (mLastSpeedType == CutConfigBeanV2.SPEED_TYPE_UNKNOWN) {
-                                        addWrongInfo(csvPath, "no speed type. at '" + line + "'");
-                                        return null;
-                                    }
-                                    line1.setSpeedType(mLastSpeedType);
-                                }
+                            }
+                            if (handledSpeed) {
+                                mLastSpeedType = line1.getSpeedType();
                             } else {
                                 if (mLastSpeedType == CutConfigBeanV2.SPEED_TYPE_UNKNOWN) {
                                     addWrongInfo(csvPath, "no speed type. at '" + line + "'");
@@ -126,11 +120,15 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                                 }
                                 line1.setSpeedType(mLastSpeedType);
                             }
+
                             speedTypes.add(line1.getSpeedType());
                             return line1;
                         }
                     });
             List<CutConfigBeanV2.CutLine> lines = readHelper.read(null, csvPath);
+            if(lines.isEmpty()){
+                return null;
+            }
             CutConfigBeanV2.CutItem item = new CutConfigBeanV2.CutItem();
             item.setName(fileName);
             item.setDuration(duration);
@@ -162,8 +160,7 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
             String low_count = fileDir + File.separator + "low_count_speed_types.txt";
             listToFile(tooSmallSpeedTypeCsvs, low_count);
             //TODO ignore
-            //writeToFileImpl(targetFilePath, items);
-
+            writeToFileImpl(targetFilePath, items);
         }
     }
 
@@ -198,7 +195,8 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
     public static void main(String[] args) {
         // String dir = "E:\\tmp\\bugfinds\\music_cuts2\\1208\\60s";
         String dir = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\60s";
-        String configPath = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts.txt";
+       // String dir = "E:\\tmp\\bugfinds\\music_cuts2\\1212_2\\60s";
+        String configPath = new File(dir).getParent() + File.separator + "cuts.txt";
         new SpeedTypeMusicCutScanner(dir).serialize(configPath);
     }
 }

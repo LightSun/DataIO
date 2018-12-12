@@ -183,6 +183,11 @@ public class FileUtils {
         if (dst.exists()) {
             dst.delete();
         }
+        //empty
+        if(content == null || content.length() == 0){
+            System.out.println("no content for: " + dst.getAbsolutePath());
+            return;
+        }
         FileWriter fw = null;
         try {
             fw = new FileWriter(dst);

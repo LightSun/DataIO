@@ -102,6 +102,6 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
     }
 
     private String getSingleFilename(MusicItem item){
-        return item.getId() + "_" + item.getDuration() + "s";
+        return item.getId() /*+ "_" + item.getDuration() + "s"*/;
     }
 }

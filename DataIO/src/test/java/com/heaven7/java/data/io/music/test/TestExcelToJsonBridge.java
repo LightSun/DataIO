@@ -34,12 +34,20 @@ public class TestExcelToJsonBridge {
         // E:\tmp\bugfinds\out_music7
         // E:\tmp\bugfinds\music_cuts2\1208\60s
         // 2
-        String[] args = {
+       /* String[] args = {
                 "E:\\tmp\\bugfinds\\music_cuts2\\1208\\music4.xlsx",
                 "music1",
                 "E:\\tmp\\bugfinds\\music_cuts2\\1208\\cuts.txt",
                 "E:\\tmp\\bugfinds\\out_music7",
                 "E:\\tmp\\bugfinds\\music_cuts2\\1208\\60s",
+                "2",
+        };*/
+        String[] args = {
+                "E:\\tmp\\bugfinds\\music5_60s.xlsx",
+                "music5",
+                "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts.txt",
+                "E:\\tmp\\bugfinds\\out_music7",
+                "E:\\tmp\\bugfinds\\music_cuts2\\1212\\60s",
                 "2",
         };
         new ExcelToJsonBridgeV2(args).execute();
