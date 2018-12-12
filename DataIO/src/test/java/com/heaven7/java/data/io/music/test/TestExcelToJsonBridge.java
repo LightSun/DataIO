@@ -26,7 +26,7 @@ public class TestExcelToJsonBridge {
         new ExcelToJsonBridgeV1(args).execute();
     }
 
-    @Test
+    @Test //$excelpath $sheet_name $cut_config_path $outDir $input_music_dir $ship_to_row_index
     public void testV2() {
         //E:\tmp\bugfinds\music_cuts2\1208\music4.xlsx
         // music1
