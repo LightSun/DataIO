@@ -130,7 +130,7 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
                 return null;
             }
             CutConfigBeanV2.CutItem item = new CutConfigBeanV2.CutItem();
-            item.setName(fileName);
+            item.setName(formatMusicName(fileName));
             item.setDuration(duration);
             item.setCutLines(lines);
             if (speedTypes.size() < 2) {
@@ -142,6 +142,10 @@ public class SpeedTypeMusicCutScanner extends AbstractMusicCutScanner<CutConfigB
             new RuntimeException(csvPath, e).printStackTrace();
             return null;
         }
+    }
+
+    protected String formatMusicName(String simpleCsvFilename){
+        return simpleCsvFilename;
     }
 
     @Override

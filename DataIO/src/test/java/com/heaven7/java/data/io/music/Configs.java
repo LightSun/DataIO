@@ -46,7 +46,7 @@ public class Configs {
         try {
             return sMood_map.get(str);
         }catch (Exception e){
-            throw new RuntimeException(e);
+            throw new RuntimeException(str, e);
         }
     }
     public static List<PartOutput> getAllParts(){

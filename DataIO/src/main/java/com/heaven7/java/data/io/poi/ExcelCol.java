@@ -34,6 +34,9 @@ public final class ExcelCol implements Comparable<ExcelCol> {
 	public final Cell getCell() {
 		return cell;
 	}
+	public void setValue(String value){
+		cell.setCellValue(value);
+	}
 	@Override
 	public int compareTo(ExcelCol o) {
 		return Integer.compare(this.getColumnIndex(), o.getColumnIndex());

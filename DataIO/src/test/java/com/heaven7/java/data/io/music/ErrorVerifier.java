@@ -18,11 +18,10 @@ import java.util.List;
 public class ErrorVerifier {
 
     public static void check(MusicItem item, float maxValue, StringBuilder sb_warn){
-        if(item.getName().equalsIgnoreCase("337_full_relativity_0163_preview")){
-            System.out.println();
-        }
-
         List<List<Float>> all = new ArrayList<>();
+        if(all.isEmpty()){
+            return;
+        }
         addIfNotEmpty(item.getSlow_speed_areas(), all);
         addIfNotEmpty(item.getMiddle_speed_areas(), all);
         addIfNotEmpty(item.getHigh_speed_areas(), all);

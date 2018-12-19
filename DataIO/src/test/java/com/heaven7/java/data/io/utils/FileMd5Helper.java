@@ -37,7 +37,7 @@ public class FileMd5Helper {
     }
 
     public static void main(String[] args) {
-        String dir = "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\resource";
+       /* String dir = "D:\\Users\\Administrator\\AppData\\Local\\Temp\\media_files\\resource";
         List<String> files = FileUtils.getFiles(new File(dir), "mp4");
         String md5s = VisitServices.from(files).map(new ResultVisitor<String, String>() {
             @Override
@@ -45,7 +45,9 @@ public class FileMd5Helper {
                 return getMD5Three(s);
             }
         }).asListService().joinToString(",");
-        System.out.println(md5s);
+        System.out.println(md5s);*/
 
+        String file = "C:\\Users\\Administrator\\Documents\\WeChat Files\\studyheaven7\\Files\\12_short3_four-leaf-clover_0068.mp3";
+        System.out.println(getMD5Three(file));
     }
 }

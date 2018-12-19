@@ -16,4 +16,6 @@ public interface ExcelOutput {
 	void writeBatch(List<ExcelRow> rows);
 	
 	void write(ExcelRow row);
+
+
 }

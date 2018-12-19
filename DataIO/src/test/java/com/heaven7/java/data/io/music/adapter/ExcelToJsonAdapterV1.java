@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.music.adapter;
 
+import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.bean.TimeArea;
 import com.heaven7.java.data.io.music.ErrorVerifier;
@@ -25,6 +26,7 @@ import static com.heaven7.java.data.io.music.Configs.*;
  */
 public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
 
+    protected final String TAG = getClass().getSimpleName();
     private final String simpleFileName;
     private final String outDir;
     private String musicInputDir;
@@ -78,10 +80,11 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         final List<MusicItem> expectItems = VisitServices.from(t).map(new ResultVisitor<ExcelRow, MusicItem>() {
             @Override
             public MusicItem visit(ExcelRow row, Object param) {
+                List<ExcelCol> columns = row.getColumns();
                 if(filter(row)){
+                    log(columns, "filter(row)", "line number = " + (row.getRowIndex() + 1));
                     return null;
                 }
-                List<ExcelCol> columns = row.getColumns();
 
                 MusicItem item = new MusicItem();
                 //parse base
@@ -91,11 +94,13 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
                 List<Float> cuts = getCuts(item);
                 //ignore
                 if (cuts == null) {
+                    log(columns, "no cuts", "line number = " + (row.getRowIndex() + 1)
+                            + " ,music name = " + item.getName());
                     return null;
                 }
                 item.setTimes(cuts);
 
-                if(!(cutProvider instanceof SpeedMusicCutProvider) ||
+                if(fillSpeedAreasByOld() || !(cutProvider instanceof SpeedMusicCutProvider) ||
                         !((SpeedMusicCutProvider) cutProvider).fillSpeedAreasForMusicItem(item.getName(), item)){
                     List<TimeArea> areas = new ArrayList<>();
                     item.setSlow_speed_areas(parseTimeAreas(item, columns.get(mIndexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
@@ -108,6 +113,7 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
                 }
                 //check
                 if (item.isAllAreaEmpty()) {
+                    log(columns,  "isAllAreaEmpty()", "line number = " + (row.getRowIndex() + 1));
                     return null;
                 }
                 return item;
@@ -118,16 +124,11 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         final List<MusicItem> musicItems = VisitServices.from(expectItems).filter(new PredicateVisitor<MusicItem>() {
             @Override
             public Boolean visit(MusicItem item, Object param) {
-                String name = item.getName();
-                for(String mp3 : mp3s){
-                    if(FileUtils.getFileName(mp3).equals(name)){
-                        item.setId(FileMd5Helper.getMD5Three(mp3));
-                        item.setRawFile(mp3);
-                        return true;
-                    }
+                boolean result = filterMusicItemByMp3(mp3s, item);
+                if(!result){
+                    System.out.println("can't find mp3 file for '"+ item.getName() +"'");
                 }
-                System.out.println("can't find mp3 file for '"+ item.getName() +"'");
-                return false;
+                return result;
             }
         }).getAsList();
 
@@ -182,6 +183,36 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
             cutMap.put(key, cuts);
         }
         return cuts;
+    }
+
+    protected void log(List<ExcelCol> columns, String mTag, String msg){
+        Logger.d(TAG, mTag, msg);
+    }
+
+    /**
+     * fill speed area by old type. V1.
+     * @return true if use old speed area.
+     */
+    protected boolean fillSpeedAreasByOld(){
+        return true;
+    }
+
+    /**
+     * filter the music item by mp3 name.
+     * @param mp3s the mp3 names
+     * @param item the music item
+     * @return true if accept. false otherwise
+     */
+    protected boolean filterMusicItemByMp3(List<String> mp3s, MusicItem item){
+        String name = item.getName();
+        for(String mp3 : mp3s){
+            if(FileUtils.getFileName(mp3).equals(name)){
+                item.setId(FileMd5Helper.getMD5Three(mp3));
+                item.setRawFile(mp3);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -253,28 +284,37 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
             return null;
         }
         String[] strs = str.split(";");
-        return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, List<Float>>() {
-            @Override
-            public List<Float> visit(String s, Object param) {
-                TimeArea timeArea = parseTimeArea(item, s);
-                tas.add(timeArea);
-                return timeArea.asList();
-            }
-        }).getAsList();
+        try {
+            return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, List<Float>>() {
+                @Override
+                public List<Float> visit(String s, Object param) {
+                    TimeArea timeArea = parseTimeArea(item, s);
+                    tas.add(timeArea);
+                    return timeArea.asList();
+                }
+            }).getAsList();
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private TimeArea parseTimeArea(final MusicItem item, String str) {
         if (!str.contains("-")) {
             throw new IllegalStateException(str);
         }
-        String[] ss = str.split("-");
-        float start = parseFloatTime(ss[0]);
-        float end = parseFloatTime(ss[1]);
         TimeArea ta = new TimeArea();
-        ta.setBegin(findNearest(item, start));
-        ta.setEnd(findNearest(item, end));
-        ta.setRawBegin(ss[0]);
-        ta.setRawEnd(ss[1]);
+        try {
+            String[] ss = str.split("-");
+            float start = parseFloatTime(ss[0]);
+            float end = parseFloatTime(ss[1]);
+            ta.setBegin(findNearest(item, start));
+            ta.setEnd(findNearest(item, end));
+            ta.setRawBegin(ss[0]);
+            ta.setRawEnd(ss[1]);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
         return ta;
     }
 

@@ -23,6 +23,11 @@ public class ExcelToJsonAdapterV2 extends ExcelToJsonAdapterV1 {
     }
 
     @Override
+    protected boolean fillSpeedAreasByOld() {
+        return false;
+    }
+
+    @Override
     protected boolean filter(ExcelRow row) {
          if(super.filter(row)){
              return true;
