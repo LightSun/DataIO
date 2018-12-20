@@ -37,6 +37,29 @@ public abstract class PartOutput {
         return matchItems;
     }
 
+    public final List<MusicItem> collectDomain(List<MusicItem> rawItems) {
+        List<MusicItem> matchItems = new ArrayList<>();
+        String domain = getPartDomain();
+        for (MusicItem item : rawItems){
+            if(item.getDomains().contains(domain)){
+                matchItems.add(item);
+            }
+        }
+        return matchItems;
+    }
+
+    public final List<MusicItem> collectPropertyRhythm(List<MusicItem> rawItems) {
+        List<MusicItem> matchItems = new ArrayList<>();
+        int property = getPartProperty();
+        int rhythm = getPartRhythm();
+        for (MusicItem item : rawItems){
+            if(item.getProperty() == property && item.getRhythm() == rhythm){
+                matchItems.add(item);
+            }
+        }
+        return matchItems;
+    }
+
     public static class SimplePartOutput extends PartOutput{
          private String domain;
          private int property;

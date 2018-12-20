@@ -4,15 +4,22 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.bean.MusicMappingItem;
+import com.heaven7.java.data.io.bean.PartConfig;
+import com.heaven7.java.data.io.bean.PartItem;
 import com.heaven7.java.data.io.music.Configs;
 import com.heaven7.java.data.io.music.PartOutput;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author heaven7
@@ -23,6 +30,8 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
 
     @Override
     public void writePart(final String outDir, final List<MusicItem> items) {
+        writeTotalCategories(outDir, items);
+        //old.
         VisitServices.from(Configs.getAllParts()).fire(new FireVisitor<PartOutput>() {
             @Override
             public Boolean visit(PartOutput part, Object param) {
@@ -103,5 +112,63 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
 
     private String getSingleFilename(MusicItem item){
         return item.getId() /*+ "_" + item.getDuration() + "s"*/;
+    }
+
+    private void writeTotalCategories(String outDir, final List<MusicItem> items) {
+        final Map<String, List<PartItem>> configMap = new HashMap<>();
+        PartConfig pc = new PartConfig();
+        pc.setParts(configMap);
+
+        VisitServices.from(Configs.getDomainParts()).fire(new FireVisitor<PartOutput>() {
+            @Override
+            public Boolean visit(final PartOutput part, Object param) {
+                final List<PartItem> pitems = new ArrayList<>();
+                configMap.put(part.getPartDomain(), pitems);
+
+                final List<MusicItem> domainItems = part.collectDomain(items);
+                List<PartOutput> prs = Configs.getPartsOfPropertyRhythm();
+                VisitServices.from(prs).fire(new FireVisitor<PartOutput>() {
+                    @Override
+                    public Boolean visit(final PartOutput part2, Object param) {
+                        //data
+                        PartItem item = new PartItem();
+                        item.setProperty(part2.getPartProperty());
+                        item.setRhythm(part2.getPartRhythm());
+                        final Map<String, List<String>> map = new HashMap<>();
+                        item.setIdMap(map);
+
+                        //transform
+                        VisitServices.from(part2.collectPropertyRhythm(domainItems))
+                                .groupService(new ResultVisitor<MusicItem, Integer>() {
+                                    @Override
+                                    public Integer visit(MusicItem item, Object param) {
+                                        return item.getDuration();
+                                    }
+                                }).fire(new MapFireVisitor<Integer, List<MusicItem>>() {
+                            @Override
+                            public Boolean visit(KeyValuePair<Integer, List<MusicItem>> pair, Object param) {
+                                List<String> ids = VisitServices.from(pair.getValue()).map(new ResultVisitor<MusicItem, String>() {
+                                    @Override
+                                    public String visit(MusicItem item, Object param) {
+                                        return item.getId();
+                                    }
+                                }).getAsList();
+                                if(!ids.isEmpty()){
+                                    map.put(pair.getKey() + "", ids);
+                                }
+                                return null;
+                            }
+                        });
+                        if(!map.isEmpty()){
+                            pitems.add(item);
+                        }
+                        return null;
+                    }
+                });
+                return false;
+            }
+        });
+        String path = outDir + File.separator + "categories.json";
+        FileUtils.writeTo(path, mGson.toJson(pc));
     }
 }

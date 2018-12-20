@@ -42,22 +42,24 @@ public class Configs {
             }
         }).getAsList();
     }
+
     public static int parseMood(String str) {
         try {
             return sMood_map.get(str);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(str, e);
         }
     }
-    public static List<PartOutput> getAllParts(){
+
+    public static List<PartOutput> getAllParts() {
         List<PartOutput> out = new ArrayList<>();
         Collection<String> domains = sDomain_map.values();
-       // Collection<Integer> properties = sMood_map.values();
+        // Collection<Integer> properties = sMood_map.values();
         Collection<Integer> rhythms = sRhythm_map.values();
         List<Integer> durations = Arrays.asList(10, 60); //10s, 60s
-        for(String domain : domains){
-            for (Integer rhythm : rhythms){
-                for (Integer duration : durations){
+        for (String domain : domains) {
+            for (Integer rhythm : rhythms) {
+                for (Integer duration : durations) {
                     out.add(new PartOutput.SimplePartOutput(domain, -1, rhythm, duration));
                 }
             }
@@ -65,5 +67,23 @@ public class Configs {
         return out;
     }
 
+    public static List<PartOutput> getDomainParts(){
+        List<PartOutput> out = new ArrayList<>();
+        for (String domain : sDomain_map.values()) {
+            out.add(new PartOutput.SimplePartOutput(domain, -1, -1, -1));
+        }
+        return out;
+    }
 
+    public static List<PartOutput> getPartsOfPropertyRhythm() {
+        List<PartOutput> out = new ArrayList<>();
+        Collection<Integer> properties = sMood_map.values();
+        Collection<Integer> rhythms = sRhythm_map.values();
+        for (Integer prop : properties){
+            for (Integer rhythm : rhythms){
+                out.add(new PartOutput.SimplePartOutput("-", prop, rhythm, -1));
+            }
+        }
+        return out;
+    }
 }
