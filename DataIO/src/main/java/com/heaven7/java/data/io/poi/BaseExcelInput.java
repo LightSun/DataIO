@@ -69,25 +69,15 @@ public abstract class BaseExcelInput implements ExcelInput {
         Workbook workbook = null;
         try {
             workbook = onCreateWorkbook(getFilePath());
-            final Sheet sheet;
-            if (sheetParam != null) {
-                if (sheetParam instanceof Integer) {
-                    sheet = workbook.getSheetAt((Integer) sheetParam);
-                } else if (sheetParam instanceof String) {
-                    sheet = workbook.getSheet((String) sheetParam);
-                } else {
-                    throw new UnsupportedOperationException();
-                }
-            } else {
-                sheet = workbook.getSheetAt(0);
-            }
+            final Sheet sheet = PoiUtils.getSheet(workbook, sheetParam);
+
             int count = sheet.getLastRowNum() + 1;
             int start = Math.max(0, getStartRowIndex());
             RowInterceptor rowInterceptor = getRowInterceptor();
             for (int i = start; i < count; i++) {
                 Row row = sheet.getRow(i);
                 ExcelRow excelRow = new ExcelRow(row);
-                if (row != null && (rowInterceptor == null || !rowInterceptor.intercept(i, excelRow))) {
+                if (row != null && (rowInterceptor == null || !rowInterceptor.intercept(excelRow))) {
                     rows.add(excelRow);
                 }
             }

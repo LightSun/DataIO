@@ -5,6 +5,6 @@ package com.heaven7.java.data.io.poi;
  */
 public interface RowInterceptor {
 
-    boolean intercept(int rowIndex, ExcelRow row);
+    boolean intercept( ExcelRow row);
 
 }
