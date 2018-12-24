@@ -181,7 +181,7 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
                 .nesting()
                 .newSheet("server-data")
-                .apply(new Sheet_WidthHeightApplier(10000, 200, 4))
+                .apply(new Sheet_WidthHeightApplier(10000, 200))
                 .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "cuts")))
                 .nesting();
         int rowIndex = 1;
