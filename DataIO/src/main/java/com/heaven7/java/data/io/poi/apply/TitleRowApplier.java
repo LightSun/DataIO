@@ -43,13 +43,21 @@ public class TitleRowApplier implements ApplyDelegate<PoiContext> {
         for (int i = 0 , size = names.size() ; i < size ; i ++){
             Cell cell = row.createCell(i, CellType.STRING);
             cell.setCellValue(names.get(i));
+
+            CellStyle style = workbook.createCellStyle();
+            Font font = createFont(workbook, i);
             if(colors != null){
-                CellStyle style = workbook.createCellStyle();
-                Font font = workbook.createFont();
                 font.setColor(colors.get(i));
-                style.setFont(font);
-                cell.setCellStyle(style);
             }
+            style.setFont(font);
+            cell.setCellStyle(style);
         }
+    }
+
+    protected Font createFont(Workbook workbook, int index){
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 30);
+        return font;
     }
 }

@@ -33,6 +33,17 @@ public class UniformNameHelper {
         return VisitServices.from(strs).joinToString("_");
     }
 
+    public static String trimPrefixDigital(String name){
+        List<String> strs = new ArrayList<String>(Arrays.asList(name.split("_")));
+        try{
+            Integer.parseInt(strs.get(0));
+            strs.remove(0);
+            return VisitServices.from(strs).joinToString(" ");
+        }catch (NumberFormatException e){
+            return name; //ignore
+        }
+    }
+
     /** return the uniformed simple music filename */
     public static String uniformMusicFilename(String file){
         String fileName = FileUtils.getFileName(file);

@@ -2,17 +2,20 @@ package com.heaven7.java.data.io.music.out;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.heaven7.java.data.io.apply.ApplyDelegate;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.bean.MusicMappingItem;
 import com.heaven7.java.data.io.bean.PartConfig;
 import com.heaven7.java.data.io.bean.PartItem;
 import com.heaven7.java.data.io.music.Configs;
 import com.heaven7.java.data.io.music.PartOutput;
+import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.poi.apply.Cell_StringApplier;
 import com.heaven7.java.data.io.poi.apply.Sheet_WidthHeightApplier;
 import com.heaven7.java.data.io.poi.apply.TitleRowApplier;
 import com.heaven7.java.data.io.poi.write.DefaultExcelWriter;
 import com.heaven7.java.data.io.poi.write.ExcelWriter;
+import com.heaven7.java.data.io.poi.write.PoiContext;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
@@ -27,6 +30,8 @@ import java.util.*;
  * @author heaven7
  */
 public class DefalutMusicOutDelegate implements MusicOutDelegate {
+
+    private static final float DEFAULT_HEIGHT = 30;
 
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
@@ -181,7 +186,7 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
                 .nesting()
                 .newSheet("server-data")
-                .apply(new Sheet_WidthHeightApplier(10000, 200))
+                .apply(new Sheet_WidthHeightApplier(10000, 500, 4))
                 .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "cuts")))
                 .nesting();
         int rowIndex = 1;
@@ -189,7 +194,7 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
             sf.newRow(rowIndex)
                     .nesting()
                         .newCell(0)
-                        .apply(new Cell_StringApplier(item.getName()))
+                        .apply(new Cell_StringApplier(UniformNameHelper.trimPrefixDigital(item.getName())))
                     .end()
                     .nesting()
                         .newCell(1)
