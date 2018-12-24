@@ -17,5 +17,4 @@ public interface ExcelOutput {
 	
 	void write(ExcelRow row);
 
-
 }

@@ -1,10 +1,8 @@
 package com.heaven7.java.data.io.poi;
 
-import java.util.List;
-
 import com.heaven7.java.visitor.collection.ListVisitService;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+
+import java.util.List;
 
 public interface ExcelInput {
 	
@@ -63,54 +61,5 @@ public interface ExcelInput {
 	 */
 	ListVisitService<ExcelRow> readService(Object param);
 
-
-	/**
-	 * the excel visitor
-	 * @author heaven7
-	 */
-	interface ExcelVisitor{
-
-		/**
-		 * start visit the sheet of the workbook
-		 * @param workbook the workbook
-		 * @param sheet the work sheet
-		 */
-		void startVisitSheet(Workbook workbook, Sheet sheet);
-
-		/**
-		 * visit the row
-		 * @param workbook the workbook
-		 * @param sheet the sheet
-		 * @param row the current row
-		 * @param rows the rows previous already visited. exclude current
-		 */
-		void visitRow(Workbook workbook, Sheet sheet, ExcelRow row, List<ExcelRow> rows);
-
-		/**
-		 * end visit the sheet
-		 * @param workbook the workbook
-		 * @param sheet the sheet
-		 * @param rows the all rows.
-		 */
-		void endVisitSheet(Workbook workbook, Sheet sheet, List<ExcelRow> rows);
-	}
-
-	class ExcelVisitorAdapter implements ExcelVisitor{
-
-		public static final ExcelVisitorAdapter EMPTY = new ExcelVisitorAdapter();
-
-		@Override
-		public void startVisitSheet(Workbook workbook, Sheet sheet) {
-
-		}
-		@Override
-		public void visitRow(Workbook workbook, Sheet sheet, ExcelRow row, List<ExcelRow> rows) {
-
-		}
-		@Override
-		public void endVisitSheet(Workbook workbook, Sheet sheet, List<ExcelRow> rows) {
-
-		}
-	}
 
 }
