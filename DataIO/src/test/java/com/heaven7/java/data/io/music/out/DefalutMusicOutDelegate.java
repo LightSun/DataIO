@@ -8,6 +8,11 @@ import com.heaven7.java.data.io.bean.PartConfig;
 import com.heaven7.java.data.io.bean.PartItem;
 import com.heaven7.java.data.io.music.Configs;
 import com.heaven7.java.data.io.music.PartOutput;
+import com.heaven7.java.data.io.poi.apply.Cell_StringApplier;
+import com.heaven7.java.data.io.poi.apply.Sheet_WidthHeightApplier;
+import com.heaven7.java.data.io.poi.apply.TitleRowApplier;
+import com.heaven7.java.data.io.poi.write.DefaultExcelWriter;
+import com.heaven7.java.data.io.poi.write.ExcelWriter;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
@@ -16,10 +21,7 @@ import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author heaven7
@@ -58,6 +60,9 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         String json = mGson.toJson(items);
         String outJsonFile = outDir + File.separator + simpleFileName + ".json";
         FileUtils.writeTo(outJsonFile, json);
+
+        //write server excel
+        writeServerExcel(outDir, simpleFileName, items);
     }
 
     @Override
@@ -170,5 +175,38 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
         });
         String path = outDir + File.separator + "categories.json";
         FileUtils.writeTo(path, mGson.toJson(pc));
+    }
+
+    private void writeServerExcel(String outDir, String simpleFileName, List<MusicItem> items) {
+        ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
+                .nesting()
+                .newSheet("server-data")
+                .apply(new Sheet_WidthHeightApplier(10000, 200, 4))
+                .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "cuts")))
+                .nesting();
+        int rowIndex = 1;
+        for(MusicItem item : items){
+            sf.newRow(rowIndex)
+                    .nesting()
+                        .newCell(0)
+                        .apply(new Cell_StringApplier(item.getName()))
+                    .end()
+                    .nesting()
+                        .newCell(1)
+                        .apply(new Cell_StringApplier(item.getMaxTime() + ""))
+                    .end()
+                    .nesting()
+                        .newCell(2)
+                        .apply(new Cell_StringApplier(item.getId()))
+                    .end()
+                    .nesting()
+                        .newCell(3)
+                        .apply(new Cell_StringApplier(mGson.toJson(item)))
+                    .end();
+            rowIndex ++;
+        }
+
+        String out = outDir + File.separator + simpleFileName + "_db.xlsx";
+        sf.end().end().write(out);
     }
 }

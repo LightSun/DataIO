@@ -283,13 +283,18 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         if (str == null || str.length() == 0) {
             return null;
         }
+        if(item.getName().contains("silver-and-gold")){
+            System.out.println();
+        }
         String[] strs = str.split(";");
         try {
             return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, List<Float>>() {
                 @Override
                 public List<Float> visit(String s, Object param) {
                     TimeArea timeArea = parseTimeArea(item, s);
-                    tas.add(timeArea);
+                    if(timeArea != null) {
+                        tas.add(timeArea);
+                    }
                     return timeArea.asList();
                 }
             }).getAsList();
@@ -306,6 +311,10 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         TimeArea ta = new TimeArea();
         try {
             String[] ss = str.split("-");
+            if(ss.length != 2){
+                Logger.d(TAG, "parseTimeArea", "wrong string: " + str);
+                return null;
+            }
             float start = parseFloatTime(ss[0]);
             float end = parseFloatTime(ss[1]);
             ta.setBegin(findNearest(item, start));

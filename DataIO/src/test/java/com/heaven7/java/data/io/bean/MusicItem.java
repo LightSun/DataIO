@@ -143,4 +143,9 @@ public class MusicItem {
     public String getUniqueKey(){
         return getName() + ": " + getDuration();
     }
+
+    public float getMaxTime() {
+        List<Float> times = getTimes();
+        return times.get(times.size() - 1);
+    }
 }
