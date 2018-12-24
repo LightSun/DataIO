@@ -18,6 +18,7 @@ public class ExcelHelper {
     private String sheetName;
     private String excelPath;
     private int skipToRowIndex = -1;
+    private ExcelVisitor visitor;
 
     protected ExcelHelper(ExcelHelper.Builder builder) {
         this.useXlsx = builder.useXlsx;
@@ -25,10 +26,13 @@ public class ExcelHelper {
         this.sheetName = builder.sheetName;
         this.excelPath = builder.excelPath;
         this.skipToRowIndex = builder.skipToRowIndex;
+        this.visitor = builder.visitor;
     }
 
     public List<ExcelRow> read(){
-        ExcelInput input = (useXlsx ? new XSSFExcelInput(): new HSSFExcelInput()).filePath(excelPath);
+        ExcelInput input = (useXlsx ? new XSSFExcelInput(): new HSSFExcelInput())
+                .filePath(excelPath)
+                .visitor(visitor);
         if(skipToRowIndex >= 0){
             input.skipToRow(skipToRowIndex);
         }
@@ -76,12 +80,17 @@ public class ExcelHelper {
         return this.skipToRowIndex;
     }
 
+    public ExcelVisitor getVisitor() {
+        return this.visitor;
+    }
+
     public static class Builder {
         private boolean useXlsx;
         private int sheetIndex = -1;
         private String sheetName;
         private String excelPath;
         private int skipToRowIndex = -1;
+        private ExcelVisitor visitor;
 
         public Builder setUseXlsx(boolean useXlsx) {
             this.useXlsx = useXlsx;
@@ -105,6 +114,11 @@ public class ExcelHelper {
 
         public Builder setSkipToRowIndex(int skipToRowIndex) {
             this.skipToRowIndex = skipToRowIndex;
+            return this;
+        }
+
+        public Builder setVisitor(ExcelVisitor visitor) {
+            this.visitor = visitor;
             return this;
         }
 
