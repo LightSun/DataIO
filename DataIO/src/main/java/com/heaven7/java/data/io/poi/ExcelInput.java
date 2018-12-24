@@ -3,7 +3,6 @@ package com.heaven7.java.data.io.poi;
 import java.util.List;
 
 import com.heaven7.java.visitor.collection.ListVisitService;
-import com.sun.rowset.internal.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
@@ -15,6 +14,8 @@ public interface ExcelInput {
 	 * @param in the input of excel
 	 */
 	//void prepare(InputStream in);
+
+	ExcelInput visitor(ExcelVisitor visitor);
 
 	/**
 	 * skip to the target row
@@ -68,6 +69,7 @@ public interface ExcelInput {
 	 * @author heaven7
 	 */
 	interface ExcelVisitor{
+
 		/**
 		 * start visit the sheet of the workbook
 		 * @param workbook the workbook
@@ -82,7 +84,7 @@ public interface ExcelInput {
 		 * @param row the current row
 		 * @param rows the rows previous already visited. exclude current
 		 */
-		void visitRow(Workbook workbook, Sheet sheet, ExcelRow row, List<Row> rows);
+		void visitRow(Workbook workbook, Sheet sheet, ExcelRow row, List<ExcelRow> rows);
 
 		/**
 		 * end visit the sheet
@@ -90,7 +92,25 @@ public interface ExcelInput {
 		 * @param sheet the sheet
 		 * @param rows the all rows.
 		 */
-		void endVisitSheet(Workbook workbook, Sheet sheet, List<Row> rows);
+		void endVisitSheet(Workbook workbook, Sheet sheet, List<ExcelRow> rows);
+	}
+
+	class ExcelVisitorAdapter implements ExcelVisitor{
+
+		public static final ExcelVisitorAdapter EMPTY = new ExcelVisitorAdapter();
+
+		@Override
+		public void startVisitSheet(Workbook workbook, Sheet sheet) {
+
+		}
+		@Override
+		public void visitRow(Workbook workbook, Sheet sheet, ExcelRow row, List<ExcelRow> rows) {
+
+		}
+		@Override
+		public void endVisitSheet(Workbook workbook, Sheet sheet, List<ExcelRow> rows) {
+
+		}
 	}
 
 }

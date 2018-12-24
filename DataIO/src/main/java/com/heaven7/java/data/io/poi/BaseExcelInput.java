@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.poi;
 
+import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,6 +17,13 @@ public abstract class BaseExcelInput implements ExcelInput {
     private String filePath;
     private int startRowIndex;
     private RowInterceptor interceptor;
+    private ExcelVisitor visitor = ExcelVisitorAdapter.EMPTY;
+
+    @Override
+    public ExcelInput visitor(ExcelVisitor visitor) {
+        this.visitor = visitor != null ? visitor : ExcelVisitorAdapter.EMPTY;
+        return this;
+    }
 
     public int getStartRowIndex() {
         return startRowIndex;
@@ -64,23 +72,37 @@ public abstract class BaseExcelInput implements ExcelInput {
 
     @Override
     public List<ExcelRow> read(Object sheetParam) {
+        final RowInterceptor rowInterceptor = getRowInterceptor();
+        final ExcelVisitor visitor = this.visitor;
+
         final List<ExcelRow> rows = new ArrayList<ExcelRow>();
         Workbook workbook = null;
         try {
             workbook = onCreateWorkbook(getFilePath());
             final Sheet sheet = PoiUtils.getSheet(workbook, sheetParam);
+            visitor.startVisitSheet(workbook, sheet);
 
             int count = sheet.getLastRowNum() + 1;
             int start = Math.max(0, getStartRowIndex());
-            RowInterceptor rowInterceptor = getRowInterceptor();
             for (int i = start; i < count; i++) {
                 Row row = sheet.getRow(i);
-                ExcelRow excelRow = new ExcelRow(row);
-                if (row != null && (rowInterceptor == null || !rowInterceptor.intercept(excelRow))) {
-                    rows.add(excelRow);
+                if(row == null){
+                    continue;
                 }
+                ExcelRow excelRow = new ExcelRow(row);
+                visitor.visitRow(workbook, sheet, excelRow, rows);
+                rows.add(excelRow);
             }
-            return rows;
+            visitor.endVisitSheet(workbook, sheet, rows);
+            if (rowInterceptor == null) {
+                return rows;
+            }
+            return VisitServices.from(rows).filter(new PredicateVisitor<ExcelRow>() {
+                @Override
+                public Boolean visit(ExcelRow row, Object param) {
+                    return !rowInterceptor.intercept(row);
+                }
+            }).getAsList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
