@@ -56,10 +56,10 @@ public class TestExcelToJsonBridge {
     @Test // $excelpath $sheet_name $cut_config_path $outDir $input_music_dir $ship_to_row_index
     public void testV3() {
         String[] args = {
-            "E:\\tmp\\bugfinds\\music8.xlsx",
+            "E:\\tmp\\bugfinds\\music9.xlsx",
             "sheet3",
             "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt",
-            "E:\\tmp\\bugfinds\\out_music8",
+            "E:\\tmp\\bugfinds\\out_music9",
             "E:\\tmp\\bugfinds\\right_musics\\60s",
             "1",
         };

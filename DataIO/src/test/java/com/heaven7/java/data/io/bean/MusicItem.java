@@ -3,6 +3,7 @@ package com.heaven7.java.data.io.bean;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.data.io.music.Configs;
 
 import java.util.List;
 
@@ -42,6 +43,11 @@ public class MusicItem {
     private int rowIndex;
     @Expose(serialize = false)
     private String filePath;
+
+    @Expose(serialize = false)
+    private String categoryStr;
+    @Expose(serialize = false)
+    private int category;
 
     public int getDuration() {
         return duration;
@@ -147,5 +153,25 @@ public class MusicItem {
     public float getMaxTime() {
         List<Float> times = getTimes();
         return times.get(times.size() - 1);
+    }
+
+    public String getCategoryStr() {
+        return categoryStr;
+    }
+
+    public void setCategoryStr(String categoryStr) {
+        this.categoryStr = categoryStr;
+        Integer category = Configs.parseCategory(categoryStr);
+        if(category == null){
+            throw new RuntimeException("categoryStr = " + categoryStr);
+        }
+        this.category = category;
+    }
+
+    public int getCategory() {
+        return category;
+    }
+    public void setCategory(int category) {
+        this.category = category;
     }
 }

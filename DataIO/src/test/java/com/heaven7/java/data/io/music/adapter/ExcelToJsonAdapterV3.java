@@ -25,7 +25,8 @@ public class ExcelToJsonAdapterV3 extends ExcelToJsonAdapterV1 {
     }
 
     public ExcelToJsonAdapterV3(String outDir, String simpleFileName, MusicCutProvider provider) {
-        super(outDir, simpleFileName, provider, new IndexDelegateV2());
+       // super(outDir, simpleFileName, provider, new IndexDelegateV2());
+        super(outDir, simpleFileName, provider, new IndexDelegateV3());
     }
 
     @Override
@@ -33,7 +34,7 @@ public class ExcelToJsonAdapterV3 extends ExcelToJsonAdapterV1 {
          if(super.filter(row)){
              return true;
          }
-        IndexDelegateV2 indexDelegate = (IndexDelegateV2) getIndexDelegate();
+        IndexDelegateV3 indexDelegate = (IndexDelegateV3) getIndexDelegate();
         String durationStr = row.getColumns().get(indexDelegate.getDurationIndex()).getColumnString();
         if(!"60s".equals(durationStr)){
             return true;
@@ -43,7 +44,7 @@ public class ExcelToJsonAdapterV3 extends ExcelToJsonAdapterV1 {
 
     protected void parseBaseInfo(List<ExcelCol> columns, MusicItem item){
         super.parseBaseInfo(columns, item);
-        IndexDelegateV2 indexDelegate = (IndexDelegateV2) getIndexDelegate();
+        IndexDelegateV3 indexDelegate = (IndexDelegateV3) getIndexDelegate();
         String str = columns.get(indexDelegate.getDurationIndex()).getColumnString().trim();
         if(str.endsWith("s")){
             str = str.substring(0, str.length() -1);
@@ -57,6 +58,10 @@ public class ExcelToJsonAdapterV3 extends ExcelToJsonAdapterV1 {
         item.setName(newName);
 
         //columns.get(indexDelegate.getNameIndex()).setValue(newName);
+
+        // category
+        String category = columns.get(indexDelegate.getCategoryIndex()).getColumnString().trim();
+        item.setCategoryStr(category);
     }
 
     protected boolean filterMusicItemByMp3(List<String> mp3s, MusicItem item){

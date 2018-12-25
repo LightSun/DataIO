@@ -185,7 +185,7 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
                 .nesting()
                 .newSheet("server-data")
                 .apply(new Sheet_WidthHeightApplier(10000, 500, 4))
-                .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "cuts")))
+                .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "category","categoryId","cuts")))
                 .nesting();
         int rowIndex = 1;
         for(MusicItem item : items){
@@ -204,6 +204,14 @@ public class DefalutMusicOutDelegate implements MusicOutDelegate {
                     .end()
                     .nesting()
                         .newCell(3)
+                        .apply(new Cell_StringApplier(Configs.getCategoryEnglish(item.getCategoryStr())))
+                    .end()
+                    .nesting()
+                        .newCell(4)
+                        .apply(new Cell_StringApplier(item.getCategory() +""))
+                    .end()
+                    .nesting()
+                        .newCell(5)
                         .apply(new Cell_StringApplier(mGson.toJson(item)))
                     .end();
             rowIndex ++;

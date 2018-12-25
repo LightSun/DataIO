@@ -13,6 +13,8 @@ public class Configs {
     private static final HashMap<String, String> sDomain_map = new HashMap<>();
     private static final HashMap<String, Integer> sMood_map = new HashMap<>();
     private static final HashMap<String, Integer> sRhythm_map = new HashMap<>();
+    private static final HashMap<String, Integer> sCategories_map = new HashMap<>();
+    private static final HashMap<String, String> sCategories_str = new HashMap<>();
 
     static {
         sDomain_map.put("运动", "sport");
@@ -27,6 +29,26 @@ public class Configs {
         sRhythm_map.put("快节奏", 2);
         sRhythm_map.put("中节奏", 1);
         sRhythm_map.put("慢节奏", 0);
+
+        sCategories_map.put("旅行", 0);
+        sCategories_map.put("动感", 1);
+        sCategories_map.put("舒缓", 2);
+        sCategories_map.put("欢快", 3);
+        sCategories_map.put("史诗", 4);
+
+        sCategories_str.put("旅行", "Travel");
+        sCategories_str.put("动感", "Dynamic");
+        sCategories_str.put("舒缓", "Relaxing");
+        sCategories_str.put("欢快", "Cheerful");
+        sCategories_str.put("史诗", "Epic");
+    }
+
+    public static String getCategoryEnglish(String category){
+        return sCategories_str.get(category);
+    }
+
+    public static Integer parseCategory(String category){
+        return sCategories_map.get(category);
     }
 
     public static int parseRhythm(String str) {
