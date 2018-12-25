@@ -283,7 +283,7 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         if (str == null || str.length() == 0) {
             return null;
         }
-        if(item.getName().contains("silver-and-gold")){
+        if(item.getName().contains("symphony-of-freedom")){
             System.out.println();
         }
         String[] strs = str.split(";");
@@ -294,8 +294,9 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
                     TimeArea timeArea = parseTimeArea(item, s);
                     if(timeArea != null) {
                         tas.add(timeArea);
+                        return timeArea.asList();
                     }
-                    return timeArea.asList();
+                    return null;
                 }
             }).getAsList();
         }catch (RuntimeException e){

@@ -31,8 +31,6 @@ import java.util.*;
  */
 public class DefalutMusicOutDelegate implements MusicOutDelegate {
 
-    private static final float DEFAULT_HEIGHT = 30;
-
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     @Override
