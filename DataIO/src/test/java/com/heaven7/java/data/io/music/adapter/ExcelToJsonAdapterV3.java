@@ -1,6 +1,7 @@
 package com.heaven7.java.data.io.music.adapter;
 
 import com.heaven7.java.base.util.Logger;
+import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.provider.MusicCutProvider;
@@ -37,6 +38,12 @@ public class ExcelToJsonAdapterV3 extends ExcelToJsonAdapterV1 {
         IndexDelegateV3 indexDelegate = (IndexDelegateV3) getIndexDelegate();
         String durationStr = row.getColumns().get(indexDelegate.getDurationIndex()).getColumnString();
         if(!"60s".equals(durationStr)){
+            return true;
+        }
+        String category = row.getColumns().get(indexDelegate.getCategoryIndex()).getColumnString();
+        if(TextUtils.isEmpty(category)){
+            String name = row.getColumns().get(indexDelegate.getNameIndex()).getColumnString();
+            Logger.w(TAG, "filter", "no category for music:  '+ " + name + " +'");
             return true;
         }
         return false;

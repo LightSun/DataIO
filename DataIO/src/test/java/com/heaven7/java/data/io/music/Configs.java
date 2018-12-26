@@ -34,13 +34,13 @@ public class Configs {
         sCategories_map.put("动感", 1);
         sCategories_map.put("舒缓", 2);
         sCategories_map.put("欢快", 3);
-        sCategories_map.put("史诗", 4);
+        sCategories_map.put("古典", 4);
 
         sCategories_str.put("旅行", "Travel");
         sCategories_str.put("动感", "Dynamic");
         sCategories_str.put("舒缓", "Relaxing");
         sCategories_str.put("欢快", "Cheerful");
-        sCategories_str.put("史诗", "Epic");
+        sCategories_str.put("古典", "Classic");
     }
 
     public static String getCategoryEnglish(String category){
