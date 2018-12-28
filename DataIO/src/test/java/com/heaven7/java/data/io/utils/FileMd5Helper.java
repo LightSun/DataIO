@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.utils;
 
+import com.google.gson.Gson;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -50,17 +51,23 @@ public class FileMd5Helper {
         System.out.println(md5s);*/
 
        final String dir = "E:\\tmp\\bugfinds\\right_musics\\60s";
-       String[] names = {
-           "281_short3_homes_0060.mp3",
-           "355_short3_mohanam_0059.mp3",
-       };
-       VisitServices.from(Arrays.asList(names)).fire(new FireVisitor<String>() {
-           @Override
-           public Boolean visit(String s, Object param) {
-               String file = dir + File.separator + s;
-               System.out.println(s + " : " + getMD5Three(file));
-               return null;
-           }
-       });
+        List<Item> list = VisitServices.from(FileUtils.getFiles(new File(dir), "mp3"))
+                .map(new ResultVisitor<String, Item>() {
+                    @Override
+                    public Item visit(String s, Object param) {
+                        return new Item(s);
+                    }
+                }).getAsList();
+        String file = "E:\\tmp\\bugfinds\\right_musics\\md5_mapping.txt";
+        FileUtils.writeTo(file, new Gson().toJson(list));
+    }
+
+    static class Item{
+        String musicName;
+        String md5;
+        public Item(String musicFilename) {
+            this.musicName = FileUtils.getFileName(musicFilename);
+            this.md5 = getMD5Three(musicFilename);
+        }
     }
 }

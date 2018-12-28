@@ -66,6 +66,19 @@ public class TestExcelToJsonBridge {
         new ExcelToJsonBridgeV3(args).execute();
     }
 
+    @Test // $excelpath $sheet_name $cut_config_path $outDir $input_music_dir $ship_to_row_index
+    public void testV3_2() {
+        String[] args = {
+                "E:\\tmp\\bugfinds\\music10.xlsx",
+                "sheet4",
+                "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt",
+                "E:\\tmp\\bugfinds\\out_music10",
+                "E:\\tmp\\bugfinds\\right_musics\\60s",
+                "1",
+        };
+        new ExcelToJsonBridgeV3(args).execute();
+    }
+
     @Test
     public void testMerge() {
         String[] args = {
