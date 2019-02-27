@@ -1,7 +1,7 @@
 package com.heaven7.java.data.io.music.bridge;
 
 import com.heaven7.java.data.io.music.out.MergedMusicOutDelegate;
-import com.heaven7.java.data.io.music.out.MusicOutDelegate;
+import com.heaven7.java.data.io.music.out.MusicOutDelegate1;
 import com.heaven7.java.data.io.poi.ExcelHelper;
 
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class MergedExcelToBridge extends ExcelToJsonBridge {
     }
 
     @Override
-    public void setMusicOutDelegate(MusicOutDelegate outDelegate) {
+    public void setMusicOutDelegate(MusicOutDelegate1 outDelegate) {
         throw new UnsupportedOperationException();
     }
 
@@ -40,7 +40,7 @@ public class MergedExcelToBridge extends ExcelToJsonBridge {
     }
 
     @Override
-    protected void launchBridge(ExcelHelper helper, MusicOutDelegate delegate, Parameters param) {
+    protected void launchBridge(ExcelHelper helper, MusicOutDelegate1 delegate, Parameters param) {
         //empty impl
     }
 }

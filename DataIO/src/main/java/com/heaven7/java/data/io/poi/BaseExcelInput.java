@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.poi;
 
+import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.data.io.poi.adapter.ExcelVisitorAdapter;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.ListVisitService;
@@ -21,7 +22,7 @@ public abstract class BaseExcelInput implements ExcelInput {
     private ExcelVisitor visitor = ExcelVisitorAdapter.EMPTY;
 
     @Override
-    public ExcelInput visitor(ExcelVisitor visitor) {
+    public ExcelInput visitor(@Nullable ExcelVisitor visitor) {
         this.visitor = visitor != null ? visitor : ExcelVisitorAdapter.EMPTY;
         return this;
     }

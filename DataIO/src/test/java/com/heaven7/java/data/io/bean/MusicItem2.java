@@ -1,16 +1,28 @@
 package com.heaven7.java.data.io.bean;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.data.io.bean.jsonAdapter.MusicItem2JsonAdapter;
 import com.heaven7.java.data.io.music.Configs;
+import com.heaven7.java.visitor.MapFireVisitor;
+import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.KeyValuePair;
+import com.heaven7.java.visitor.collection.VisitServices;
 
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.heaven7.java.data.io.utils.MusicItem2Helper.getEffectOutItem;
 
 /**
  * @author heaven7
  */
-public class MusicItem implements MusicItemDelegate{
+@JsonAdapter(MusicItem2JsonAdapter.class)
+public class MusicItem2 implements MusicItemDelegate{
 
     @Expose
     private String id = "default";
@@ -22,8 +34,6 @@ public class MusicItem implements MusicItemDelegate{
     @Expose
     private int duration; //in seconds
 
-    @Expose
-    private List<Float> times;
     @Expose
     @SerializedName("property")
     private int property;
@@ -47,9 +57,66 @@ public class MusicItem implements MusicItemDelegate{
     @Expose(serialize = false)
     private String categoryStr;
     @Expose(serialize = false)
-    private int category;
+    private int category; //领域
 
-    @Override
+    //===========================================
+    private List<EffectInfo> effectInfos;
+    private List<EffectInfo> transitionInfos;
+    private List<String> filterNames;
+    @Expose
+    private List<CutInfo> cutInfos;
+    @Expose
+    @SerializedName("transition_cuts")
+    private List<Float> transitionCuts;
+
+    public EffectOutItem getSpecialEffectItem(){
+        return getEffectOutItem(effectInfos);
+    }
+
+    public EffectOutItem getTransitionItem(){
+        return getEffectOutItem(transitionInfos);
+    }
+    //----------------------------------------------
+
+    public List<EffectInfo> getTransitionInfos() {
+        return transitionInfos;
+    }
+    public void setTransitionInfos(List<EffectInfo> transitionInfos) {
+        this.transitionInfos = transitionInfos;
+    }
+
+    public List<Float> getTransitionCuts() {
+        return transitionCuts;
+    }
+    public void setTransitionCuts(List<Float> transitionCuts) {
+        this.transitionCuts = transitionCuts;
+    }
+
+    public List<String> getFilterNames() {
+        return filterNames;
+    }
+    public void setFilterNames(List<String> filterNames) {
+        this.filterNames = filterNames;
+    }
+
+    public String getFilterName() {
+        return Predicates.isEmpty(filterNames) ? null : filterNames.get(0);
+    }
+
+    public List<EffectInfo> getEffectInfos() {
+        return effectInfos;
+    }
+    public void setEffectInfos(List<EffectInfo> effectInfos) {
+        this.effectInfos = effectInfos;
+    }
+
+    public List<CutInfo> getCutInfos() {
+        return cutInfos;
+    }
+    public void setCutInfos(List<CutInfo> cutInfos) {
+        this.cutInfos = cutInfos;
+    }
+
     public int getDuration() {
         return duration;
     }
@@ -73,7 +140,6 @@ public class MusicItem implements MusicItemDelegate{
     }
 
 
-    @Override
     public List<String> getDomains() {
         return domains;
     }
@@ -81,15 +147,6 @@ public class MusicItem implements MusicItemDelegate{
         this.domains = domains;
     }
 
-    public List<Float> getTimes() {
-        return times;
-    }
-
-    public void setTimes(List<Float> times) {
-        this.times = times;
-    }
-
-    @Override
     public int getProperty() {
         return property;
     }
@@ -98,7 +155,6 @@ public class MusicItem implements MusicItemDelegate{
         this.property = property;
     }
 
-    @Override
     public int getRhythm() {
         return rhythm;
     }
@@ -154,11 +210,6 @@ public class MusicItem implements MusicItemDelegate{
         return getName() + ": " + getDuration();
     }
 
-    public Float getMaxTime() {
-        List<Float> times = getTimes();
-        return times.get(times.size() - 1);
-    }
-
     public String getCategoryStr() {
         return categoryStr;
     }
@@ -177,5 +228,37 @@ public class MusicItem implements MusicItemDelegate{
     }
     public void setCategory(int category) {
         this.category = category;
+    }
+
+    @Override
+    public Float getMaxTime() {
+        if(cutInfos == null){
+            return null;
+        }
+        CutInfo info = VisitServices.from(cutInfos).query(new PredicateVisitor<CutInfo>() {
+            @Override
+            public Boolean visit(CutInfo cutInfo, Object param) {
+                return cutInfo.getType() == CutInfo.TYPE_INTENSIVE;
+            }
+        });
+        return info != null ? info.getMaxTime() : null;
+    }
+
+    public String genUniqueId() {
+        return getId() + "_" + duration;
+    }
+
+    public void addTransitionInfos(List<EffectInfo> infos) {
+        if(transitionInfos == null){
+            transitionInfos = new ArrayList<>();
+        }
+        transitionInfos.addAll(infos);
+    }
+
+    public void addEffectInfos(List<EffectInfo> infos) {
+        if(effectInfos == null){
+            effectInfos = new ArrayList<>();
+        }
+        effectInfos.addAll(infos);
     }
 }

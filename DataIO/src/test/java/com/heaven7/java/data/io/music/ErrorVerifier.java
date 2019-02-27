@@ -2,6 +2,7 @@ package com.heaven7.java.data.io.music;
 
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.data.io.bean.MusicItem;
+import com.heaven7.java.data.io.bean.MusicItemDelegate;
 import com.heaven7.java.visitor.FireMultiVisitor2;
 import com.heaven7.java.visitor.PileVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class ErrorVerifier {
 
-    public static void check(MusicItem item, float maxValue, StringBuilder sb_warn){
+    public static void check(MusicItemDelegate item, float maxValue, StringBuilder sb_warn){
         List<List<Float>> all = new ArrayList<>();
         if(all.isEmpty()){
             return;

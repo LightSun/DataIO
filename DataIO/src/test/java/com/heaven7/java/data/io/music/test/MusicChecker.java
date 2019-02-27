@@ -30,6 +30,14 @@ public class MusicChecker {
         this.outDir = outDir;
     }
 
+    /*
+    92a481a0e0a8aead8e115106d88d213a
+    8535aab197b3ffcfe6679ef8fe4d5bf
+    4b960176acac55895049d04e6bfdb36c
+    62991d0ea2be53850afc0f0ddde3d594
+    a74af2bbf57b400c16ab477eb5f420fe
+     *
+     */
     public static void main(String[] args) {
         String okDir = "E:\\tmp\\bugfinds\\right_musics\\60s音乐to陈军";
         String checkDir = "E:\\tmp\\bugfinds\\right_musics\\60s";

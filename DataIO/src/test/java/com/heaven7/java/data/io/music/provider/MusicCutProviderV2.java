@@ -24,3 +24,6 @@ public class MusicCutProviderV2 implements MusicCutProvider {
     }
 
 }
+/**
+ *  音乐切点(csv)。excel, 音乐。->输出client需要的数据， server数据。含音乐.
+ */

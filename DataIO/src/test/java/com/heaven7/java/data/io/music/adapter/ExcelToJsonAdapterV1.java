@@ -4,7 +4,7 @@ import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.bean.TimeArea;
 import com.heaven7.java.data.io.music.ErrorVerifier;
-import com.heaven7.java.data.io.music.out.MusicOutDelegate;
+import com.heaven7.java.data.io.music.out.MusicOutDelegate1;
 import com.heaven7.java.data.io.music.provider.MusicCutProvider;
 import com.heaven7.java.data.io.music.provider.SpeedMusicCutProvider;
 import com.heaven7.java.data.io.poi.ExcelCol;
@@ -34,7 +34,7 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
     private final HashMap<String, List<Float>> cutMap = new HashMap<>();
     private final MusicCutProvider cutProvider;
     private final IndexDelegate mIndexDelegate;
-    private MusicOutDelegate mMusicOutDelegate;
+    private MusicOutDelegate1 mMusicOutDelegate;
 
     /**
      * create excel to json adapter
@@ -147,7 +147,7 @@ public class ExcelToJsonAdapterV1 extends ExcelDataServiceAdapter {
         return t.size();
     }
 
-    public void setMusicOutDelegate(MusicOutDelegate delegate) {
+    public void setMusicOutDelegate(MusicOutDelegate1 delegate) {
         this.mMusicOutDelegate = delegate;
     }
 

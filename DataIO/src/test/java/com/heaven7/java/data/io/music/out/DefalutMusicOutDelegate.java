@@ -2,7 +2,6 @@ package com.heaven7.java.data.io.music.out;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.heaven7.java.data.io.apply.ApplyDelegate;
 import com.heaven7.java.data.io.bean.MusicItem;
 import com.heaven7.java.data.io.bean.MusicMappingItem;
 import com.heaven7.java.data.io.bean.PartConfig;
@@ -15,7 +14,6 @@ import com.heaven7.java.data.io.poi.apply.Sheet_WidthHeightApplier;
 import com.heaven7.java.data.io.poi.apply.TitleRowApplier;
 import com.heaven7.java.data.io.poi.write.DefaultExcelWriter;
 import com.heaven7.java.data.io.poi.write.ExcelWriter;
-import com.heaven7.java.data.io.poi.write.PoiContext;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
@@ -29,7 +27,7 @@ import java.util.*;
 /**
  * @author heaven7
  */
-public class DefalutMusicOutDelegate implements MusicOutDelegate {
+public class DefalutMusicOutDelegate implements MusicOutDelegate1 {
 
     private final Gson mGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 

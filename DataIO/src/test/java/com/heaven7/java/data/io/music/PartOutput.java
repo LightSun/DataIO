@@ -1,6 +1,7 @@
 package com.heaven7.java.data.io.music;
 
 import com.heaven7.java.data.io.bean.MusicItem;
+import com.heaven7.java.data.io.bean.MusicItemDelegate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +24,12 @@ public abstract class PartOutput {
         return getPartDomain() + "_music_" + getPartRhythm() + "_" + getDuration() + "s";
     }
 
-    public final List<MusicItem> collectDomainWithRhythm(List<MusicItem> rawItems){
-        List<MusicItem> matchItems = new ArrayList<>();
+    public final <T extends MusicItemDelegate> List<T> collectDomainWithRhythm(List<T> rawItems){
+        List<T> matchItems = new ArrayList<>();
         String domain = getPartDomain();
         int rhythm = getPartRhythm();
         int duration = getDuration();
-        for(MusicItem item : rawItems){
+        for(T item : rawItems){
             if(item.getDomains().contains(domain) && item.getRhythm() == rhythm
                     && item.getDuration() == duration){
                 matchItems.add(item);
@@ -37,10 +38,10 @@ public abstract class PartOutput {
         return matchItems;
     }
 
-    public final List<MusicItem> collectDomain(List<MusicItem> rawItems) {
-        List<MusicItem> matchItems = new ArrayList<>();
+    public final <T extends MusicItemDelegate> List<T> collectDomain(List<T> rawItems) {
+        List<T> matchItems = new ArrayList<>();
         String domain = getPartDomain();
-        for (MusicItem item : rawItems){
+        for (T item : rawItems){
             if(item.getDomains().contains(domain)){
                 matchItems.add(item);
             }
@@ -48,11 +49,11 @@ public abstract class PartOutput {
         return matchItems;
     }
 
-    public final List<MusicItem> collectPropertyRhythm(List<MusicItem> rawItems) {
-        List<MusicItem> matchItems = new ArrayList<>();
+    public final <T extends MusicItemDelegate> List<T> collectPropertyRhythm(List<T> rawItems) {
+        List<T> matchItems = new ArrayList<>();
         int property = getPartProperty();
         int rhythm = getPartRhythm();
-        for (MusicItem item : rawItems){
+        for (T item : rawItems){
             if(item.getProperty() == property && item.getRhythm() == rhythm){
                 matchItems.add(item);
             }

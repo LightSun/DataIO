@@ -11,14 +11,14 @@ import java.util.List;
  * the merged music out delegate. which can out multi times until call {@linkplain #mergeOut()}.
  * @author heaven7
  */
-public class MergedMusicOutDelegate implements MusicOutDelegate {
+public class MergedMusicOutDelegate implements MusicOutDelegate1 {
 
     private static final String TAG = "MergedMusicOutDelegate";
     private final List<MusicItem> mItems = new ArrayList<>();
     private final List<String> mOutDirs = new ArrayList<>();
     private final List<String> mWarnMessages = new ArrayList<>();
 
-    private final MusicOutDelegate mInternalOut = new DefalutMusicOutDelegate();
+    private final MusicOutDelegate1 mInternalOut = new DefalutMusicOutDelegate();
     private final String mOutDir;
     private final String mSimpleFilename;
 

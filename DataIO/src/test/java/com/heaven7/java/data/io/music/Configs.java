@@ -16,6 +16,9 @@ public class Configs {
     private static final HashMap<String, Integer> sCategories_map = new HashMap<>();
     private static final HashMap<String, String> sCategories_str = new HashMap<>();
 
+    private static final HashMap<String, String> sEffectMap = new HashMap<>();
+    private static final HashMap<String, String> sTransitionMap = new HashMap<>();
+
     static {
         sDomain_map.put("运动", "sport");
         sDomain_map.put("旅行", "travel");
@@ -30,17 +33,61 @@ public class Configs {
         sRhythm_map.put("中节奏", 1);
         sRhythm_map.put("慢节奏", 0);
 
-        sCategories_map.put("旅行", 0);
-        sCategories_map.put("动感", 1);
-        sCategories_map.put("舒缓", 2);
-        sCategories_map.put("欢快", 3);
-        sCategories_map.put("古典", 4);
+        sCategories_map.put("旅行", 1);
+        sCategories_map.put("动感", 2);
+        sCategories_map.put("舒缓", 3);
+        sCategories_map.put("欢快", 4);
+        sCategories_map.put("古典", 5);
 
         sCategories_str.put("旅行", "Travel");
         sCategories_str.put("动感", "Dynamic");
         sCategories_str.put("舒缓", "Relaxing");
         sCategories_str.put("欢快", "Cheerful");
         sCategories_str.put("古典", "Classic");
+
+        sEffectMap.put("慢到快", "speed_50_to_speed_200");
+        sEffectMap.put("快到慢", "speed_200_to_speed_50");
+        sEffectMap.put("正常到慢速", "speed_100_to_speed_50");
+        sEffectMap.put("正常到慢", "speed_100_to_speed_50");
+        sEffectMap.put("慢到正常", "speed_50_to_speed_100");
+        sEffectMap.put("快到正常", "speed_120_to_speed_100");
+        sEffectMap.put("正常到快", "speed_100_to_speed_120");
+        sEffectMap.put("极慢到极快", "speed_25_to_speed_1600");
+        sEffectMap.put("极快到极慢", "speed_1600_to_speed_25");
+
+        sEffectMap.put("速度x0.5", "speed_50");
+        sEffectMap.put("速度x0.8", "speed_80");
+        sEffectMap.put("速度x1.2", "speed_120");
+        sEffectMap.put("速度x2", "speed_200");
+        sEffectMap.put("速度x4", "speed_400");
+        sEffectMap.put("左平移", "left_translation");
+        sEffectMap.put("右平移", "right_translation");
+        sEffectMap.put("放大", "zoom_in");
+        sEffectMap.put("缩小", "zoom_out");
+        sEffectMap.put("无", "none");
+
+        sTransitionMap.put("无", "none");
+        sTransitionMap.put("叠化", "dissolve");
+        sTransitionMap.put("闪白", "white_fade");
+        sTransitionMap.put("长叠黑", "black_fade_long");
+        sTransitionMap.put("短叠黑", "black_fade_short");
+        sTransitionMap.put("zoom xy", "zoom_up_right_down_left");
+        sTransitionMap.put("zoom x", "zoom_right_left");
+        sTransitionMap.put("zoom y", "zoom_up_down");
+        sTransitionMap.put("zoom in", "zoom_in");
+        sTransitionMap.put("zoom out", "zoom_out");
+
+        sTransitionMap.put("推动左右", "push_left_right");
+        sTransitionMap.put("推动右左", "push_right_left");
+        sTransitionMap.put("错位左右", "comb_left_right");
+        sTransitionMap.put("错位右左", "comb_right_left");
+    }
+
+    public static String getEffectStr(String key){
+        return sEffectMap.get(key);
+    }
+    public static String getTransitionStr(String key){
+        return sTransitionMap.get(key);
     }
 
     public static String getCategoryEnglish(String category){

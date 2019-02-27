@@ -1,6 +1,7 @@
 package com.heaven7.java.data.io.poi;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 
 /**
  * column
@@ -21,6 +22,7 @@ public final class ExcelCol implements Comparable<ExcelCol> {
 	}
 	
 	public final String getColumnString() {
+		cell.setCellType(CellType.STRING);
 		return cell.getStringCellValue();
 	}
 

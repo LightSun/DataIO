@@ -4,7 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.bind.TypeAdapters;
+import com.heaven7.java.data.io.poi.ExcelCol;
+import com.heaven7.java.data.io.poi.ExcelHelper;
+import com.heaven7.java.data.io.poi.ExcelRow;
+import com.heaven7.java.data.io.poi.ExcelVisitor;
+import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 /** @author heaven7 */
 public class TestGson {
@@ -26,14 +37,14 @@ public class TestGson {
     @Test
     public void testNull() {
         System.out.println(new Gson().toJson(null).length()); // "null"
-        System.out.println((1<<8) + 3);
+        System.out.println((1 << 8) + 3);
         System.out.println(259 >> 8);
-        System.out.println(Byte.MAX_VALUE); //127. key. value
+        System.out.println(Byte.MAX_VALUE); // 127. key. value
         // {"":"","":""}
 
         System.out.println(new JsonParser().parse("1").getClass());
-        Integer int1 = new Gson().fromJson("1", int.class);     //ok
-        Integer int2 = new Gson().fromJson("1", Integer.class); //ok
+        // Integer int1 = new Gson().fromJson("1", int.class);     //ok
+        // Integer int2 = new Gson().fromJson("1", Integer.class); //ok
 
     }
 
@@ -42,4 +53,5 @@ public class TestGson {
         JsonElement je = TypeAdapters.NUMBER.toJsonTree(1);
         System.out.println(je.getClass());
     }
+
 }

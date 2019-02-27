@@ -1,7 +1,7 @@
 package com.heaven7.java.data.io.music.bridge;
 
 import com.heaven7.java.data.io.music.out.DefalutMusicOutDelegate;
-import com.heaven7.java.data.io.music.out.MusicOutDelegate;
+import com.heaven7.java.data.io.music.out.MusicOutDelegate1;
 import com.heaven7.java.data.io.poi.ExcelHelper;
 import com.heaven7.java.data.io.utils.FileUtils;
 
@@ -11,7 +11,7 @@ import com.heaven7.java.data.io.utils.FileUtils;
 public abstract class ExcelToJsonBridge {
 
     private final Parameters mParam;
-    private MusicOutDelegate mMusicOutDelegate;
+    private MusicOutDelegate1 mMusicOutDelegate;
 
     public ExcelToJsonBridge(String[] args) {
         this.mParam = new Parameters(args);
@@ -20,10 +20,10 @@ public abstract class ExcelToJsonBridge {
         this.mParam = mParam;
     }
 
-    public void setMusicOutDelegate(MusicOutDelegate outDelegate) {
+    public void setMusicOutDelegate(MusicOutDelegate1 outDelegate) {
         this.mMusicOutDelegate = outDelegate;
     }
-    public MusicOutDelegate getMusicOutDelegate(){
+    public MusicOutDelegate1 getMusicOutDelegate(){
         return mMusicOutDelegate;
     }
 
@@ -55,7 +55,7 @@ public abstract class ExcelToJsonBridge {
         builder.build().readAndWrite(adapter);*/
     }
 
-    protected abstract void launchBridge(ExcelHelper helper, MusicOutDelegate delegate, Parameters param);
+    protected abstract void launchBridge(ExcelHelper helper, MusicOutDelegate1 delegate, Parameters param);
 
     //$excelpath $sheet_name $cut_config_path $outDir $input_music_dir $ship_to_row_index
     protected static class Parameters {
