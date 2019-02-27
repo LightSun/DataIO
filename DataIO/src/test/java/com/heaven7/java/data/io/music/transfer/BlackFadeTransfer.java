@@ -25,7 +25,9 @@ public class BlackFadeTransfer extends BaseAdditionalTransfer<List<EffectInfo>> 
         DELEGATES.add(new ColumnDelegate_M());
         DELEGATES.add(new ColumnDelegate_H());
     }
-
+    public BlackFadeTransfer(){
+        this(new Indexer());
+    }
     public BlackFadeTransfer(Indexer indexer) {
         super("repeat_black", indexer);
     }

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public interface MusicOutDelegate2 {
+public interface MusicOutDelegate2 extends MusicOutDelegate<MusicItem2>{
 
     /**
      * write music items as  parts output. see {@linkplain PartOutput}

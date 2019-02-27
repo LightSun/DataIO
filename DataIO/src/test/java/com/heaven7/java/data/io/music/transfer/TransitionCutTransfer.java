@@ -16,6 +16,9 @@ public class TransitionCutTransfer extends BaseAdditionalTransfer<List<Float>> {
 
     private int travelIndex = -1;
 
+    public TransitionCutTransfer(){
+        this(new TransitionCutTransfer.Indexer());
+    }
     public TransitionCutTransfer(TransitionCutTransfer.Indexer indexer) {
         super("transition_cut", indexer);
     }

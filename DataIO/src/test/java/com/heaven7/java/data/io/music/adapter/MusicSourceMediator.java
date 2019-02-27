@@ -44,7 +44,7 @@ public class MusicSourceMediator {
         this.speedEffectTransfer = builder.speedEffectTransfer;
         this.blackFadeTransfer = builder.blackFadeTransfer;
         this.filterTransfer = builder.filterTransfer;
-        this.transitionTransfer = builder.transitionTransfer;
+        this.transitionTransfer = builder.transitionCutTransfer;
     }
     public void normalize(){
         //transfer.
@@ -136,7 +136,7 @@ public class MusicSourceMediator {
         private AdditionalTransfer speedEffectTransfer;
         private AdditionalTransfer blackFadeTransfer;
         private AdditionalTransfer filterTransfer;
-        private AdditionalTransfer transitionTransfer;
+        private AdditionalTransfer transitionCutTransfer;
 
         public Builder setExcelSources(ExcelSources excelSources) {
             this.excelSources = excelSources;
@@ -183,8 +183,8 @@ public class MusicSourceMediator {
             return this;
         }
 
-        public Builder setTransitionTransfer(AdditionalTransfer transitionTransfer) {
-            this.transitionTransfer = transitionTransfer;
+        public Builder setTransitionCutTransfer(AdditionalTransfer transitionTransfer) {
+            this.transitionCutTransfer = transitionTransfer;
             return this;
         }
 

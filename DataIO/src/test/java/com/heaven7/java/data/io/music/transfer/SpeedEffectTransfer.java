@@ -35,7 +35,9 @@ public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>
         sDelegates.add(new IndexParseDelegate_HM());
         sDelegates.add(new IndexParseDelegate_HH());
     }
-
+    public SpeedEffectTransfer(){
+        this(new Indexer());
+    }
     public SpeedEffectTransfer(Indexer indexer) {
         super("speed_effect", indexer);
     }

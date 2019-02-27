@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author heaven7
  */
-public class DefalutMusicOutDelegate2 implements MusicOutDelegate<MusicItem2> {
+public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
     private final Gson mGson = new GsonBuilder().registerTypeAdapter(MusicItem2.class, new MusicItem2JsonAdapter()).create();
 

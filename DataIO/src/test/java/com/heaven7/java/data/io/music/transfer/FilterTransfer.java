@@ -12,6 +12,9 @@ import java.util.List;
  */
 public class FilterTransfer extends BaseAdditionalTransfer<List<String>> {
 
+    public FilterTransfer() {
+        this(new Indexer());
+    }
     public FilterTransfer(Indexer indexer) {
         super("filter", indexer);
     }
