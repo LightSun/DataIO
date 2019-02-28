@@ -98,9 +98,9 @@ public class EffectOutItem {
             return effects;
         }
 
-        public void setEffects(List<String> effects) {
+      /*  public void setEffects(List<String> effects) {
             this.effects = effects;
-        }
+        }*/
 
         public void addEffects(List<String> effects) {
             if(this.effects == null){

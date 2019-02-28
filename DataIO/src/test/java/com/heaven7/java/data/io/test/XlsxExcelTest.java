@@ -37,6 +37,7 @@ public void testRead(){
 }
 
 @Test
+@SuppressWarnings({"deprecation"})
 public void testReadAndWriteToJson(){
         String outDir = "E:\\tmp\\bugfinds";
         String warnFile = "E:\\tmp\\bugfinds\\music2_warn.txt";

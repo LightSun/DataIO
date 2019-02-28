@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class TransitionCutTransfer extends BaseAdditionalTransfer<List<Float>> {
 
+    public static final int PERIOD = 3;
     private int travelIndex = -1;
 
     public TransitionCutTransfer(){
@@ -33,7 +34,7 @@ public class TransitionCutTransfer extends BaseAdditionalTransfer<List<Float>> {
         }else {
             travelIndex++;
         }
-        if(travelIndex % 3 == 0){
+        if(travelIndex % PERIOD == 0){
             String str = row.getColumns().get(mIndexer.index_trans_cuts).getColumnString();
             if(TextUtils.isEmpty(str)){
                 return null;

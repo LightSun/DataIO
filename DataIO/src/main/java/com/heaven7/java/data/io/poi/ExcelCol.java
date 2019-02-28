@@ -8,7 +8,7 @@ import org.apache.poi.ss.usermodel.CellType;
  * @author heaven7
  *
  */
-public final class ExcelCol implements Comparable<ExcelCol> {
+public class ExcelCol implements Comparable<ExcelCol> {
 
 	private final Cell cell;
 
@@ -17,19 +17,23 @@ public final class ExcelCol implements Comparable<ExcelCol> {
 		this.cell = cell;
 	}
 
-	public final int getColumnIndex() {
+	protected ExcelCol(){
+		cell = null;
+	}
+
+	public int getColumnIndex() {
 		return cell.getColumnIndex();
 	}
 	
-	public final String getColumnString() {
+	public String getColumnString() {
 		cell.setCellType(CellType.STRING);
 		return cell.getStringCellValue();
 	}
 
-	public final int getColumnInt() {
+	public int getColumnInt() {
 		return Integer.parseInt(cell.getStringCellValue());
 	}
-	public final float getColumnFloat() {
+	public float getColumnFloat() {
 		return Float.valueOf(cell.getStringCellValue());
 	}
 

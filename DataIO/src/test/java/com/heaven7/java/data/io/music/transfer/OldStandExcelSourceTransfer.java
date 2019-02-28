@@ -7,6 +7,7 @@ import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.adapter.IndexDelegate;
 import com.heaven7.java.data.io.music.adapter.IndexDelegateV3;
 import com.heaven7.java.data.io.music.in.MusicCutSource;
+import com.heaven7.java.data.io.music.in.SpeedAreaSource;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 
@@ -17,8 +18,8 @@ import java.util.List;
  */
 public class OldStandExcelSourceTransfer extends SimpleExcelSourceTransfer{
 
-    public OldStandExcelSourceTransfer(MusicCutSource musicCutSource, IndexDelegate indexDelegate, String outDir) {
-        super(musicCutSource, indexDelegate, outDir);
+    public OldStandExcelSourceTransfer(MusicCutSource musicCutSource, SpeedAreaSource areaSource, IndexDelegate indexDelegate, String outDir) {
+        super(musicCutSource, areaSource, indexDelegate, outDir);
     }
 
     @Override
@@ -30,14 +31,6 @@ public class OldStandExcelSourceTransfer extends SimpleExcelSourceTransfer{
             str = str.substring(0, str.length() -1);
         }
         item.setDuration(Integer.parseInt(str));
-        //name changed
-        String name = columns.get(indexDelegate.getNameIndex()).getColumnString();
-        String newName = UniformNameHelper.uniformSimpleMusicName(name);
-        Logger.d(TAG, "parseBaseInfo", "ExcelCol -- music name changed : old = " +  name
-                + " ,new = " + newName);
-        item.setName(newName);
-
-        //columns.get(indexDelegate.getNameIndex()).setValue(newName);
 
         // category
         String category = columns.get(indexDelegate.getCategoryIndex()).getColumnString().trim();

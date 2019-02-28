@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBeanV10.CutItem> {
 
+    private int mLastAreaType = -1;
+
     public MusicCutterScannerV10(String dir) {
         super(dir);
     }
@@ -53,7 +55,8 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
                 line = line.replace(" ", "");
                 String[] strs = line.split(",");
                 cl.setCut(Float.parseFloat(strs[0]));
-                cl.setFlags(strs.length >=3 && strs[2].equals("^") ? CutInfo.TYPE_INTENSIVE | CutInfo.TYPE_SPARSE : CutInfo.TYPE_INTENSIVE);
+                cl.setFlags(getCutFlags(strs));
+                cl.setAreaType(getAreaType(strs));
                 return cl;
             }
         }).read(null, csvPath);
@@ -74,8 +77,51 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         FileUtils.writeTo(targetFilePath, new Gson().toJson(beanV10));
     }
 
+    private int getAreaType(String[] strs) {
+        //{L}, {M}, {H}
+       // boolean hasLow boolean hasMiddle = false;boolean hasHigh = false;
+        int areaType = -1;
+        if(!hasStr(strs, "{L}")){
+            if(!hasStr(strs, "{M}")){
+                if(hasStr(strs, "{H}")){
+                    areaType = CutConfigBeanV10.AREA_TYPE_HIGH;
+                }
+            }else {
+                areaType = CutConfigBeanV10.AREA_TYPE_MIDDLE;
+            }
+        }else {
+            areaType = CutConfigBeanV10.AREA_TYPE_LOW;
+        }
+        if(areaType == -1){
+            areaType = mLastAreaType;
+        }else {
+            mLastAreaType = areaType;
+        }
+        return areaType;
+    }
+
+    private static byte getCutFlags(String[] strs) {
+        byte flags = CutInfo.TYPE_INTENSIVE;
+        if(hasStr(strs, "^")){
+            flags |= CutInfo.TYPE_SPARSE;
+        }
+        if(hasStr(strs, "@")){
+            flags |= CutInfo.FLAG_TRANSITION_CUT;
+        }
+        return flags;
+    }
+    private static boolean hasStr(String[] strs, final String require){
+        return VisitServices.from(strs).query(new PredicateVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                return s.equals(require);
+            }
+        }) != null;
+    }
+
     public static void main(String[] args) {
         //
-        new MusicCutterScannerV10("E:\\tmp\\bugfinds\\新版").serialize("E:\\tmp\\bugfinds\\新版\\cut.txt");
+        new MusicCutterScannerV10("E:\\tmp\\bugfinds\\music_cut3")
+                .serialize("E:\\tmp\\bugfinds\\music_cut3\\cut.txt");
     }
 }

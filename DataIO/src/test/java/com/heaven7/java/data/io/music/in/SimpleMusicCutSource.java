@@ -15,24 +15,24 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * as ExcelSource used for transfer cut.
  * @author heaven7
  */
 public class SimpleMusicCutSource implements MusicCutSource {
 
-    private final String cutFilePath;
     private final HashMap<MusicItem2,List<CutInfo>> cache = new HashMap<>();
-    private CutConfigBeanV10 bean;
+    private final CutConfigBeanV10 bean;
 
+    public SimpleMusicCutSource(CutConfigBeanV10 bean){
+        this.bean = bean;
+    }
     public SimpleMusicCutSource(String cutFilePath) {
-        this.cutFilePath = cutFilePath;
+        String json = ResourceLoader.getDefault().loadFileAsString(null, cutFilePath);
+        bean = new Gson().fromJson(json, CutConfigBeanV10.class);
     }
 
     @Override
     public List<CutInfo> getCutInfos(MusicItem2 mi) {
-        if(bean == null){
-            String json = ResourceLoader.getDefault().loadFileAsString(null, cutFilePath);
-            bean = new Gson().fromJson(json, CutConfigBeanV10.class);
-        }
         CutConfigBeanV10.CutItem cutItem = bean.getCutItem(mi.getName(), mi.getDuration());
         if(cutItem == null || Predicates.isEmpty(cutItem.getCutLines())){
             return null;
@@ -64,4 +64,9 @@ public class SimpleMusicCutSource implements MusicCutSource {
         cache.put(mi, list);
         return list;
     }
+
+    public CutConfigBeanV10 getBean(){
+        return bean;
+    }
+
 }

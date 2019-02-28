@@ -17,7 +17,8 @@ public class UniformNameHelper {
     );
     //the second useless str
     private static final List<String> SECOND_USELESS_STR = Arrays.asList(
-            "short3"
+            "short3",
+            "short1"
     );
 
     public static String uniformSimpleMusicName(String name){

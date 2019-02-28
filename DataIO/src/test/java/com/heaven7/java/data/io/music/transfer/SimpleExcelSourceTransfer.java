@@ -2,13 +2,16 @@ package com.heaven7.java.data.io.music.transfer;
 
 import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.data.io.bean.CutConfigBeanV10;
 import com.heaven7.java.data.io.bean.CutInfo;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.TimeArea;
 import com.heaven7.java.data.io.music.ErrorVerifier;
+import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.adapter.IndexDelegate;
 import com.heaven7.java.data.io.music.in.ExcelSource;
 import com.heaven7.java.data.io.music.in.MusicCutSource;
+import com.heaven7.java.data.io.music.in.SpeedAreaSource;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.utils.FileUtils;
@@ -33,12 +36,15 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
 
     protected  final String TAG = getClass().getSimpleName();
 
+    private final SpeedAreaSource speedAreaSource;
     private final MusicCutSource musicCutSource;
     private final IndexDelegate indexDelegate;
     private final String outDir;
     private final StringBuilder sb_warn = new StringBuilder();
 
-    public SimpleExcelSourceTransfer(MusicCutSource musicCutSource, IndexDelegate indexDelegate, String outDir) {
+
+    public SimpleExcelSourceTransfer(MusicCutSource musicCutSource, SpeedAreaSource speedAreaSource, IndexDelegate indexDelegate, String outDir) {
+        this.speedAreaSource = speedAreaSource;
         this.musicCutSource = musicCutSource;
         this.indexDelegate = indexDelegate;
         this.outDir = outDir;
@@ -69,7 +75,7 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
                 item.setLineNumber(row.getRowIndex() + 1);
                 item.setId(item.getName());
 
-                List<CutInfo> infos = musicCutSource.getCutInfos( item);
+                List<CutInfo> infos = musicCutSource.getCutInfos(item);
                 if (infos == null) {
                     log(columns, "no cuts", "line number = " + (row.getRowIndex() + 1)
                             + " ,music name = " + item.getName());
@@ -87,13 +93,8 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
                 }
                 CutInfo intensiveInfo = list.get(0);
                 List<Float> cuts = intensiveInfo.getCuts();
-
-                List<TimeArea> areas = new ArrayList<>();
-                item.setSlow_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
-                item.setMiddle_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getMiddleSpeedIndex()).getColumnString(), areas));
-                item.setHigh_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getHighSpeedIndex()).getColumnString(), areas));
-                //old need mapping
-                writeMappingFile(item, areas);
+                //speed areas
+                handleSpeedAreas(columns, item, intensiveInfo);
                 //old need check
                 ErrorVerifier.check(item, cuts.get(cuts.size() - 1), sb_warn);
 
@@ -107,8 +108,28 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
         return items;
     }
 
+    private void handleSpeedAreas(List<ExcelCol> columns, MusicItem2 item, CutInfo intensiveInfo) {
+        if(speedAreaSource != null){
+            item.setSlow_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_LOW));
+            item.setMiddle_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_MIDDLE));
+            item.setHigh_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_HIGH));
+        }else {
+            List<TimeArea> areas = new ArrayList<>();
+            item.setSlow_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getSlowSpeedIndex()).getColumnString(), areas));
+            item.setMiddle_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getMiddleSpeedIndex()).getColumnString(), areas));
+            item.setHigh_speed_areas(parseTimeAreas(intensiveInfo, item, columns.get(indexDelegate.getHighSpeedIndex()).getColumnString(), areas));
+            //old need mapping
+            writeMappingFile(item, areas);
+        }
+    }
+
     protected  void parseBaseInfo(List<ExcelCol> columns, MusicItem2 item){
-        item.setName(columns.get(indexDelegate.getNameIndex()).getColumnString());
+        String name = columns.get(indexDelegate.getNameIndex()).getColumnString();
+        String newName = UniformNameHelper.uniformSimpleMusicName(name);
+        Logger.d(TAG, "parseBaseInfo", "ExcelCol -- music name changed : old = " +  name
+                + " ,new = " + newName);
+        item.setName(newName);
+        //item.setName(columns.get(indexDelegate.getNameIndex()).getColumnString());
         item.setDomains(parseDomain(columns.get(indexDelegate.getDomainIndex()).getColumnString()));
         item.setProperty(parseMood(columns.get(indexDelegate.getMoodIndex()).getColumnString()));
         item.setRhythm(parseRhythm(columns.get(indexDelegate.getRhythmIndex()).getColumnString()));

@@ -9,11 +9,15 @@ import com.heaven7.java.data.io.util.Utils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-public final class ExcelRow implements Comparable<ExcelRow>{
+public class ExcelRow implements Comparable<ExcelRow>{
 
 	private final Row mRow;
 	private List<ExcelCol> mCols;
-	
+
+	protected ExcelRow(){
+		mRow = null;
+	}
+
 	public ExcelRow(Row mRow) {
 		super();
 		this.mRow = mRow;
@@ -24,7 +28,7 @@ public final class ExcelRow implements Comparable<ExcelRow>{
 		return Utils.getColumnForMultiRow(this, rows, requireColumnIndex, maxMergeCount);
 	}
 
-	public final List<ExcelCol> getColumns() {
+	public List<ExcelCol> getColumns() {
 		if(mCols == null){
 			final Iterator<Cell> it = mRow.cellIterator();
 			final List<ExcelCol> list = new ArrayList<ExcelCol>();
@@ -37,7 +41,7 @@ public final class ExcelRow implements Comparable<ExcelRow>{
 		return mCols;
 	}
 	
-	public final int getRowIndex(){
+	public int getRowIndex(){
 		return mRow.getRowNum();
 	}
 	

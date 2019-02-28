@@ -3,11 +3,11 @@ package com.heaven7.java.data.io.test;
 import com.heaven7.java.data.io.bean.EffectOutItem;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.music.UniformNameHelper;
+import com.heaven7.java.data.io.music.adapter.IndexDelegateV3;
 import com.heaven7.java.data.io.music.in.SimpleExcelSource;
-import com.heaven7.java.data.io.music.transfer.BlackFadeTransfer;
-import com.heaven7.java.data.io.music.transfer.FilterTransfer;
-import com.heaven7.java.data.io.music.transfer.SpeedEffectTransfer;
-import com.heaven7.java.data.io.music.transfer.TransitionCutTransfer;
+import com.heaven7.java.data.io.music.in.SimpleMusicCutSource;
+import com.heaven7.java.data.io.music.in.SimpleSpeedAreaSource;
+import com.heaven7.java.data.io.music.transfer.*;
 import com.heaven7.java.data.io.poi.ExcelHelper;
 import com.heaven7.java.visitor.ResultIndexedVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -19,6 +19,26 @@ import java.util.List;
  * @author heaven7
  */
 public class ExcelSourcesTest {
+
+    @Test
+    public void testStandSource(){
+        String musicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
+        String outDir = "E:\\tmp\\bugfinds\\新版\\temp";
+
+        String exl = "E:\\tmp\\bugfinds\\方案.xlsx";
+        ExcelHelper helper = new ExcelHelper.Builder()
+                .setUseXlsx(true)
+                .setExcelPath(exl)
+                .setSheetName("切换音乐 - 表格 1")
+                .setSkipToRowIndex(1)
+                .build();
+        SimpleExcelSource source = new SimpleExcelSource(helper);
+        SimpleMusicCutSource cutSource = new SimpleMusicCutSource(musicCutFile);
+        OldStandExcelSourceTransfer transfer = new OldStandExcelSourceTransfer(cutSource, new SimpleSpeedAreaSource(cutSource.getBean()),
+                new IndexDelegateV3(), outDir);
+        List<MusicItem2> items = transfer.transfer(source);
+        System.out.println();
+    }
 
     @Test
     public void testTransitionCutSource(){

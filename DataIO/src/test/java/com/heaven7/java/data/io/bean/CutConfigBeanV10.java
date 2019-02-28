@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.bean;
 
+import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
@@ -10,6 +11,9 @@ import java.util.List;
  */
 public class CutConfigBeanV10 {
 
+    public static final int AREA_TYPE_LOW    = 1;
+    public static final int AREA_TYPE_MIDDLE = 2;
+    public static final int AREA_TYPE_HIGH   = 3;
     private List<CutItem> cutItems;
 
     public List<CutItem> getCutItems() {
@@ -26,7 +30,7 @@ public class CutConfigBeanV10 {
         return VisitServices.from(cutItems).query(new PredicateVisitor<CutItem>() {
             @Override
             public Boolean visit(CutItem cutItem, Object param) {
-                return rowName.equals(cutItem.getName()) && duration == cutItem.getDuration();
+                return rowName.equals(UniformNameHelper.uniformSimpleMusicName(cutItem.getName())) && duration == cutItem.getDuration();
             }
         });
     }
@@ -61,6 +65,7 @@ public class CutConfigBeanV10 {
     public static class CutLine{
         float cut;
         byte flags;
+        int areaType; //see AREA_TYPE_LOW and etc.
 
         public float getCut() {
             return cut;
@@ -76,8 +81,14 @@ public class CutConfigBeanV10 {
             this.flags = flags;
         }
 
-        public boolean hasFlag(byte typeSparse) {
-            return false;
+        public boolean hasFlag(byte flag) {
+            return (flags & flag) == flag;
+        }
+        public int getAreaType() {
+            return areaType;
+        }
+        public void setAreaType(int areaType) {
+            this.areaType = areaType;
         }
     }
 
