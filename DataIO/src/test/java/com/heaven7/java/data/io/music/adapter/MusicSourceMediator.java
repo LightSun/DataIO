@@ -5,6 +5,7 @@ import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.music.in.ExcelSources;
 import com.heaven7.java.data.io.music.in.MusicCutSource;
 import com.heaven7.java.data.io.music.in.MusicSource;
+import com.heaven7.java.data.io.music.in.SpeedAreaSource;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.AdditionalTransfer;
 import com.heaven7.java.data.io.music.transfer.OldStandExcelSourceTransfer;
@@ -23,6 +24,7 @@ public class MusicSourceMediator {
 
     private ExcelSources excelSources;
     private MusicCutSource musicCutSource;
+    private SpeedAreaSource speedAreaSource;
     private MusicSource musicSource;
     private MusicOutDelegate2 musicOutDelegate;
     private String outDir;
@@ -36,6 +38,7 @@ public class MusicSourceMediator {
 
     protected MusicSourceMediator(MusicSourceMediator.Builder builder) {
         this.excelSources = builder.excelSources;
+        this.speedAreaSource = builder.speedAreaSource;
         this.musicCutSource = builder.musicCutSource;
         this.musicSource = builder.musicSource;
         this.musicOutDelegate = builder.musicOutDelegate;
@@ -49,7 +52,7 @@ public class MusicSourceMediator {
     public void normalize(){
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
-        OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, indexDelegate, outDir);
+        OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource,indexDelegate, outDir);
         List<MusicItem2> items = standTransfer.transfer(excelSources.getOldStandSource());
         sb_warn.append(standTransfer.getSb_warn().toString());
         List<MusicItem2> items2 = standTransfer.transfer(excelSources.getStandSource());
@@ -137,6 +140,7 @@ public class MusicSourceMediator {
         private AdditionalTransfer blackFadeTransfer;
         private AdditionalTransfer filterTransfer;
         private AdditionalTransfer transitionCutTransfer;
+        private SpeedAreaSource speedAreaSource;
 
         public Builder setExcelSources(ExcelSources excelSources) {
             this.excelSources = excelSources;
@@ -185,6 +189,10 @@ public class MusicSourceMediator {
 
         public Builder setTransitionCutTransfer(AdditionalTransfer transitionTransfer) {
             this.transitionCutTransfer = transitionTransfer;
+            return this;
+        }
+        public Builder setSpeedAreaSource(SpeedAreaSource speedAreaSource) {
+            this.speedAreaSource = speedAreaSource;
             return this;
         }
 

@@ -90,6 +90,10 @@ public class CutConfigBeanV10 {
         public void setAreaType(int areaType) {
             this.areaType = areaType;
         }
+
+        public void addFlag(byte flag) {
+            this.flags |= flag;
+        }
     }
 
 }

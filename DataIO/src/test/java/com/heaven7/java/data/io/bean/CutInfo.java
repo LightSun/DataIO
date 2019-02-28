@@ -7,9 +7,10 @@ import java.util.List;
  */
 public class CutInfo {
 
-    public static final byte TYPE_SPARSE         =  1;
-    public static final byte TYPE_INTENSIVE      =  1 << 1;
-    public static final byte FLAG_TRANSITION_CUT = 1 << 2;
+    public static final byte TYPE_SPARSE            = 1;
+    public static final byte TYPE_INTENSIVE         = 1 << 1;
+    public static final byte FLAG_TRANSITION_CUT    = 1 << 2;
+    public static final byte FLAG_SPEED_AREA_MARKED = 1 << 3;
 
     private byte type;
     private List<Float> cuts;

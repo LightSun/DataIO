@@ -56,11 +56,15 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
                 String[] strs = line.split(",");
                 cl.setCut(Float.parseFloat(strs[0]));
                 cl.setFlags(getCutFlags(strs));
-                cl.setAreaType(getAreaType(strs));
+                //must call after flag set
+                getAreaType(strs, cl);
                 return cl;
             }
         }).read(null, csvPath);
-        //
+        //末尾需要加一个mark标志, 便于L-M-H区域的处理
+        lines.get(lines.size() - 1).addFlag(CutInfo.FLAG_SPEED_AREA_MARKED);
+
+
         String fileName = FileUtils.getFileName(csvPath);
         CutConfigBeanV10.CutItem item = new CutConfigBeanV10.CutItem();
         item.setDuration(duration);
@@ -77,7 +81,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         FileUtils.writeTo(targetFilePath, new Gson().toJson(beanV10));
     }
 
-    private int getAreaType(String[] strs) {
+    private void getAreaType(String[] strs, CutConfigBeanV10.CutLine line) {
         //{L}, {M}, {H}
        // boolean hasLow boolean hasMiddle = false;boolean hasHigh = false;
         int areaType = -1;
@@ -94,10 +98,14 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         }
         if(areaType == -1){
             areaType = mLastAreaType;
+            if(mLastAreaType == -1){
+                throw new RuntimeException("wrong data for head line must has area type.");
+            }
         }else {
             mLastAreaType = areaType;
+            line.addFlag(CutInfo.FLAG_SPEED_AREA_MARKED);
         }
-        return areaType;
+        line.setAreaType(areaType);
     }
 
     private static byte getCutFlags(String[] strs) {
@@ -120,8 +128,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
     }
 
     public static void main(String[] args) {
-        //
-        new MusicCutterScannerV10("E:\\tmp\\bugfinds\\music_cut3")
-                .serialize("E:\\tmp\\bugfinds\\music_cut3\\cut.txt");
+        new MusicCutterScannerV10("E:\\tmp\\bugfinds\\新版")
+                .serialize("E:\\tmp\\bugfinds\\新版\\cut.txt");
     }
 }
