@@ -57,10 +57,6 @@ public class TransferCutSource implements ExcelSource {
                 }
             }).getAsList();
             //nop populate
-            List<ExcelRow> nopRows = new ArrayList<>();
-            for (int i = 0; i < TransitionCutTransfer.PERIOD - 1 ; i ++){
-                nopRows.add(new MockExcelRow());
-            }
             mRows = new ArrayList<>();
             for (int i =0, count = list.size() ; i < count ; i ++){
                 mRows.addAll(createNopRows());
@@ -73,7 +69,7 @@ public class TransferCutSource implements ExcelSource {
         }
         return mRows;
     }
-
+    //nop populate
     private Collection<? extends ExcelRow> createNopRows() {
         //nop populate
         List<ExcelRow> nopRows = new ArrayList<>();

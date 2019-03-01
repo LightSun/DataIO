@@ -19,7 +19,7 @@ public class MusicItem2JsonAdapter extends TypeAdapter<MusicItem2> {
     public void write(JsonWriter out, MusicItem2 value) throws IOException {
         //id, property, rhythm, domains
         out.beginObject();
-        out.name("id").value(value.genUniqueId());
+        out.name("id").value(value.getId());
         out.name("property").value(value.getProperty());
         out.name("rhythm").value(value.getRhythm());
         out.name("domains");
@@ -31,7 +31,7 @@ public class MusicItem2JsonAdapter extends TypeAdapter<MusicItem2> {
         // dense_cuts and sparse_cuts
         assert value.getCutInfos().size() <= 2;
         for(CutInfo info : value.getCutInfos()){
-            String name = info.getType() == CutInfo.TYPE_INTENSIVE ? "dense_cuts" : "sparse_cuts";
+            String name = info.getType() == CutInfo.TYPE_INTENSIVE ? "dense_times" : "sparse_times";
             out.name(name);
             out.beginArray();
             for (Float val : info.getCuts()){
@@ -41,7 +41,7 @@ public class MusicItem2JsonAdapter extends TypeAdapter<MusicItem2> {
         }
         //transition_cuts
         if(!Predicates.isEmpty(value.getTransitionCuts())){
-            out.name("transition_cuts");
+            out.name("transition_times");
             out.beginArray();
             for (Float val : value.getTransitionCuts()){
                 out.value(val);
