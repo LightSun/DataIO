@@ -5,7 +5,6 @@ import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -13,6 +12,7 @@ import java.util.List;
  */
 public class MockExcelRow extends ExcelRow {
 
+    private int rowIndex;
     private final List<ExcelCol> cols;
 
     public MockExcelRow(){
@@ -33,6 +33,15 @@ public class MockExcelRow extends ExcelRow {
             this.cols.addAll(nopCols);
             this.cols.add(cols.get(i));
         }
+    }
+
+    public void setRowIndex(int rowIndex) {
+        this.rowIndex = rowIndex;
+    }
+
+    @Override
+    public int getRowIndex() {
+        return rowIndex;
     }
 
     @Override

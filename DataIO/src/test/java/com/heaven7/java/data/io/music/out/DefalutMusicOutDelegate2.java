@@ -2,6 +2,7 @@ package com.heaven7.java.data.io.music.out;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.data.io.bean.*;
 import com.heaven7.java.data.io.bean.jsonAdapter.MusicItem2JsonAdapter;
 import com.heaven7.java.data.io.music.Configs;
@@ -48,16 +49,50 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                 String transitionFile = outDir + File.separator + "transition_" + mi.genUniqueId() + ".json";
                 String filterFile = outDir + File.separator + "filter_" + mi.genUniqueId() + ".json";
                 FileUtils.writeTo(infoFile, mGson.toJson(mi));
-                FileUtils.writeTo(effectFile, mGson.toJson(mi.getSpecialEffectItem()));
-                FileUtils.writeTo(transitionFile, mGson.toJson(mi.getTransitionItem()));
-                FileUtils.writeTo(filterFile, mGson.toJson(mi.getFilterNames()));
+                EffectOutItem item = mi.getSpecialEffectItem();
+                if(item != null){
+                    FileUtils.writeTo(effectFile, mGson.toJson(item));
+                }
+
+                item = mi.getTransitionItem();
+                if(item != null){
+                    FileUtils.writeTo(transitionFile, mGson.toJson(item));
+                }
+                if(!Predicates.isEmpty(mi.getFilterNames())){
+                    FileUtils.writeTo(filterFile, mGson.toJson(mi.getFilterNames()));
+                }
                 return null;
             }
         });
     }
     @Override
     public void copyValidMusics(String outDir, List<MusicItem2> items) {
-
+        final File out = new File(outDir, "musics");
+        FileUtils.deleteDir(out);
+        out.mkdirs();
+        List<MusicMappingItem> maps = VisitServices.from(items).map(new ResultVisitor<MusicItem2, MusicMappingItem>() {
+            @Override
+            public MusicMappingItem visit(MusicItem2 item, Object param) {
+                Float maxTime = item.getMaxTime();
+                File dst = new File(out, item.getId() + "." + FileUtils.getFileExtension(item.getRawFile()));
+                MusicMappingItem mmi = new MusicMappingItem();
+                mmi.setMusicName(item.getName());
+                mmi.setId(item.getId());
+                mmi.setFullId(dst.getAbsolutePath());
+                mmi.setFilename(item.getRawFile());
+                mmi.setDuration(maxTime);
+                return mmi;
+            }
+        }).fire(new FireVisitor<MusicMappingItem>() {
+            @Override
+            public Boolean visit(MusicMappingItem mmi, Object param) {
+                FileUtils.copyFile(new File(mmi.getFilename()), new File(mmi.getFullId()));
+                return null;
+            }
+        }).getAsList();
+        //save mapping
+        final File file_mapping = new File(outDir, "name_id_mapping.txt");
+        FileUtils.writeTo(file_mapping, mGson.toJson(maps));
     }
 
 

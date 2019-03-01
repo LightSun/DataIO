@@ -4,25 +4,25 @@ package com.heaven7.java.data.io.music.in;
  * @author heaven7
  */
 public class ExcelSources {
-    //数据源：旧标准， 标准，切点，速度特效，其他（短叠黑）,滤镜
+    //数据源：旧标准， 标准，切点，速度特效，转场,,滤镜
     private ExcelSource oldStandSource;
     private ExcelSource standSource;
     private ExcelSource speedEffectSource;
-    private ExcelSource blackFadeSource;
-    private ExcelSource filterSource;
     private ExcelSource transitionSource;
+    private ExcelSource filterSource;
+    private ExcelSource transCutSource;
 
     protected ExcelSources(ExcelSources.Builder builder) {
         this.oldStandSource = builder.oldStandSource;
         this.standSource = builder.standSource;
         this.speedEffectSource = builder.speedEffectSource;
-        this.blackFadeSource = builder.blackFadeSource;
-        this.filterSource = builder.filterSource;
         this.transitionSource = builder.transitionSource;
+        this.filterSource = builder.filterSource;
+        this.transCutSource = builder.transCutSource;
     }
 
-    public void setTransitionSource(ExcelSource transitionSource) {
-        this.transitionSource = transitionSource;
+    public void setTransCutSource(ExcelSource transitionSource) {
+        this.transCutSource = transitionSource;
     }
     public void setStandSource(ExcelSource standSource) {
         this.standSource = standSource;
@@ -52,16 +52,16 @@ public class ExcelSources {
         return this.speedEffectSource;
     }
 
-    public ExcelSource getBlackFadeSource() {
-        return this.blackFadeSource;
+    public ExcelSource getTransitionSource() {
+        return this.transitionSource;
     }
 
     public ExcelSource getFilterSource() {
         return this.filterSource;
     }
 
-    public ExcelSource getTransitionSource() {
-        return this.transitionSource;
+    public ExcelSource getTransCutSource() {
+        return transCutSource;
     }
 
     public static class Builder {
@@ -69,9 +69,9 @@ public class ExcelSources {
         private ExcelSource oldStandSource;
         private ExcelSource standSource;
         private ExcelSource speedEffectSource;
-        private ExcelSource blackFadeSource;
-        private ExcelSource filterSource;
         private ExcelSource transitionSource;
+        private ExcelSource filterSource;
+        private ExcelSource transCutSource;
 
         public Builder setOldStandSource(ExcelSource oldStandSource) {
             this.oldStandSource = oldStandSource;
@@ -88,8 +88,8 @@ public class ExcelSources {
             return this;
         }
 
-        public Builder setBlackFadeSource(ExcelSource blackFadeSource) {
-            this.blackFadeSource = blackFadeSource;
+        public Builder setTransitionSource(ExcelSource transitionSource) {
+            this.transitionSource = transitionSource;
             return this;
         }
 
@@ -98,8 +98,8 @@ public class ExcelSources {
             return this;
         }
 
-        public Builder setTransitionSource(ExcelSource transitionSource) {
-            this.transitionSource = transitionSource;
+        public Builder setTransCutSource(ExcelSource transCutSource) {
+            this.transCutSource = transCutSource;
             return this;
         }
 

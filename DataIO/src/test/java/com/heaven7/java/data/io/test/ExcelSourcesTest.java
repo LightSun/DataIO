@@ -92,7 +92,7 @@ public class ExcelSourcesTest {
                 .setSkipToRowIndex(2)
                 .build();
         SimpleExcelSource source = new SimpleExcelSource(helper);
-        BlackFadeTransfer transfer = new BlackFadeTransfer(new BlackFadeTransfer.Indexer());
+        TransitionTransfer transfer = new TransitionTransfer(new TransitionTransfer.Indexer());
         String[] names = {
                 "12_four-leaf-clover_0068", "12_short1_four-leaf-clover_0022"
         };

@@ -12,10 +12,7 @@ import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author heaven7
@@ -54,7 +51,7 @@ public class TransferCutSource implements ExcelSource {
                     }
                     String transCut = VisitServices.from(transCuts).joinToString(",");
                     List<MockExcelCol> cols = Arrays.asList(new MockExcelCol(UniformNameHelper.uniformSimpleMusicName(cutItem.getName())),
-                            new MockExcelCol(cutItem.getDuration() + ""),
+                            new MockExcelCol(cutItem.getDuration() + ""), new MockExcelCol("unused"),
                             new MockExcelCol(transCut));
                     return new MockExcelRow(cols);
                 }
@@ -66,10 +63,25 @@ public class TransferCutSource implements ExcelSource {
             }
             mRows = new ArrayList<>();
             for (int i =0, count = list.size() ; i < count ; i ++){
-                mRows.addAll(nopRows);
+                mRows.addAll(createNopRows());
                 mRows.add(list.get(i));
+            }
+            for(int i = 0 , size = mRows.size() ; i < size ; i ++){
+                MockExcelRow excelRow = (MockExcelRow) mRows.get(i);
+                excelRow.setRowIndex(i);
             }
         }
         return mRows;
     }
+
+    private Collection<? extends ExcelRow> createNopRows() {
+        //nop populate
+        List<ExcelRow> nopRows = new ArrayList<>();
+        for (int i = 0; i < TransitionCutTransfer.PERIOD - 1 ; i ++){
+            nopRows.add(new MockExcelRow());
+        }
+        return nopRows;
+    }
+
+
 }

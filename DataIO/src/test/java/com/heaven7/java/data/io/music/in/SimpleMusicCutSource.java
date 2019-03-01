@@ -40,7 +40,7 @@ public class SimpleMusicCutSource implements MusicCutSource {
         CutInfo sparseInfo = new CutInfo();
         sparseInfo.setType(CutInfo.TYPE_SPARSE);
         CutInfo intensiveInfo = new CutInfo();
-        sparseInfo.setType(CutInfo.TYPE_INTENSIVE);
+        intensiveInfo.setType(CutInfo.TYPE_INTENSIVE);
 
         List<Float> sparseCuts = VisitServices.from(cutItem.getCutLines()).map(new ResultVisitor<CutConfigBeanV10.CutLine, Float>() {
             @Override

@@ -41,13 +41,20 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
     private final IndexDelegate indexDelegate;
     private final String outDir;
     private final StringBuilder sb_warn = new StringBuilder();
-
+    private boolean useOldSpeedArea;
 
     public SimpleExcelSourceTransfer(MusicCutSource musicCutSource, SpeedAreaSource speedAreaSource, IndexDelegate indexDelegate, String outDir) {
         this.speedAreaSource = speedAreaSource;
         this.musicCutSource = musicCutSource;
         this.indexDelegate = indexDelegate;
         this.outDir = outDir;
+    }
+
+    public boolean isUseOldSpeedArea() {
+        return useOldSpeedArea;
+    }
+    public void setUseOldSpeedArea(boolean useOldSpeedArea) {
+        this.useOldSpeedArea = useOldSpeedArea;
     }
 
     public IndexDelegate getIndexDelegate() {
@@ -109,7 +116,7 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
     }
 
     private void handleSpeedAreas(List<ExcelCol> columns, MusicItem2 item, CutInfo intensiveInfo) {
-        if(speedAreaSource != null){
+        if(!useOldSpeedArea && speedAreaSource != null){
             item.setSlow_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_LOW));
             item.setMiddle_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_MIDDLE));
             item.setHigh_speed_areas(speedAreaSource.getSpeedArea(item, CutConfigBeanV10.AREA_TYPE_HIGH));

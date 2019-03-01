@@ -99,10 +99,12 @@ public class Configs {
     }
 
     public static int parseRhythm(String str) {
+        str = str.replace(" ", "");
         return sRhythm_map.get(str);
     }
 
     public static List<String> parseDomain(String str) {
+        str = str.replace(" ", "");
         String[] strs = str.split(";");
         return VisitServices.from(Arrays.asList(strs)).map(new ResultVisitor<String, String>() {
             @Override
@@ -113,6 +115,7 @@ public class Configs {
     }
 
     public static int parseMood(String str) {
+        str = str.replace(" ", "");
         try {
             return sMood_map.get(str);
         } catch (Exception e) {

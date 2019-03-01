@@ -9,6 +9,7 @@ import com.heaven7.java.data.io.music.in.SpeedAreaSource;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.AdditionalTransfer;
 import com.heaven7.java.data.io.music.transfer.OldStandExcelSourceTransfer;
+import com.heaven7.java.data.io.utils.FileMd5Helper;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -32,9 +33,9 @@ public class MusicSourceMediator {
     private IndexDelegate indexDelegate;
     //---------------------------------------
     private AdditionalTransfer speedEffectTransfer;
-    private AdditionalTransfer blackFadeTransfer;
-    private AdditionalTransfer filterTransfer;
     private AdditionalTransfer transitionTransfer;
+    private AdditionalTransfer filterTransfer;
+    private AdditionalTransfer transCutTransfer;
 
     protected MusicSourceMediator(MusicSourceMediator.Builder builder) {
         this.excelSources = builder.excelSources;
@@ -45,30 +46,31 @@ public class MusicSourceMediator {
         this.outDir = builder.outDir;
         this.indexDelegate = builder.indexDelegate;
         this.speedEffectTransfer = builder.speedEffectTransfer;
-        this.blackFadeTransfer = builder.blackFadeTransfer;
+        this.transitionTransfer = builder.transitionTransfer;
         this.filterTransfer = builder.filterTransfer;
-        this.transitionTransfer = builder.transitionCutTransfer;
+        this.transCutTransfer = builder.transCutTransfer;
     }
     public void normalize(){
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
-        OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource,indexDelegate, outDir);
-        List<MusicItem2> items = standTransfer.transfer(excelSources.getOldStandSource());
-        sb_warn.append(standTransfer.getSb_warn().toString());
-        List<MusicItem2> items2 = standTransfer.transfer(excelSources.getStandSource());
-        sb_warn.append(standTransfer.getSb_warn().toString());
-        items.addAll(items2);
+        List<MusicItem2> items = getMusicItems(sb_warn);
         //transfer other.
         speedEffectTransfer.transfer(excelSources.getSpeedEffectSource(), items);
-        blackFadeTransfer.transfer(excelSources.getBlackFadeSource(), items);
         transitionTransfer.transfer(excelSources.getTransitionSource(), items);
+        transCutTransfer.transfer(excelSources.getTransCutSource(), items);
         filterTransfer.transfer(excelSources.getFilterSource(), items);
 
         List<MusicItem2> noMusicItems = new ArrayList<>();
         items = VisitServices.from(items).filter(null, new PredicateVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
-                return musicSource.getMusicPath(mi) != null;
+                String musicPath = musicSource.getMusicPath(mi);
+                if(musicPath == null){
+                    return false;
+                }
+                mi.setRawFile(musicPath);
+                mi.setId(FileMd5Helper.getMD5Three(musicPath));
+                return true;
             }
         }, noMusicItems).getAsList();
          // write no musics.
@@ -90,6 +92,27 @@ public class MusicSourceMediator {
         musicOutDelegate.writeItem(outDir, items);
         //copy music to one dir
         musicOutDelegate.copyValidMusics(outDir, items);
+    }
+
+    private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {
+        OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource, indexDelegate, outDir);
+        if(excelSources.getOldStandSource() == null){
+            //only new
+            List<MusicItem2> items = standTransfer.transfer(excelSources.getStandSource());
+            sb_warn.append(standTransfer.getSb_warn().toString());
+            return items;
+        } else {
+            //for compat old and new
+            standTransfer.setUseOldSpeedArea(true);
+            List<MusicItem2> items = standTransfer.transfer(excelSources.getOldStandSource());
+            sb_warn.append(standTransfer.getSb_warn().toString());
+
+            standTransfer.setUseOldSpeedArea(false);
+            List<MusicItem2> items2 = standTransfer.transfer(excelSources.getStandSource());
+            sb_warn.append(standTransfer.getSb_warn().toString());
+            items.addAll(items2);
+            return items;
+        }
     }
 
     public ExcelSources getExcelSources() {
@@ -137,9 +160,9 @@ public class MusicSourceMediator {
         private IndexDelegate indexDelegate;
         //---------------------------------------
         private AdditionalTransfer speedEffectTransfer;
-        private AdditionalTransfer blackFadeTransfer;
+        private AdditionalTransfer transitionTransfer;
         private AdditionalTransfer filterTransfer;
-        private AdditionalTransfer transitionCutTransfer;
+        private AdditionalTransfer transCutTransfer;
         private SpeedAreaSource speedAreaSource;
 
         public Builder setExcelSources(ExcelSources excelSources) {
@@ -177,8 +200,8 @@ public class MusicSourceMediator {
             return this;
         }
 
-        public Builder setBlackFadeTransfer(AdditionalTransfer blackFadeTransfer) {
-            this.blackFadeTransfer = blackFadeTransfer;
+        public Builder setTransitionTransfer(AdditionalTransfer transitionTransfer) {
+            this.transitionTransfer = transitionTransfer;
             return this;
         }
 
@@ -187,8 +210,8 @@ public class MusicSourceMediator {
             return this;
         }
 
-        public Builder setTransitionCutTransfer(AdditionalTransfer transitionTransfer) {
-            this.transitionCutTransfer = transitionTransfer;
+        public Builder setTransitionCutTransfer(AdditionalTransfer transCutTransfer) {
+            this.transCutTransfer = transCutTransfer;
             return this;
         }
         public Builder setSpeedAreaSource(SpeedAreaSource speedAreaSource) {

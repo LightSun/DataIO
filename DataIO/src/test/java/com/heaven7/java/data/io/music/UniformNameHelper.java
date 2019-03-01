@@ -79,4 +79,7 @@ public class UniformNameHelper {
         return strs;
     }
 
+    public static void main(String[] args) {
+        System.out.println(uniformSimpleMusicName("339_full_sound-off_0158_preview"));
+    }
 }

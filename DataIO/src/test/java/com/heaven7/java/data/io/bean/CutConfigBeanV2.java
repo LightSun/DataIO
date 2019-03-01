@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.bean;
 
+import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 
@@ -28,12 +29,20 @@ public class CutConfigBeanV2 {
         if(cutItems == null){
             return null;
         }
-        return VisitServices.from(cutItems).query(new PredicateVisitor<CutItem>() {
-            @Override
-            public Boolean visit(CutItem cutItem, Object param) {
-                return rowName.equals(cutItem.getName()) && duration == cutItem.getDuration();
-            }
-        });
+        return VisitServices.from(cutItems)
+                .query(
+                        new PredicateVisitor<CutItem>() {
+                            @Override
+                            public Boolean visit(CutItem cutItem, Object param) {
+                                if (cutItem.name.contains("sound-off")) {
+                                    System.out.println();
+                                }
+                                return rowName.equals(
+                                                UniformNameHelper.uniformSimpleMusicName(
+                                                        cutItem.name))
+                                        && duration == cutItem.getDuration();
+                            }
+                        });
     }
 
     public static class CutItem{

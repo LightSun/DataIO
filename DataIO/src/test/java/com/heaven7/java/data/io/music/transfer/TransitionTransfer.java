@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** @author heaven7 */
-public class BlackFadeTransfer extends BaseAdditionalTransfer<List<EffectInfo>> {
+public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>> {
 
     private static final List<ColumnDelegate> DELEGATES = new ArrayList<>();
 
@@ -25,10 +25,10 @@ public class BlackFadeTransfer extends BaseAdditionalTransfer<List<EffectInfo>> 
         DELEGATES.add(new ColumnDelegate_M());
         DELEGATES.add(new ColumnDelegate_H());
     }
-    public BlackFadeTransfer(){
+    public TransitionTransfer(){
         this(new Indexer());
     }
-    public BlackFadeTransfer(Indexer indexer) {
+    public TransitionTransfer(Indexer indexer) {
         super("repeat_black", indexer);
     }
 

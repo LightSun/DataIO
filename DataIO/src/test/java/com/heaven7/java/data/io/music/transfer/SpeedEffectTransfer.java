@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 特效
  * @author heaven7
  */
 public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>> {

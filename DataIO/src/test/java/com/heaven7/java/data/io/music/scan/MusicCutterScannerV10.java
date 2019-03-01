@@ -37,7 +37,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
     }
 
     @Override
-    protected CutConfigBeanV10.CutItem readCutItem(String csvPath) {
+    protected CutConfigBeanV10.CutItem readCutItem(final String csvPath) {
         String dirName = FileUtils.getFileDir(csvPath, 1, false);
         if (dirName == null || !dirName.endsWith("s")) {
             throw new IllegalStateException("for version 2. csv path must used duration as direct dir. path like '30s', csvPath = " + csvPath);
@@ -55,9 +55,9 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
                 line = line.replace(" ", "");
                 String[] strs = line.split(",");
                 cl.setCut(Float.parseFloat(strs[0]));
-                cl.setFlags(getCutFlags(strs));
+                cl.addFlag(getCutFlags(strs));
                 //must call after flag set
-                getAreaType(strs, cl);
+                getAreaType(strs, cl, csvPath);
                 return cl;
             }
         }).read(null, csvPath);
@@ -81,7 +81,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         FileUtils.writeTo(targetFilePath, new Gson().toJson(beanV10));
     }
 
-    private void getAreaType(String[] strs, CutConfigBeanV10.CutLine line) {
+    private void getAreaType(String[] strs, CutConfigBeanV10.CutLine line, String csvPath) {
         //{L}, {M}, {H}
        // boolean hasLow boolean hasMiddle = false;boolean hasHigh = false;
         int areaType = -1;
@@ -99,7 +99,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         if(areaType == -1){
             areaType = mLastAreaType;
             if(mLastAreaType == -1){
-                throw new RuntimeException("wrong data for head line must has area type.");
+                throw new RuntimeException("wrong data for head line must has area type. csvPath = " + csvPath);
             }
         }else {
             mLastAreaType = areaType;
