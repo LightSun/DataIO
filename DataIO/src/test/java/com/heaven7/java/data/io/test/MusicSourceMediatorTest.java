@@ -49,46 +49,48 @@ public class MusicSourceMediatorTest {
     @Test
     public void testNew(){
         String oldMusicCutFile = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt";
-        String newMusicCutFile = "E:\\tmp\\bugfinds\\新版\\cut.txt";
+        String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
         String outDir = "E:\\tmp\\bugfinds\\新版\\out";
         MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2();
 
         SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);
         MusicCutSource oldMusicCutSrc = new OldMusicCutSource(oldMusicCutFile);
-        // TODO
+
         ExcelSource filterSource =
                 new SimpleExcelSource(
                         new ExcelHelper.Builder()
                                 .setUseXlsx(true)
-                                .setExcelPath("E:\\tmp\\bugfinds\\测试001.xlsx")
-                                .setSkipToRowIndex(0)
-                                .setSheetName("工作表 1 - 表格 1-1-1-1-1")
+                                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                                .setSkipToRowIndex(2)
+                                .setSheetName("滤镜 - 表格 1-1-1-1-1")
                                 .build());
         ExcelSource transitionSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试001.xlsx")
-                .setSkipToRowIndex(0)
-                .setSheetName("工作表 1 - 表格 1-1-1-1")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                .setSkipToRowIndex(2)
+                .setSheetName("转场 - 表格 1-1-1-1")
                 .build());
         ExcelSource effectSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试001.xlsx")
-                .setSkipToRowIndex(0)
-                .setSheetName("工作表 1 - 表格 1-1")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                .setSkipToRowIndex(2)
+                .setSheetName("特效 - 表格 1-1")
                 .build());
         ExcelSource standSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试001.xlsx")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
                 .setSkipToRowIndex(1)
-                .setSheetName("工作表 1 - 表格 2-1")
+                .setSheetName("切点 - 表格 2-1")
                 .build());
-        ExcelSource oldStandSource = new SimpleExcelSource(new ExcelHelper.Builder()
-                .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试001.xlsx")
-                .setSkipToRowIndex(0)
-                .setSheetName("旧数据1")
-                .build());
+        ExcelSource oldStandSource =
+                new SimpleExcelSource(
+                        new ExcelHelper.Builder()
+                                .setUseXlsx(true)
+                                .setExcelPath("E:\\tmp\\bugfinds\\music9.xlsx")
+                                .setSkipToRowIndex(2)
+                                .setSheetName("sheet3")
+                                .build());
 
         //--------------------------------------------
         MusicSourceMediator mediator = new MusicSourceMediator.Builder()

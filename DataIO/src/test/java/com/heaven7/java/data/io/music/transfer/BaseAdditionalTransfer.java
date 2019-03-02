@@ -27,6 +27,10 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
         this.transferName = transferName;
     }
 
+    public String getTransferName() {
+        return transferName;
+    }
+
     @Override
     public final void transfer(ExcelSource effect, final List<MusicItem2> toItems) {
         final List<ExcelRow> rows = effect.getRows();

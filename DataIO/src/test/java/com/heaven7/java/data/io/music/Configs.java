@@ -46,25 +46,39 @@ public class Configs {
         sCategories_str.put("古典", "Classic");
 
         sEffectMap.put("慢到快", "speed_50_to_speed_200");
+        sEffectMap.put("慢速到快速", "speed_50_to_speed_200");
         sEffectMap.put("快到慢", "speed_200_to_speed_50");
+        sEffectMap.put("快速到慢速", "speed_200_to_speed_50");
         sEffectMap.put("正常到慢速", "speed_100_to_speed_50");
         sEffectMap.put("正常到慢", "speed_100_to_speed_50");
         sEffectMap.put("慢到正常", "speed_50_to_speed_100");
         sEffectMap.put("快到正常", "speed_120_to_speed_100");
+        sEffectMap.put("快速到正常", "speed_120_to_speed_100");
         sEffectMap.put("正常到快", "speed_100_to_speed_120");
+        sEffectMap.put("正常到快速", "speed_100_to_speed_120");
         sEffectMap.put("极慢到极快", "speed_25_to_speed_1600");
         sEffectMap.put("极快到极慢", "speed_1600_to_speed_25");
 
         sEffectMap.put("速度x0.5", "speed_50");
+        sEffectMap.put("速度0.5", "speed_50");
+        sEffectMap.put("x0.5", "speed_50");
         sEffectMap.put("速度x0.8", "speed_80");
         sEffectMap.put("速度x1.2", "speed_120");
         sEffectMap.put("速度x2", "speed_200");
         sEffectMap.put("速度x4", "speed_400");
+        sEffectMap.put("速度4x", "speed_400");
         sEffectMap.put("左平移", "left_translation");
         sEffectMap.put("右平移", "right_translation");
         sEffectMap.put("放大", "zoom_in");
         sEffectMap.put("缩小", "zoom_out");
         sEffectMap.put("无", "none");
+
+        sEffectMap.put("慢速x0.8", "speed_80");
+        sEffectMap.put("慢速x0.5", "speed_50");
+        sEffectMap.put("极慢x0.25", "speed_25");
+        sEffectMap.put("JEPG", "jepg");
+        sEffectMap.put("左旋转", "rotate_left");
+        sEffectMap.put("右旋转", "rotate_right");
 
         sTransitionMap.put("无", "none");
         sTransitionMap.put("叠化", "dissolve");
@@ -81,6 +95,16 @@ public class Configs {
         sTransitionMap.put("推动右左", "push_right_left");
         sTransitionMap.put("错位左右", "comb_left_right");
         sTransitionMap.put("错位右左", "comb_right_left");
+
+        sTransitionMap.put("左错位", "comb_right_left");
+        sTransitionMap.put("右错位", "comb_left_right");
+        sTransitionMap.put("右推动", "push_left_right");
+        sTransitionMap.put("左推动", "push_right_left");
+        sTransitionMap.put("下推动", "push_down");
+        sTransitionMap.put("zoom r", "zoom_rotate");
+        sTransitionMap.put("zoom l", "zoom_left");
+        sTransitionMap.put("右滚筒", "rotate_right");
+        sTransitionMap.put("左滚筒", "rotate_left");
     }
 
     public static String getEffectStr(String key){
@@ -100,7 +124,11 @@ public class Configs {
 
     public static int parseRhythm(String str) {
         str = str.replace(" ", "");
-        return sRhythm_map.get(str);
+        try{
+            return sRhythm_map.get(str);
+        }catch (RuntimeException e){
+            throw e;
+        }
     }
 
     public static List<String> parseDomain(String str) {
@@ -115,6 +143,9 @@ public class Configs {
     }
 
     public static int parseMood(String str) {
+        if(str.endsWith("\t")){
+            str = str.substring(0, str.length() - 1);
+        }
         str = str.replace(" ", "");
         try {
             return sMood_map.get(str);

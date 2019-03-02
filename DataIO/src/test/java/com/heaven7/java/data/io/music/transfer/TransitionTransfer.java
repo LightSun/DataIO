@@ -29,7 +29,7 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
         this(new Indexer());
     }
     public TransitionTransfer(Indexer indexer) {
-        super("repeat_black", indexer);
+        super("transition", indexer);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
                                 EffectInfo info = delegate.create();
                                 String effectStr = Configs.getTransitionStr(s);
                                 if (Predicates.isEmpty(effectStr)) {
-                                    System.err.println("RepeatBlackTransfer >>> wrong effect:  " + s);
+                                    System.err.println( "TransitionTransfer >>> wrong effect:  " + s);
                                 }
                                 info.setEffect(effectStr);
                                 return info;

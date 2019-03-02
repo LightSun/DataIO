@@ -83,7 +83,7 @@ public class ExcelSourcesTest {
     }
 
     @Test
-    public void testBlackFadeSource(){
+    public void testTransitionSource(){
         String exl = "E:\\tmp\\bugfinds\\方案.xlsx";
         ExcelHelper helper = new ExcelHelper.Builder()
                 .setUseXlsx(true)

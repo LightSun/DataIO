@@ -48,9 +48,22 @@ public class OldStandExcelSourceTransfer extends SimpleExcelSourceTransfer{
             return true;
         }*/
         String category = row.getColumns().get(indexDelegate.getCategoryIndex()).getColumnString();
+        String duration = row.getColumns().get(indexDelegate.getDurationIndex()).getColumnString();
         if(TextUtils.isEmpty(category)){
             String name = row.getColumns().get(indexDelegate.getNameIndex()).getColumnString();
-            Logger.w(TAG, "filter", "no category for music:  '+ " + name + " +'");
+            Logger.w(TAG, "filter", "no category for music:  "+ name + ", rowIndex = "
+                    + row.getRowIndex() + " , duration = " + duration);
+            return true;
+        }
+        try{
+            if(duration.endsWith("s")){
+                duration = duration.substring(0, duration.length() - 1);
+            }
+            Integer.parseInt(duration);
+        }catch (NumberFormatException e){
+            String name = row.getColumns().get(indexDelegate.getNameIndex()).getColumnString();
+            Logger.w(TAG, "filter", "Invalid duration for music:  "+ name + ", rowIndex = "
+                    + row.getRowIndex() + " , duration = " + duration);
             return true;
         }
         return false;

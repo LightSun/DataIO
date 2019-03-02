@@ -44,7 +44,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         VisitServices.from(items).fire(new FireVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
-                String infoFile = outDir + File.separator + "music_" + mi.genUniqueId() + ".json";
+                String infoFile = outDir + File.separator + "music_info_" + mi.genUniqueId() + ".json";
                 String effectFile = outDir + File.separator + "effect_" + mi.genUniqueId() + ".json";
                 String transitionFile = outDir + File.separator + "transition_" + mi.genUniqueId() + ".json";
                 String filterFile = outDir + File.separator + "filter_" + mi.genUniqueId() + ".json";
