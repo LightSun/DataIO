@@ -80,6 +80,16 @@ public class Configs {
         sEffectMap.put("左旋转", "rotate_left");
         sEffectMap.put("右旋转", "rotate_right");
 
+        sEffectMap.put("缓慢放大", "zoom_in");
+        sEffectMap.put("缓慢缩小", "zoom_out");
+        sEffectMap.put("缓慢上移", "move_up_slow");
+        sEffectMap.put("缓慢下移", "move_down_slow");
+        sEffectMap.put("缓慢左移", "move_left_slow");
+        sEffectMap.put("缓慢右移", "move_right_slow");
+        sEffectMap.put("变焦", "zoom");
+        sEffectMap.put("左靠位", "position_left");
+        sEffectMap.put("右靠位", "position_right");
+
         sTransitionMap.put("无", "none");
         sTransitionMap.put("叠化", "dissolve");
         sTransitionMap.put("闪白", "white_fade");
