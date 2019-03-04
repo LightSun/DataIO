@@ -167,7 +167,7 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
 
     private void writeMappingFile(MusicItem2 item, List<TimeArea> areas) {
         //write mapping
-        String outFile = outDir + File.separator + item.getName() + "___mapping.txt";
+        String outFile = outDir + File.separator + "mapping" + File.separator + item.getName() + "___mapping.txt";
         StringBuilder sb_mapping = new StringBuilder();
         Collections.sort(areas);
         for (TimeArea ta : areas){

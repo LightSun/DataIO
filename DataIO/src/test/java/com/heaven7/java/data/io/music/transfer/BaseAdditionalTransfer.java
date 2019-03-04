@@ -61,7 +61,8 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
                     }
                 });
                 if(matchItem == null){
-                    System.err.println("can't find " + transferName + " ,for lineNum = " + wsb.getLineNumber() + ",musicName = " + wsb.getName());
+                    System.err.println("can't find " + transferName + " ,for lineNum = " + wsb.getLineNumber()
+                            + ",musicName = " + wsb.getName() + " ,duration = " + wsb.getDuration());
                 }else {
                     applyAdditionInfo(matchItem, wsb);
                 }

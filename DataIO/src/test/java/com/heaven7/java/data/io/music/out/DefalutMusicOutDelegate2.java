@@ -134,7 +134,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             }
         }).getAsList();
         //save mapping
-        final File file_mapping = new File(outDir, "name_id_mapping.txt");
+        final File file_mapping = new File(outDir, "mapping" +File.separator + "name_id_mapping.txt");
         FileUtils.writeTo(file_mapping, mGson.toJson(maps));
     }
 
