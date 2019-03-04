@@ -14,6 +14,7 @@ import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.heaven7.java.data.io.utils.MusicItem2Helper.getEffectOutItem;
@@ -93,7 +94,7 @@ public class MusicItem2 implements MusicItemDelegate{
     }
 
     public List<String> getFilterNames() {
-        return filterNames;
+        return filterNames != null ? filterNames : new ArrayList<String>();
     }
     public void setFilterNames(List<String> filterNames) {
         this.filterNames = filterNames;

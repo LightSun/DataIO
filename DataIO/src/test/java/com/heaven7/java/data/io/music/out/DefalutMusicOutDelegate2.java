@@ -7,6 +7,12 @@ import com.heaven7.java.data.io.bean.*;
 import com.heaven7.java.data.io.bean.jsonAdapter.MusicItem2JsonAdapter;
 import com.heaven7.java.data.io.music.Configs;
 import com.heaven7.java.data.io.music.PartOutput;
+import com.heaven7.java.data.io.music.UniformNameHelper;
+import com.heaven7.java.data.io.poi.apply.Cell_StringApplier;
+import com.heaven7.java.data.io.poi.apply.Sheet_WidthHeightApplier;
+import com.heaven7.java.data.io.poi.apply.TitleRowApplier;
+import com.heaven7.java.data.io.poi.write.DefaultExcelWriter;
+import com.heaven7.java.data.io.poi.write.ExcelWriter;
 import com.heaven7.java.data.io.utils.FileUtils;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
@@ -15,10 +21,7 @@ import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author heaven7
@@ -66,10 +69,17 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
     @Override
     public void writeTotal(String outDir, String simpleFileName, List<MusicItem2> items) {
+        String json = mGson.toJson(items);
+        String outJsonFile = outDir + File.separator + simpleFileName + ".json";
+        FileUtils.writeTo(outJsonFile, json);
+
+        //write server excel
+        writeServerExcel(outDir, simpleFileName, items);
     }
 
     @Override
     public void writeWarn(String outDir, String simpleFileName, String warnMessages) {
+        System.out.println("writeWarn: >>>\r\n" + warnMessages);
     }
 
     @Override
@@ -128,5 +138,61 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         FileUtils.writeTo(file_mapping, mGson.toJson(maps));
     }
 
+    private void writeServerExcel(String outDir, String simpleFileName, List<MusicItem2> items) {
+        ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
+                .nesting()
+                .newSheet("server-data")
+                .apply(new Sheet_WidthHeightApplier(10000, 500, 4))
+                .apply(new TitleRowApplier(Arrays.asList("name", "timelen", "hashid", "category","categoryId","music_info",
+                        "effects", "transitions", "filters")))
+                .nesting();
+        int rowIndex = 1;
+        for(MusicItem2 item : items){
+            sf.newRow(rowIndex)
+                    .nesting()
+                    .newCell(0)
+                    .apply(new Cell_StringApplier(UniformNameHelper.trimPrefixDigital(item.getName())))
+                    .end()
+                    .nesting()
+                    .newCell(1)
+                    .apply(new Cell_StringApplier(item.getDuration() + ""))
+                    .end()
+                    .nesting()
+                    .newCell(2)
+                    .apply(new Cell_StringApplier(item.getId()))
+                    .end()
+                    .nesting()
+                    .newCell(3)
+                    .apply(new Cell_StringApplier(Configs.getCategoryEnglish(item.getCategoryStr())))
+                    .end()
+                    .nesting()
+                    .newCell(4)
+                    .apply(new Cell_StringApplier(item.getCategory() + ""))
+                    .end()
+                    .nesting()
+                    .newCell(5)
+                    .apply(new Cell_StringApplier(mGson.toJson(item)))
+                    .end();
+            //effect, transition, filter
+            EffectOutItem eoi = item.getSpecialEffectItem();
+            if(eoi != null){
+                sf.nesting().newCell(6).apply(new Cell_StringApplier(mGson.toJson(eoi)));
+            }else {
+                sf.nesting().newCell(6).apply(new Cell_StringApplier("{}"));
+            }
+            eoi = item.getTransitionItem();
+            if(eoi != null){
+                sf.nesting().newCell(7).apply(new Cell_StringApplier(mGson.toJson(eoi)));
+            }else {
+                sf.nesting().newCell(7).apply(new Cell_StringApplier("{}"));
+            }
+            sf.nesting().newCell(8).apply(new Cell_StringApplier(mGson.toJson(item.getFilterNames())));
+            //add index
+            rowIndex ++;
+        }
+
+        String out = outDir + File.separator + simpleFileName + "_db.xlsx";
+        sf.end().end().write(out);
+    }
 
 }
