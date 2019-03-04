@@ -61,25 +61,25 @@ public class MusicSourceMediatorTest {
                 new SimpleExcelSource(
                         new ExcelHelper.Builder()
                                 .setUseXlsx(true)
-                                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
                                 .setSkipToRowIndex(2)
                                 .setSheetName("滤镜 - 表格 1-1-1-1-1")
                                 .build());
         ExcelSource transitionSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
                 .setSkipToRowIndex(2)
                 .setSheetName("转场 - 表格 1-1-1-1")
                 .build());
         ExcelSource effectSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
                 .setSkipToRowIndex(2)
                 .setSheetName("特效 - 表格 1-1")
                 .build());
         ExcelSource standSource = new SimpleExcelSource(new ExcelHelper.Builder()
                 .setUseXlsx(true)
-                .setExcelPath("E:\\tmp\\bugfinds\\测试002.xlsx")
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
                 .setSkipToRowIndex(1)
                 .setSheetName("切点 - 表格 2-1")
                 .build());

@@ -26,6 +26,7 @@ public class Configs {
         sDomain_map.put("聚会", "party");
 
         sMood_map.put("标准的", 1);
+        sMood_map.put("标准", 1);
         sMood_map.put("多变的", 2);
         sMood_map.put("单调的", 0);
 
@@ -137,6 +138,7 @@ public class Configs {
         try{
             return sRhythm_map.get(str);
         }catch (RuntimeException e){
+            System.err.println("wrong rhythm: " + str);
             throw e;
         }
     }
