@@ -24,6 +24,22 @@ public abstract class PartOutput {
         return getPartDomain() + "_music_" + getPartRhythm() + "_" + getDuration() + "s";
     }
 
+    public String getFormatFilename(int duration){
+        return getPartDomain() + "_music_" + getPartRhythm() + "_" + duration + "s";
+    }
+
+    public final <T extends MusicItemDelegate> List<T> collectDomainWithRhythmWithoutDuration(List<T> rawItems){
+        List<T> matchItems = new ArrayList<>();
+        String domain = getPartDomain();
+        int rhythm = getPartRhythm();
+        for(T item : rawItems){
+            if(item.getDomains().contains(domain) && item.getRhythm() == rhythm){
+                matchItems.add(item);
+            }
+        }
+        return matchItems;
+    }
+
     public final <T extends MusicItemDelegate> List<T> collectDomainWithRhythm(List<T> rawItems){
         List<T> matchItems = new ArrayList<>();
         String domain = getPartDomain();

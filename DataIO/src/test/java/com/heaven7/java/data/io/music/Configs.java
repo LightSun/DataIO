@@ -199,4 +199,15 @@ public class Configs {
         }
         return out;
     }
+    public static List<PartOutput> getPartsOfDomainRhythm() {
+        List<PartOutput> out = new ArrayList<>();
+        Collection<String> domains = sDomain_map.values();
+        Collection<Integer> rhythms = sRhythm_map.values();
+        for (String domain : domains) {
+            for (Integer rhythm : rhythms) {
+                 out.add(new PartOutput.SimplePartOutput(domain, -1, rhythm, -1));
+            }
+        }
+        return out;
+    }
 }

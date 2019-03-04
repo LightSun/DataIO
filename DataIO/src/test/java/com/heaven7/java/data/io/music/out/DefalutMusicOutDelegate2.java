@@ -29,6 +29,39 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
     @Override
     public void writePart(final String outDir, final List<MusicItem2> items) {
+        //domain_music_thythm_duration
+        final List<PartOutput> parts = Configs.getPartsOfDomainRhythm();
+        VisitServices.from(items).groupService(new ResultVisitor<MusicItem2, Integer>() {
+            @Override
+            public Integer visit(MusicItem2 musicItem2, Object param) {
+                return musicItem2.getDuration();
+            }
+        }).mapPair().fire(new FireVisitor<KeyValuePair<Integer, List<MusicItem2>>>() {
+            @Override
+            public Boolean visit(final KeyValuePair<Integer, List<MusicItem2>> pair, Object param) {
+                final Integer duration = pair.getKey();
+                VisitServices.from(parts).fire(new FireVisitor<PartOutput>() {
+                    @Override
+                    public Boolean visit(PartOutput po, Object param) {
+                        List<String> list = VisitServices.from(po.collectDomainWithRhythmWithoutDuration(pair.getValue()))
+                                .map(new ResultVisitor<MusicItem2, String>() {
+                                    @Override
+                                    public String visit(MusicItem2 musicItem2, Object param) {
+                                        return musicItem2.getId();
+                                    }
+                                }).getAsList();
+                        if (list.isEmpty()) {
+                            System.out.println("no items for '"+ po.getFormatFilename(duration) + ".json'");
+                            return false;
+                        }
+                        String partPath = outDir + File.separator + "parts" + File.separator + po.getFormatFilename(duration) + ".json";
+                        FileUtils.writeTo(partPath, mGson.toJson(list));
+                        return null;
+                    }
+                });
+                return null;
+            }
+        });
     }
 
     @Override
