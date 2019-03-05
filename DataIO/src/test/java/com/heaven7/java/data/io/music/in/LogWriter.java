@@ -7,8 +7,18 @@ package com.heaven7.java.data.io.music.in;
 public interface LogWriter {
 
 
+    /**
+     * write transfer item log. often transfer excel row to item.
+     * @param transferName the transfer name
+     * @param log the log
+     */
     void writeTransferItem(String transferName, String log);
 
+    /**
+     * write transfer effect log. like effects-filter-transition.
+     * @param transferName the transfer name
+     * @param log the log
+     */
     void writeTransferEffect(String transferName, String log);
 
     /**
@@ -17,4 +27,13 @@ public interface LogWriter {
      */
     void writeMusicFileNotExist(String log);
 
+    /**
+     * start write log
+     */
+    void start();
+
+    /**
+     * end write log
+     */
+    void end();
 }

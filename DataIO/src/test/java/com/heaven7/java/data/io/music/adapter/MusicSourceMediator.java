@@ -66,6 +66,7 @@ public class MusicSourceMediator {
             logWriter = DefaultLogWriter.INSTANCE;
             setLogWriter();
         }
+        logWriter.start();
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
         List<MusicItem2> items = getMusicItems(sb_warn);
@@ -109,6 +110,8 @@ public class MusicSourceMediator {
         musicOutDelegate.writeItem(outDir, items);
         //copy music to one dir
         musicOutDelegate.copyValidMusics(outDir, items);
+
+        logWriter.end();
     }
 
     private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {

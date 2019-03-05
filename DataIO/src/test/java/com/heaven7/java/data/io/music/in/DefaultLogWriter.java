@@ -21,4 +21,14 @@ public class DefaultLogWriter implements LogWriter {
     public void writeMusicFileNotExist(String log) {
 
     }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void end() {
+
+    }
 }

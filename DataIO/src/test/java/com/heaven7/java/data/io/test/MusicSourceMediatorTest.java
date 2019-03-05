@@ -4,6 +4,7 @@ import com.heaven7.java.data.io.music.adapter.IndexDelegateV3;
 import com.heaven7.java.data.io.music.adapter.MusicSourceMediator;
 import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.music.out.DefalutMusicOutDelegate2;
+import com.heaven7.java.data.io.music.out.FileLogWriter;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.TransitionTransfer;
 import com.heaven7.java.data.io.music.transfer.FilterTransfer;
@@ -158,6 +159,7 @@ public class MusicSourceMediatorTest {
                 .setSpeedEffectTransfer(new SpeedEffectTransfer())
                 .setTransitionCutTransfer(new TransitionCutTransfer())
                 .setForceUseNewSpeedArea(true)
+                .setLogWriter(new FileLogWriter(outDir))
                 .build();
 
         mediator.normalize();
