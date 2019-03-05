@@ -51,7 +51,7 @@ public class MusicSourceMediatorTest {
         String oldMusicCutFile = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt";
         String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
-        String outDir = "E:\\tmp\\bugfinds\\新版\\out";
+        String outDir = "E:\\tmp\\bugfinds\\新版\\out2";
         MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2();
 
         SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);

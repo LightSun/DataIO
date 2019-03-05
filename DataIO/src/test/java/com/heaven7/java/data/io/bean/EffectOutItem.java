@@ -44,6 +44,18 @@ public class EffectOutItem {
         ScoreArea low_score_area = new ScoreArea();
         ScoreArea middle_score_area  = new ScoreArea();
         ScoreArea high_score_area  = new ScoreArea();
+        ScoreArea no_score_area;
+
+        //for no-score-area. just set low/middle/high score_area null.
+        public ScoreArea ensureNoScoreAreaNotNull(){
+            if(this.no_score_area == null){
+                this.no_score_area = new ScoreArea();
+                low_score_area = null;
+                middle_score_area = null;
+                high_score_area = null;
+            }
+            return no_score_area;
+        }
 
         public ScoreArea getLow_score_area() {
             return low_score_area;

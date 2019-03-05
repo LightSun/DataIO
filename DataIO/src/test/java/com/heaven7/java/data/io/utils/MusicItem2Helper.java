@@ -65,9 +65,10 @@ public class MusicItem2Helper {
                             case EffectInfo.NONE:
                                 //for none it can be used for low-middle-high score areas.
                                 List<String> effects = inflateEffects(pair);
-                                area.getLow_score_area().getVideoScope().addEffects(effects);
+                                area.ensureNoScoreAreaNotNull().getVideoScope().addEffects(effects);
+                              /*  area.getLow_score_area().getVideoScope().addEffects(effects);
                                 area.getMiddle_score_area().getVideoScope().addEffects(effects);
-                                area.getHigh_score_area().getVideoScope().addEffects(effects);
+                                area.getHigh_score_area().getVideoScope().addEffects(effects);*/
                                 return true;
                             default:
                                 throw new RuntimeException("wrong effect category. = " + pair.getKey());
