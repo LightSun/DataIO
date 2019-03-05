@@ -9,9 +9,7 @@ import com.heaven7.java.data.io.bean.TimeArea;
 import com.heaven7.java.data.io.music.ErrorVerifier;
 import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.adapter.IndexDelegate;
-import com.heaven7.java.data.io.music.in.ExcelSource;
-import com.heaven7.java.data.io.music.in.MusicCutSource;
-import com.heaven7.java.data.io.music.in.SpeedAreaSource;
+import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.utils.FileUtils;
@@ -42,6 +40,7 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
     private final String outDir;
     private final StringBuilder sb_warn = new StringBuilder();
     private boolean useOldSpeedArea;
+    private LogWriter logWriter;
 
     public SimpleExcelSourceTransfer(MusicCutSource musicCutSource, SpeedAreaSource speedAreaSource, IndexDelegate indexDelegate, String outDir) {
         this.speedAreaSource = speedAreaSource;
@@ -65,15 +64,24 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
         return sb_warn;
     }
 
+    public void setLogWriter(LogWriter logWriter) {
+        this.logWriter = logWriter;
+    }
+
     @Override
     public List<MusicItem2> transfer(ExcelSource source) {
+        if(logWriter == null){
+            logWriter = DefaultLogWriter.INSTANCE;
+        }
         sb_warn.delete(0, sb_warn.length());
         List<MusicItem2> items = VisitServices.from(source.getRows()).map(new ResultVisitor<ExcelRow, MusicItem2>() {
             @Override
             public MusicItem2 visit(ExcelRow row, Object param) {
                 List<ExcelCol> columns = row.getColumns();
                 if (filter(row)) {
-                    log(columns, "filter(row)", "line number = " + (row.getRowIndex() + 1));
+                    String msg =  "the row is filtered. row number = " + (row.getRowIndex() + 1);
+                    log(columns, "filter(row)", msg);
+                    logWriter.writeTransferItem(TAG, msg);
                     return null;
                 }
 
@@ -84,8 +92,9 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
 
                 List<CutInfo> infos = musicCutSource.getCutInfos(item);
                 if (infos == null) {
-                    log(columns, "no cuts", "line number = " + (row.getRowIndex() + 1)
-                            + " ,music name = " + item.getName());
+                    String msg = "can't find cuts, line number = " + (row.getRowIndex() + 1) + " ,music key = " + item.getUniqueKey();
+                    log(columns, "no cuts", msg);
+                    logWriter.writeTransferItem(TAG, msg);
                     return null;
                 }
                 item.setCutInfos(infos);
@@ -106,7 +115,9 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
                 ErrorVerifier.check(item, cuts.get(cuts.size() - 1), sb_warn);
 
                 if (item.isAllAreaEmpty()) {
-                    log(columns, "isAllAreaEmpty()", "line number = " + (row.getRowIndex() + 1));
+                    String msg = "no speed area. line number = " + (row.getRowIndex() + 1) + " ,music key = " + item.getUniqueKey();
+                    log(columns, "isAllAreaEmpty()", msg);
+                    logWriter.writeTransferItem(TAG, msg);
                     return null;
                 }
                 return item;
@@ -142,7 +153,7 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
         item.setRhythm(parseRhythm(columns.get(indexDelegate.getRhythmIndex()).getColumnString()));
     }
 
-    protected  boolean filter(ExcelRow row){
+    protected boolean filter(ExcelRow row){
         List<ExcelCol> columns = row.getColumns();
         String name = columns.get(indexDelegate.getNameIndex()).getColumnString();
         String domain = columns.get(indexDelegate.getDomainIndex()).getColumnString();
@@ -178,4 +189,5 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
     protected void log(List<ExcelCol> columns, String mTag, String msg){
         Logger.d(TAG, mTag, msg);
     }
+
 }

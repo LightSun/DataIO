@@ -5,6 +5,7 @@ import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.WrappedSubItem;
 import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.in.ExcelSource;
+import com.heaven7.java.data.io.music.in.LogWriter;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
@@ -21,6 +22,7 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
     public static final int MAX_ROW_MERGE_COUNT = 3;
     protected final Indexer indexer;
     private final String transferName;
+    private LogWriter logWriter;
 
     public BaseAdditionalTransfer(String transferName, Indexer indexer) {
         this.indexer = indexer;
@@ -29,6 +31,15 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
 
     public String getTransferName() {
         return transferName;
+    }
+    @Override
+    public void setLogWriter(LogWriter logWriter) {
+        this.logWriter = logWriter;
+    }
+
+    @Override
+    public LogWriter getLogWriter() {
+        return logWriter;
     }
 
     @Override
@@ -41,6 +52,7 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
                 T t = parseItem(row);
                 if(t == null){
                     //Logger.d(transferName, "parseItem is null.");
+                    logWriter.writeTransferEffect(getTransferName(), "parseItem return null. row num = " + (row.getRowIndex() + 1));
                     return null;
                 }
                 String name = row.getCellString(rows, indexer.nameIndex, MAX_ROW_MERGE_COUNT);
@@ -61,8 +73,10 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
                     }
                 });
                 if(matchItem == null){
-                    System.err.println("can't find " + transferName + " ,for lineNum = " + wsb.getLineNumber()
-                            + ",musicName = " + wsb.getName() + " ,duration = " + wsb.getDuration());
+                    String msg = "can't find " + transferName + " ,for lineNum = " + wsb.getLineNumber()
+                            + ",musicName = " + wsb.getName() + " ,duration = " + wsb.getDuration();
+                    System.err.println(msg);
+                    logWriter.writeTransferEffect(getTransferName(), msg);
                 }else {
                     applyAdditionInfo(matchItem, wsb);
                 }

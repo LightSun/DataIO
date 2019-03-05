@@ -2,10 +2,7 @@ package com.heaven7.java.data.io.music.adapter;
 
 import com.heaven7.java.base.util.Platforms;
 import com.heaven7.java.data.io.bean.MusicItem2;
-import com.heaven7.java.data.io.music.in.ExcelSources;
-import com.heaven7.java.data.io.music.in.MusicCutSource;
-import com.heaven7.java.data.io.music.in.MusicSource;
-import com.heaven7.java.data.io.music.in.SpeedAreaSource;
+import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.AdditionalTransfer;
 import com.heaven7.java.data.io.music.transfer.OldStandExcelSourceTransfer;
@@ -36,6 +33,8 @@ public class MusicSourceMediator {
     private AdditionalTransfer transitionTransfer;
     private AdditionalTransfer filterTransfer;
     private AdditionalTransfer transCutTransfer;
+    private boolean forceUseNewSpeedArea;
+    private LogWriter logWriter;
 
     protected MusicSourceMediator(MusicSourceMediator.Builder builder) {
         this.excelSources = builder.excelSources;
@@ -49,8 +48,24 @@ public class MusicSourceMediator {
         this.transitionTransfer = builder.transitionTransfer;
         this.filterTransfer = builder.filterTransfer;
         this.transCutTransfer = builder.transCutTransfer;
+        this.forceUseNewSpeedArea = builder.forceUseNewSpeedArea;
+        this.logWriter = builder.logWriter;
+        setLogWriter();
     }
+
+    private void setLogWriter(){
+        LogWriter writer = this.logWriter;
+        speedEffectTransfer.setLogWriter(writer);
+        transitionTransfer.setLogWriter(writer);
+        transCutTransfer.setLogWriter(writer);
+        filterTransfer.setLogWriter(writer);
+    }
+
     public void normalize(){
+        if(logWriter == null){
+            logWriter = DefaultLogWriter.INSTANCE;
+            setLogWriter();
+        }
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
         List<MusicItem2> items = getMusicItems(sb_warn);
@@ -60,12 +75,14 @@ public class MusicSourceMediator {
         transCutTransfer.transfer(excelSources.getTransCutSource(), items);
         filterTransfer.transfer(excelSources.getFilterSource(), items);
 
+        //方案主要功能做了。除了剪辑底层。
         List<MusicItem2> noMusicItems = new ArrayList<>();
         items = VisitServices.from(items).filter(null, new PredicateVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
                 String musicPath = musicSource.getMusicPath(mi);
                 if(musicPath == null){
+                    logWriter.writeMusicFileNotExist("music not exist. " + mi.getUniqueKey());
                     return false;
                 }
                 mi.setRawFile(musicPath);
@@ -96,6 +113,7 @@ public class MusicSourceMediator {
 
     private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {
         OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource, indexDelegate, outDir);
+        standTransfer.setLogWriter(logWriter);
         if(excelSources.getOldStandSource() == null){
             //only new
             List<MusicItem2> items = standTransfer.transfer(excelSources.getStandSource());
@@ -103,7 +121,7 @@ public class MusicSourceMediator {
             return items;
         } else {
             //for compat old and new
-            standTransfer.setUseOldSpeedArea(true);
+            standTransfer.setUseOldSpeedArea(!forceUseNewSpeedArea);
             List<MusicItem2> items = standTransfer.transfer(excelSources.getOldStandSource());
             sb_warn.append(standTransfer.getSb_warn().toString());
 
@@ -164,6 +182,18 @@ public class MusicSourceMediator {
         private AdditionalTransfer filterTransfer;
         private AdditionalTransfer transCutTransfer;
         private SpeedAreaSource speedAreaSource;
+        private boolean forceUseNewSpeedArea;
+        private LogWriter logWriter;
+
+        public Builder setLogWriter(LogWriter logWriter) {
+            this.logWriter = logWriter;
+            return this;
+        }
+
+        public Builder setForceUseNewSpeedArea(boolean forceUseNewSpeedArea) {
+            this.forceUseNewSpeedArea = forceUseNewSpeedArea;
+            return this;
+        }
 
         public Builder setExcelSources(ExcelSources excelSources) {
             this.excelSources = excelSources;

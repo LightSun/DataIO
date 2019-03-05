@@ -17,37 +17,8 @@ import org.junit.Test;
  */
 public class MusicSourceMediatorTest {
 
-    @Test
-    public void testWhole(){
-        String outDir = "";
-        String oldMusicCutFile = "";
-        String newMusicCutFile = "";
-        MusicOutDelegate2 delegate2 = null;
-
-        SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);
-        //--------------------------------------------
-        MusicSourceMediator mediator = new MusicSourceMediator.Builder()
-                .setExcelSources(new ExcelSources.Builder()
-                        .setTransCutSource(new TransferCutSource(source.getBean()))
-                       //TODO .setBlackFadeSource()
-                        .build())
-                //TODO  .setMusicSource()
-                .setMusicCutSource(new MultiMusicCutSource(new OldMusicCutSource(oldMusicCutFile), source))
-                .setSpeedAreaSource(new SimpleSpeedAreaSource(source.getBean()))
-                .setOutDir(outDir)
-                .setMusicOutDelegate(delegate2)
-                //TODO  .setIndexDelegate()
-                .setTransitionTransfer(new TransitionTransfer())
-                .setFilterTransfer(new FilterTransfer())
-                .setSpeedEffectTransfer(new SpeedEffectTransfer())
-                .setTransitionCutTransfer(new TransitionCutTransfer())
-                .build();
-
-        mediator.normalize();
-    }
-
-    @Test
-    public void testNew(){
+    @Test //contains old music cut source.
+    public void test1(){
         String oldMusicCutFile = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt";
         String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
@@ -114,6 +85,79 @@ public class MusicSourceMediatorTest {
                 .setFilterTransfer(new FilterTransfer())
                 .setSpeedEffectTransfer(new SpeedEffectTransfer())
                 .setTransitionCutTransfer(new TransitionCutTransfer())
+                .build();
+
+        mediator.normalize();
+    }
+
+    @Test
+    public void test2(){
+       // String oldMusicCutFile = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt";
+        String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
+        String musicDir = "E:\\tmp\\bugfinds\\right_music2";
+        String outDir = "E:\\tmp\\bugfinds\\新版\\out2";
+        MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2();
+
+        SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);
+
+        ExcelSource filterSource =
+                new SimpleExcelSource(
+                        new ExcelHelper.Builder()
+                                .setUseXlsx(true)
+                                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
+                                .setSkipToRowIndex(2)
+                                .setSheetName("滤镜 - 表格 1-1-1-1-1")
+                                .build());
+        ExcelSource transitionSource = new SimpleExcelSource(new ExcelHelper.Builder()
+                .setUseXlsx(true)
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
+                .setSkipToRowIndex(2)
+                .setSheetName("转场 - 表格 1-1-1-1")
+                .build());
+        ExcelSource effectSource = new SimpleExcelSource(new ExcelHelper.Builder()
+                .setUseXlsx(true)
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
+                .setSkipToRowIndex(2)
+                .setSheetName("特效 - 表格 1-1")
+                .build());
+        ExcelSource standSource = new SimpleExcelSource(new ExcelHelper.Builder()
+                .setUseXlsx(true)
+                .setExcelPath("E:\\tmp\\bugfinds\\测试003.xlsx")
+                .setSkipToRowIndex(1)
+                .setSheetName("切点 - 表格 2-1")
+                .build());
+        ExcelSource oldStandSource =
+                new SimpleExcelSource(
+                        new ExcelHelper.Builder()
+                                .setUseXlsx(true)
+                                .setExcelPath("E:\\tmp\\bugfinds\\music9.xlsx")
+                                .setSkipToRowIndex(2)
+                                .setSheetName("sheet3")
+                                .build());
+
+        //--------------------------------------------
+        MusicSourceMediator mediator = new MusicSourceMediator.Builder()
+                .setExcelSources(new ExcelSources.Builder()
+                        .setTransCutSource(new TransferCutSource(source.getBean()))
+                        .setFilterSource(filterSource)
+                        .setTransitionSource(transitionSource)
+                        .setSpeedEffectSource(effectSource)
+                        .setStandSource(standSource)
+                        .setOldStandSource(oldStandSource)
+                        .build())
+                .setMusicCutSource(source)
+                .setSpeedAreaSource(new SimpleSpeedAreaSource(source.getBean()))
+                .setMusicSource(new SimpleMusicSource(musicDir))
+
+                .setOutDir(outDir)
+                .setMusicOutDelegate(delegate2)
+                .setIndexDelegate(new IndexDelegateV3())
+
+                .setTransitionTransfer(new TransitionTransfer())
+                .setFilterTransfer(new FilterTransfer())
+                .setSpeedEffectTransfer(new SpeedEffectTransfer())
+                .setTransitionCutTransfer(new TransitionCutTransfer())
+                .setForceUseNewSpeedArea(true)
                 .build();
 
         mediator.normalize();

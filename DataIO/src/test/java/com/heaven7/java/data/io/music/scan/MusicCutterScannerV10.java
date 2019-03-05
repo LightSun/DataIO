@@ -85,7 +85,7 @@ public class MusicCutterScannerV10 extends AbstractMusicCutScanner<CutConfigBean
         //trans_cut and area is wrong return null
         boolean intercept = false;
         if(!transCutExist.get()){
-            intercept = true;
+            //intercept = true; // 60s don't have the transition cut.
             if(!mNoTransCutCsvs.contains(csvPath)){
                 mNoTransCutCsvs.add(csvPath);
                 System.err.println("wrong data for no transition_cut. csvPath = " + csvPath);
