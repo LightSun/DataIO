@@ -24,10 +24,18 @@ public class MusicSourceMediatorTest {
         String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
         String outDir = "E:\\tmp\\bugfinds\\新版\\out2";
-        MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2();
+        String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
+        MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2(new SimpleExcelSource(
+                new ExcelHelper.Builder()
+                        .setSheetName("工作表1")
+                        .setSkipToRowIndex(1)
+                        .setUseXlsx(true)
+                        .setExcelPath(serverConfigFile)
+                        .build()));
 
         SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);
         MusicCutSource oldMusicCutSrc = new OldMusicCutSource(oldMusicCutFile);
+
 
         ExcelSource filterSource =
                 new SimpleExcelSource(
@@ -97,7 +105,14 @@ public class MusicSourceMediatorTest {
         String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
         String outDir = "E:\\tmp\\bugfinds\\新版\\out2";
-        MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2();
+        String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
+        MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2(new SimpleExcelSource(
+                new ExcelHelper.Builder()
+                        .setSheetName("工作表3")
+                        .setSkipToRowIndex(1)
+                        .setUseXlsx(true)
+                        .setExcelPath(serverConfigFile)
+                        .build()));
 
         SimpleMusicCutSource source = new SimpleMusicCutSource(newMusicCutFile);
 

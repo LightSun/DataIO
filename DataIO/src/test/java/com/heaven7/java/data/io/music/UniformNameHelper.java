@@ -31,6 +31,7 @@ public class UniformNameHelper {
         if(strs.size() > 2 ){
             strs = trimSecondStr(strs);
         }
+        strs = trimStartDigital(strs);
         return VisitServices.from(strs).joinToString("_");
     }
 
@@ -55,6 +56,18 @@ public class UniformNameHelper {
         String secondStr = strs.get(1);
         if(SECOND_USELESS_STR.contains(secondStr)){
             strs.remove(1);
+        }
+        return strs;
+    }
+
+    private static List<String> trimStartDigital(List<String> strs) {
+        String endStr = strs.get(0);
+        try {
+            Integer.parseInt(endStr);
+            //has number .remove last
+            strs.remove(0);
+        }catch (NumberFormatException e){
+            return strs;
         }
         return strs;
     }
