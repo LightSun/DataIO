@@ -25,7 +25,7 @@ public abstract class PartOutput {
     }
 
     public String getFormatFilename(int duration){
-        return getPartDomain() + "_music_" + getPartRhythm() + "_" + duration + "s";
+        return getPartDomain() + "_music_" + getPartRhythm() + "_" + duration;
     }
 
     public final <T extends MusicItemDelegate> List<T> collectDomainWithRhythmWithoutDuration(List<T> rawItems){
