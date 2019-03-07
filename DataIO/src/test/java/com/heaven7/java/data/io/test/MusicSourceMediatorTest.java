@@ -104,7 +104,7 @@ public class MusicSourceMediatorTest {
        // String oldMusicCutFile = "E:\\tmp\\bugfinds\\music_cuts2\\1212\\cuts_uniform.txt";
         String newMusicCutFile = "E:\\tmp\\bugfinds\\music_cut3\\cut.txt";
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
-        String outDir = "E:\\tmp\\bugfinds\\新版\\out2";
+        String outDir = "E:\\tmp\\bugfinds\\新版\\out";
 
         String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
         String musicNameTable = "E:\\tmp\\bugfinds\\music_name_table.xlsx";

@@ -94,16 +94,17 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         VisitServices.from(items).fire(new FireVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
-                String infoFile = outDir + File.separator + "music_info_" + mi.genUniqueId() + ".json";
-                String effectFile = outDir + File.separator + "effect_" + mi.genUniqueId() + ".json";
-                String transitionFile = outDir + File.separator + "transition_" + mi.genUniqueId() + ".json";
-                String filterFile = outDir + File.separator + "filter_" + mi.genUniqueId() + ".json";
+                String subDir = "info";
+                String infoFile = FileUtils.createFilePath(outDir, "music_info_" + mi.genUniqueId() + ".json", subDir);
+                String effectFile = FileUtils.createFilePath(outDir, "effect_" + mi.genUniqueId() + ".json", subDir);
+                String transitionFile = FileUtils.createFilePath(outDir, "transition_" + mi.genUniqueId() + ".json", subDir);
+                String filterFile = FileUtils.createFilePath(outDir, "filter_" + mi.genUniqueId() + ".json", subDir);
+
                 FileUtils.writeTo(infoFile, mGson.toJson(mi));
                 EffectOutItem item = mi.getSpecialEffectItem();
                 if(item != null){
                     FileUtils.writeTo(effectFile, mGson.toJson(item));
                 }
-
                 item = mi.getTransitionItem();
                 if(item != null){
                     FileUtils.writeTo(transitionFile, mGson.toJson(item));

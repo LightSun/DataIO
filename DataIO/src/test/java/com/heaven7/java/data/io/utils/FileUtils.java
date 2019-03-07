@@ -29,6 +29,18 @@ public class FileUtils {
         String transform(String name);
     }
 
+    /** create file path. */
+    public static String createFilePath(String baseDir, String simpleFileName, String...subDirs){
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseDir);
+        if (subDirs != null) {
+            for (String dir : subDirs) {
+                sb.append(File.separator).append(dir);
+            }
+        }
+        return sb.append(File.separator).append(simpleFileName).toString();
+    }
+
     /** get the file name only. exclude extension and dir. */
     public static String getFileName(String path) {
         int index = path.lastIndexOf("/");
