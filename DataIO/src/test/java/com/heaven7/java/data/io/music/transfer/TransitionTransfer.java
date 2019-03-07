@@ -6,6 +6,7 @@ import com.heaven7.java.data.io.bean.EffectInfo;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.WrappedSubItem;
 import com.heaven7.java.data.io.music.Configs;
+import com.heaven7.java.data.io.music.in.LogWriter;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.visitor.ResultVisitor;
@@ -39,7 +40,7 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
         List<EffectInfo> results = new ArrayList<>();
 
         for (ColumnDelegate delegate : DELEGATES) {
-            delegate.parse(columns, mIndexer, results);
+            delegate.parse(this, columns, mIndexer, results);
         }
         return results;
     }
@@ -49,8 +50,12 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
         matchItem.addTransitionInfos(wsb.getSubItem());
     }
 
-    private static List<EffectInfo> parseShotBlack(
-            List<ExcelCol> columns, final int index, final ColumnDelegate delegate) {
+    private static List<EffectInfo> parseTransition(
+            TransitionTransfer context, List<ExcelCol> columns, final int index, final ColumnDelegate delegate) {
+        final List<String> totalTrans = context.getEffectMappingSource().getTransitions();
+        final String transferName = context.getTransferName();
+        final LogWriter logWriter = context.getLogWriter();
+
         String colStr = columns.get(index).getColumnString().trim();
         if (TextUtils.isEmpty(colStr)) {
             return null;
@@ -62,12 +67,16 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
                             @Override
                             public EffectInfo visit(String s, Object param) {
                                 s = s.trim();
+                                if(!totalTrans.contains(s)){
+                                    logWriter.writeTransferEffect(transferName, "wrong [Transition] = " + s );
+                                    System.err.println(transferName + ": wrong [Transition] = " + s);
+                                }
                                 EffectInfo info = delegate.create();
-                                String effectStr = Configs.getTransitionStr(s);
+                             /*   String effectStr = Configs.getTransitionStr(s);
                                 if (Predicates.isEmpty(effectStr)) {
                                     System.err.println( "TransitionTransfer >>> wrong effect:  " + s);
-                                }
-                                info.setEffect(effectStr);
+                                }*/
+                                info.setEffect(s);
                                 return info;
                             }
                         })
@@ -93,8 +102,8 @@ public class TransitionTransfer extends BaseAdditionalTransfer<List<EffectInfo>>
 
         protected abstract void onEffectCreated(EffectInfo info);
 
-        public void parse(List<ExcelCol> columns, Indexer indexer, List<EffectInfo> outInfos) {
-            List<EffectInfo> infos = parseShotBlack(columns, getIndex(indexer), this);
+        public void parse(TransitionTransfer context, List<ExcelCol> columns, Indexer indexer, List<EffectInfo> outInfos) {
+            List<EffectInfo> infos = parseTransition(context, columns, getIndex(indexer), this);
             if (!Predicates.isEmpty(infos)) {
                 outInfos.addAll(infos);
             }

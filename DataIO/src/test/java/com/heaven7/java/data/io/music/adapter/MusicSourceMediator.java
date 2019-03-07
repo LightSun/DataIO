@@ -1,15 +1,21 @@
 package com.heaven7.java.data.io.music.adapter;
 
 import com.heaven7.java.base.util.Platforms;
+import com.heaven7.java.base.util.TextUtils;
+import com.heaven7.java.data.io.bean.CutConfigBeanV10;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.AdditionalTransfer;
 import com.heaven7.java.data.io.music.transfer.OldStandExcelSourceTransfer;
+import com.heaven7.java.data.io.utils.Debugger;
 import com.heaven7.java.data.io.utils.FileMd5Helper;
 import com.heaven7.java.data.io.utils.FileUtils;
-import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.*;
+import com.heaven7.java.visitor.collection.KeyValuePair;
+import com.heaven7.java.visitor.collection.MapVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.java.visitor.util.Map;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,14 +31,18 @@ public class MusicSourceMediator {
     private SpeedAreaSource speedAreaSource;
     private MusicSource musicSource;
     private MusicOutDelegate2 musicOutDelegate;
+    private MusicNameSource musicNameSource;
     private String outDir;
 
+    private EffectMappingSource effectMappingSource;
     private IndexDelegate indexDelegate;
     //---------------------------------------
     private AdditionalTransfer speedEffectTransfer;
     private AdditionalTransfer transitionTransfer;
     private AdditionalTransfer filterTransfer;
     private AdditionalTransfer transCutTransfer;
+
+
     private boolean forceUseNewSpeedArea;
     private LogWriter logWriter;
 
@@ -41,6 +51,8 @@ public class MusicSourceMediator {
         this.speedAreaSource = builder.speedAreaSource;
         this.musicCutSource = builder.musicCutSource;
         this.musicSource = builder.musicSource;
+        this.musicNameSource = builder.musicNameSource;
+        this.effectMappingSource = builder.effectMappingSource;
         this.musicOutDelegate = builder.musicOutDelegate;
         this.outDir = builder.outDir;
         this.indexDelegate = builder.indexDelegate;
@@ -60,6 +72,12 @@ public class MusicSourceMediator {
         transCutTransfer.setLogWriter(writer);
         filterTransfer.setLogWriter(writer);
     }
+    private void setEffectMappingSource(){
+        speedEffectTransfer.setEffectMappingSource(effectMappingSource);
+        transitionTransfer.setEffectMappingSource(effectMappingSource);
+        transCutTransfer.setEffectMappingSource(effectMappingSource);
+        filterTransfer.setEffectMappingSource(effectMappingSource);
+    }
 
     public void normalize(){
         if(logWriter == null){
@@ -70,13 +88,27 @@ public class MusicSourceMediator {
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
         List<MusicItem2> items = getMusicItems(sb_warn);
+        items = VisitServices.from(items).filter(new PredicateVisitor<MusicItem2>() {
+            @Override
+            public Boolean visit(MusicItem2 musicItem2, Object param) {
+                boolean result = musicNameSource.getMusicNames().contains(musicItem2.getName());
+                if(!result){
+                    logWriter.writeMusicNameFilter(String.format("music name doesn't exist from Table. name is %s", musicItem2.getName()));
+                }
+                return result;
+            }
+        }).getAsList();
+        debug(items);
+
+        //set effect mapping source.
+        setEffectMappingSource();
         //transfer other.
         speedEffectTransfer.transfer(excelSources.getSpeedEffectSource(), items);
         transitionTransfer.transfer(excelSources.getTransitionSource(), items);
         transCutTransfer.transfer(excelSources.getTransCutSource(), items);
         filterTransfer.transfer(excelSources.getFilterSource(), items);
 
-        //方案主要功能做了。除了剪辑底层。
+        //
         List<MusicItem2> noMusicItems = new ArrayList<>();
         items = VisitServices.from(items).filter(null, new PredicateVisitor<MusicItem2>() {
             @Override
@@ -117,6 +149,7 @@ public class MusicSourceMediator {
     private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {
         OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource, indexDelegate, outDir);
         standTransfer.setLogWriter(logWriter);
+        standTransfer.setMusicNameSource(musicNameSource);
         if(excelSources.getOldStandSource() == null){
             //only new
             List<MusicItem2> items = standTransfer.transfer(excelSources.getStandSource());
@@ -134,6 +167,11 @@ public class MusicSourceMediator {
             items.addAll(items2);
             return items;
         }
+    }
+
+    private void debug(List<MusicItem2> items) {
+        String logPath  = outDir + File.separator + "mapping" + File.separator + "debug_music_items.txt";
+        Debugger.debugPair(musicNameSource, items,  logPath, "Check_MusicItems");
     }
 
     public ExcelSources getExcelSources() {
@@ -187,6 +225,18 @@ public class MusicSourceMediator {
         private SpeedAreaSource speedAreaSource;
         private boolean forceUseNewSpeedArea;
         private LogWriter logWriter;
+        private MusicNameSource musicNameSource;
+        private EffectMappingSource effectMappingSource;
+
+        public Builder setEffectMappingSource(EffectMappingSource source) {
+            this.effectMappingSource = source;
+            return this;
+        }
+
+        public Builder setMusicNameSource(MusicNameSource source) {
+            this.musicNameSource = source;
+            return this;
+        }
 
         public Builder setLogWriter(LogWriter logWriter) {
             this.logWriter = logWriter;

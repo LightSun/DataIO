@@ -3,7 +3,7 @@ package com.heaven7.java.data.io.bean;
 import java.util.List;
 
 /** @author heaven7 */
-public interface MusicItemDelegate {
+public interface MusicItemDelegate extends NameDeleagte{
 
     List<String> getDomains();
 

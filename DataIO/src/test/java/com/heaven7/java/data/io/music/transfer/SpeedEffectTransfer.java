@@ -6,6 +6,7 @@ import com.heaven7.java.data.io.bean.EffectInfo;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.WrappedSubItem;
 import com.heaven7.java.data.io.music.Configs;
+import com.heaven7.java.data.io.music.in.LogWriter;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.visitor.ResultVisitor;
@@ -46,7 +47,7 @@ public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>
     @Override
     protected List<EffectInfo> parseItem(ExcelRow row) {
         Indexer mIndexer = (Indexer) this.indexer;
-        return mIndexer.parse(row.getColumns());
+        return mIndexer.parse(this,row.getColumns());
     }
 
     @Override
@@ -54,22 +55,29 @@ public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>
         matchItem.addEffectInfos(wsb.getSubItem());
     }
 
-    private static List<EffectInfo> parseSpeed(List<ExcelCol> columns, int index ,final IndexParseDelegate delegate){
+    private static List<EffectInfo> parseSpeed(final SpeedEffectTransfer context, List<ExcelCol> columns, int index, final IndexParseDelegate delegate){
         String columnString = columns.get(index).getColumnString().trim();
         if(TextUtils.isEmpty(columnString)){
             return null;
         }
         String[] effects = columnString.split("\\n");
+        final List<String> totalEffects = context.getEffectMappingSource().getSpecialEffects();
+        final LogWriter logWriter = context.getLogWriter();
+
         return VisitServices.from(Arrays.asList(effects)).map(new ResultVisitor<String, EffectInfo>() {
             @Override
             public EffectInfo visit(String s, Object param) {
                 s = s.trim();
+                if(!totalEffects.contains(s)){
+                    logWriter.writeTransferEffect(context.getTransferName(), "wrong [Special-Effect] = " + s);
+                    System.err.println(context.getTransferName() + ": wrong [Special-Effect] = " + s);
+                }
                 EffectInfo info = delegate.create();
-                String effectStr = Configs.getEffectStr(s);
+                info.setEffect(s);
+               /* String effectStr = Configs.getEffectStr(s);
                 if (Predicates.isEmpty(effectStr)) {
                     System.err.println("RepeatBlackTransfer >>> wrong effect:  " + s);
-                }
-                info.setEffect(effectStr);
+                }*/
                 return info;
             }
         }).getAsList();
@@ -89,10 +97,10 @@ public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>
         public int high_middle_index = 9;
         public int high_high_index = 10;
 
-        public List<EffectInfo> parse(List<ExcelCol> columns){
+        public List<EffectInfo> parse(SpeedEffectTransfer context, List<ExcelCol> columns){
             List<EffectInfo> infos = new ArrayList<>();
             for(IndexParseDelegate delegate :  sDelegates){
-                delegate.parse(columns, this, infos);
+                delegate.parse(context, columns, this, infos);
             }
             return infos;
         }
@@ -105,8 +113,8 @@ public class SpeedEffectTransfer extends BaseAdditionalTransfer<List<EffectInfo>
 
         protected abstract EffectInfo create();
 
-        public void parse(List<ExcelCol> columns, Indexer indexer, List<EffectInfo> outInfos){
-            List<EffectInfo> infos = parseSpeed(columns, getIndex(indexer), this);
+        public void parse(SpeedEffectTransfer context, List<ExcelCol> columns, Indexer indexer, List<EffectInfo> outInfos){
+            List<EffectInfo> infos = parseSpeed(context, columns, getIndex(indexer), this);
             if(!Predicates.isEmpty(infos)){
                 outInfos.addAll(infos);
             }

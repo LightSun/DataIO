@@ -18,7 +18,9 @@ public class UniformNameHelper {
     //the second useless str
     private static final List<String> SECOND_USELESS_STR = Arrays.asList(
             "short3",
-            "short1"
+            "short1",
+            "full",
+            "loop2"
     );
 
     public static String uniformSimpleMusicName(String name){
@@ -31,7 +33,8 @@ public class UniformNameHelper {
         if(strs.size() > 2 ){
             strs = trimSecondStr(strs);
         }
-        strs = trimStartDigital(strs);
+        //start digital is important.
+        //strs = trimStartDigital(strs);
         return VisitServices.from(strs).joinToString("_");
     }
 

@@ -4,6 +4,7 @@ import com.heaven7.java.base.util.Logger;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.WrappedSubItem;
 import com.heaven7.java.data.io.music.UniformNameHelper;
+import com.heaven7.java.data.io.music.in.EffectMappingSource;
 import com.heaven7.java.data.io.music.in.ExcelSource;
 import com.heaven7.java.data.io.music.in.LogWriter;
 import com.heaven7.java.data.io.poi.ExcelRow;
@@ -23,6 +24,7 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
     protected final Indexer indexer;
     private final String transferName;
     private LogWriter logWriter;
+    private EffectMappingSource effectMappingSource;
 
     public BaseAdditionalTransfer(String transferName, Indexer indexer) {
         this.indexer = indexer;
@@ -40,6 +42,15 @@ public abstract class BaseAdditionalTransfer<T> implements AdditionalTransfer {
     @Override
     public LogWriter getLogWriter() {
         return logWriter;
+    }
+
+    @Override
+    public void setEffectMappingSource(EffectMappingSource source) {
+        this.effectMappingSource = source;
+    }
+    @Override
+    public EffectMappingSource getEffectMappingSource() {
+        return effectMappingSource;
     }
 
     @Override

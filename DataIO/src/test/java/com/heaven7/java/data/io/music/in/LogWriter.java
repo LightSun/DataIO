@@ -36,4 +36,10 @@ public interface LogWriter {
      * end write log
      */
     void end();
+
+    /**
+     *  write the music name filter log
+     * @param log the log
+     */
+    void writeMusicNameFilter(String log);
 }

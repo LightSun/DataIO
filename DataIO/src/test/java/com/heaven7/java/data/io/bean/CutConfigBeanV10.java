@@ -35,7 +35,7 @@ public class CutConfigBeanV10 {
         });
     }
 
-    public static class CutItem{
+    public static class CutItem implements NameDeleagte{
         private String name;
         private int duration;
         private List<CutLine> cutLines;

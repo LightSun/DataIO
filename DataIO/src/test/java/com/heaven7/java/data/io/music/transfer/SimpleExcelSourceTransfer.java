@@ -41,12 +41,17 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
     private final StringBuilder sb_warn = new StringBuilder();
     private boolean useOldSpeedArea;
     private LogWriter logWriter;
+    private MusicNameSource musicNameSource;
 
     public SimpleExcelSourceTransfer(MusicCutSource musicCutSource, SpeedAreaSource speedAreaSource, IndexDelegate indexDelegate, String outDir) {
         this.speedAreaSource = speedAreaSource;
         this.musicCutSource = musicCutSource;
         this.indexDelegate = indexDelegate;
         this.outDir = outDir;
+    }
+
+    public void setMusicNameSource(MusicNameSource musicNameSource) {
+        this.musicNameSource = musicNameSource;
     }
 
     public boolean isUseOldSpeedArea() {
@@ -84,11 +89,14 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
                     logWriter.writeTransferItem(TAG, msg);
                     return null;
                 }
-
                 MusicItem2 item = new MusicItem2();
                 parseBaseInfo(columns, item);
                 item.setLineNumber(row.getRowIndex() + 1);
                 item.setId(item.getName());
+                if(!musicNameSource.getMusicNames().contains(item.getName())){
+                    logWriter.writeMusicNameFilter("music name was filtered. name = " + item.getName());
+                    return null;
+                }
 
                 List<CutInfo> infos = musicCutSource.getCutInfos(item);
                 if (infos == null) {

@@ -31,4 +31,9 @@ public class DefaultLogWriter implements LogWriter {
     public void end() {
 
     }
+
+    @Override
+    public void writeMusicNameFilter(String log) {
+
+    }
 }
