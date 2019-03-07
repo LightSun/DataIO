@@ -9,4 +9,5 @@ public interface EffectMappingSource {
 
     List<String> getSpecialEffects();
     List<String> getTransitions();
+    List<String> getFilters();
 }

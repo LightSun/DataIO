@@ -5,10 +5,11 @@ import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.bean.WrappedSubItem;
 import com.heaven7.java.data.io.poi.ExcelRow;
+import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,6 +35,16 @@ public class FilterTransfer extends BaseAdditionalTransfer<List<String>> {
         if(Predicates.isEmpty(strs)){
             return new ArrayList<>();
         }
+        final List<String> allFilters = getEffectMappingSource().getFilters();
+        VisitServices.from(strs).fire(new FireVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                if(!allFilters.contains(s)){
+                   getLogWriter().writeTransferEffect(getTransferName(), "wrong [Filter] = " + s);
+                }
+                return null;
+            }
+        });
         return Arrays.asList(strs);
     }
     @Override

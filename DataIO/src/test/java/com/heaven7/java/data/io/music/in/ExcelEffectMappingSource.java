@@ -20,6 +20,7 @@ public class ExcelEffectMappingSource implements EffectMappingSource {
     private static final int INDEX_DESC = 4;
     private final List<String> effects = new ArrayList<>();
     private final List<String> transitions = new ArrayList<>();
+    private final List<String> filters = new ArrayList<>();
 
     public ExcelEffectMappingSource(ExcelHelper excelHelper) {
         List<ExcelRow> rows = excelHelper.read();
@@ -54,6 +55,14 @@ public class ExcelEffectMappingSource implements EffectMappingSource {
         if(!transitions.contains("none")){
             transitions.add("none");
         }
+        String[] strs = {
+                "trams","normal","oslo","moss",
+                "skien","bergen","molde","bodo",
+                "vadso","bouvet","svalbard","jan",
+                "mayen","oppland","nordland","telemark",
+                "arendal","drammen","tonsberg",
+        };
+        filters.addAll(Arrays.asList(strs));
     }
     @Override
     public List<String> getSpecialEffects() {
@@ -62,5 +71,9 @@ public class ExcelEffectMappingSource implements EffectMappingSource {
     @Override
     public List<String> getTransitions() {
         return transitions;
+    }
+    @Override
+    public List<String> getFilters() {
+        return filters;
     }
 }
