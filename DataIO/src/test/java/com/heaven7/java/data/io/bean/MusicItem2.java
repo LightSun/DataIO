@@ -29,6 +29,9 @@ public class MusicItem2 implements MusicItemDelegate{
     private String id = "default";
     @Expose(serialize = false)
     private String name;
+
+    private String displayName;
+    private String singer;
     @Expose
     private List<String> domains;
 
@@ -69,6 +72,20 @@ public class MusicItem2 implements MusicItemDelegate{
     @Expose
     @SerializedName("transition_cuts")
     private List<Float> transitionCuts;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getSinger() {
+        return singer;
+    }
+    public void setSinger(String singer) {
+        this.singer = singer;
+    }
 
     public EffectOutItem getSpecialEffectItem(){
         return getEffectOutItem(effectInfos);

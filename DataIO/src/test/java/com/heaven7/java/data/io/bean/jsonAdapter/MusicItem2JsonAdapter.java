@@ -20,6 +20,9 @@ public class MusicItem2JsonAdapter extends TypeAdapter<MusicItem2> {
         //id, property, rhythm, domains
         out.beginObject();
         out.name("id").value(value.getId());
+        out.name("name").value(value.getDisplayName());
+        out.name("singer").value(value.getSinger());
+
         out.name("property").value(value.getProperty());
         out.name("rhythm").value(value.getRhythm());
         out.name("domains");

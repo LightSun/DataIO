@@ -132,6 +132,7 @@ public class MusicSourceMediator {
         FileUtils.writeTo(noMusicFile, sb.toString());
 
         String simpleFileName = "music_v10";
+        musicOutDelegate.start(outDir, items);
         //part outputs
         musicOutDelegate.writePart(outDir, items);
         //total
@@ -142,6 +143,7 @@ public class MusicSourceMediator {
         musicOutDelegate.writeItem(outDir, items);
         //copy music to one dir
         musicOutDelegate.copyValidMusics(outDir, items);
+        musicOutDelegate.end();
 
         logWriter.end();
     }

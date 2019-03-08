@@ -9,6 +9,7 @@ public class ServerMapBean {
     private String name;
     private String md5;
     private String link;
+    private String singer;
 
     public String getLink() {
         return link;
@@ -39,5 +40,12 @@ public class ServerMapBean {
 
     public void setMd5(String md5) {
         this.md5 = md5;
+    }
+
+    public String getSinger() {
+        return singer;
+    }
+    public void setSinger(String singer) {
+        this.singer = singer;
     }
 }

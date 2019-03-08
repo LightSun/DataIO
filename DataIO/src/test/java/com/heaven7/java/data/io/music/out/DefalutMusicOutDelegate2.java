@@ -32,9 +32,20 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
     private final Gson mGson = new GsonBuilder().registerTypeAdapter(MusicItem2.class, new MusicItem2JsonAdapter()).create();
     private final List<ServerMapBean> mServeBeans;
+    private List<ServerPairBean> mServerPairBeans;
 
     public DefalutMusicOutDelegate2(ExcelSource mServerSource) {
         mServeBeans = readServerConfig(mServerSource);
+    }
+
+    @Override
+    public void start(String outDir, List<MusicItem2> items) {
+        //attach: display name and singer
+        mServerPairBeans = mapServerBean(outDir, items);
+    }
+    @Override
+    public void end() {
+
     }
 
     @Override
@@ -94,6 +105,8 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         VisitServices.from(items).fire(new FireVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
+                ServerMapBean smb = getServerMapBean(mi);
+
                 String subDir = "info";
                 String infoFile = FileUtils.createFilePath(outDir, "music_info_" + mi.genUniqueId() + ".json", subDir);
                 String effectFile = FileUtils.createFilePath(outDir, "effect_" + mi.genUniqueId() + ".json", subDir);
@@ -116,6 +129,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             }
         });
     }
+
     @Override
     public void copyValidMusics(String outDir, List<MusicItem2> items) {
         final File out = new File(outDir, "musics");
@@ -147,7 +161,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
     }
 
     private void writeServerExcel(String outDir, String simpleFileName, List<MusicItem2> items) {
-        List<ServerPairBean> pairBeans = mapServerBean(outDir, items);
+       // List<ServerPairBean> pairBeans = mapServerBean(outDir, items);
         ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
                 .nesting()
                 .newSheet("server-data")
@@ -157,7 +171,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                         "link")))
                 .nesting();
         int rowIndex = 1; // f0 is title
-        for (ServerPairBean bean : pairBeans){
+        for (ServerPairBean bean : mServerPairBeans){
             for(MusicItem2 item : bean.items){
                 sf.newRow(rowIndex)
                         .nesting()
@@ -251,6 +265,11 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                                 .append(Platforms.getNewLine());
                         return ServerPairBean.NULL;
                     }
+                    //set singer
+                    for(MusicItem2 mi : pair.getValue()){
+                        mi.setSinger(bean.getSinger());
+                        mi.setDisplayName(bean.getName());
+                    }
                     return new ServerPairBean(bean, pair.getValue());
                 }
             }
@@ -266,9 +285,15 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         return serverBeans;
     }
 
+    private ServerMapBean getServerMapBean(MusicItem2 mi) {
+
+        return null;
+    }
+
     private static List<ServerMapBean> readServerConfig(ExcelSource mServerSource){
         final int index_musicId = 0;
         final int index_name = 1;
+        final int index_singer = 3;
         final int index_md5 = 7;
         final int index_link = 5;
         return VisitServices.from(mServerSource.getRows()).map(new ResultVisitor<ExcelRow, ServerMapBean>() {
@@ -278,12 +303,14 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                 List<ExcelCol> columns = row.getColumns();
                 String musicId = columns.get(index_musicId).getColumnString();
                 String name = columns.get(index_name).getColumnString();
+                String singer = columns.get(index_singer).getColumnString();
                 String md5 = columns.get(index_md5).getColumnString();
                 String link = columns.get(index_link).getColumnString();
                 bean.setName(name);
                 bean.setMusicId(musicId);
                 bean.setMd5(md5);
                 bean.setLink(link);
+                bean.setSinger(singer);
                 return bean;
             }
         }).getAsList();

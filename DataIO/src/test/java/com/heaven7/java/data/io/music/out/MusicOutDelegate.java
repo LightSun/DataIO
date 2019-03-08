@@ -10,6 +10,10 @@ import java.util.List;
  */
 public interface MusicOutDelegate<T extends MusicItemDelegate> {
 
+    void start(String outDir, List<T> items);
+
+    void end();
+
     /**
      * write music items as  parts output. see {@linkplain PartOutput}
      * @param items the music items
