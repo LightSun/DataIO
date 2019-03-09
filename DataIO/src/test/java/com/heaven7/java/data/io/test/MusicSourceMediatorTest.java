@@ -32,7 +32,7 @@ public class MusicSourceMediatorTest {
 
         String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
         String musicNameTable = "E:\\tmp\\bugfinds\\music_name_table.xlsx";
-        String mainExcelPath = "E:\\tmp\\bugfinds\\测试004.xlsx";
+        String mainExcelPath = "E:\\tmp\\bugfinds\\测试005.xlsx";
 
         MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2(new SimpleExcelSource(
                 new ExcelHelper.Builder()
