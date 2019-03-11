@@ -105,8 +105,6 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         VisitServices.from(items).fire(new FireVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 mi, Object param) {
-                ServerMapBean smb = getServerMapBean(mi);
-
                 String subDir = "info";
                 String infoFile = FileUtils.createFilePath(outDir, "music_info_" + mi.genUniqueId() + ".json", subDir);
                 String effectFile = FileUtils.createFilePath(outDir, "effect_" + mi.genUniqueId() + ".json", subDir);
@@ -283,11 +281,6 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         String targetFile = outDir + File.separator + "mapping" + File.separator + "map_server_bean.txt";
         FileUtils.writeTo(targetFile, sb_log.toString());
         return serverBeans;
-    }
-
-    private ServerMapBean getServerMapBean(MusicItem2 mi) {
-
-        return null;
     }
 
     private static List<ServerMapBean> readServerConfig(ExcelSource mServerSource){

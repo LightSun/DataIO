@@ -11,7 +11,7 @@ public class FileMd5Test {
     @Test
     public void test1(){
 
-        String file = "E:\\tmp\\bugfinds\\right_music2\\60s\\239_short3_exciting-prelude_0069.mp3";
+        String file = "E:\\tmp\\bugfinds\\right_music2\\60s\\4_full_yesterday-s-tango_0077_preview.mp3";
         System.out.println(FileMd5Helper.getMD5Three(file));
     }
 }
