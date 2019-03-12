@@ -137,7 +137,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             @Override
             public MusicMappingItem visit(MusicItem2 item, Object param) {
                 Float maxTime = item.getMaxTime();
-                File dst = new File(out, item.getId() + "." + FileUtils.getFileExtension(item.getRawFile()));
+                File dst = new File(out, item.genUniqueId() + "." + FileUtils.getFileExtension(item.getRawFile()));
                 MusicMappingItem mmi = new MusicMappingItem();
                 mmi.setMusicName(item.getName());
                 mmi.setId(item.getId());
@@ -267,6 +267,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                     for(MusicItem2 mi : pair.getValue()){
                         mi.setSinger(bean.getSinger());
                         mi.setDisplayName(bean.getName());
+                        mi.setMusicId(bean.getMusicId());
                     }
                     return new ServerPairBean(bean, pair.getValue());
                 }

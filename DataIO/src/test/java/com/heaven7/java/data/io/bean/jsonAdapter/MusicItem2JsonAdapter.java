@@ -19,7 +19,7 @@ public class MusicItem2JsonAdapter extends TypeAdapter<MusicItem2> {
     public void write(JsonWriter out, MusicItem2 value) throws IOException {
         //id, property, rhythm, domains
         out.beginObject();
-        out.name("id").value(value.getId());
+        out.name("id").value(value.getMusicId() + "_" + value.getDuration());
         out.name("name").value(value.getDisplayName());
         out.name("singer").value(value.getSinger());
 

@@ -30,6 +30,8 @@ public class MusicItem2 implements MusicItemDelegate{
     @Expose(serialize = false)
     private String name;
 
+    private String musicId;
+
     private String displayName;
     private String singer;
     @Expose
@@ -96,23 +98,27 @@ public class MusicItem2 implements MusicItemDelegate{
     }
     //----------------------------------------------
 
+    public String getUniqueKey(){
+        return getName() + ": " + getDuration();
+    }
     public List<EffectInfo> getTransitionInfos() {
         return transitionInfos;
     }
+
     public void setTransitionInfos(List<EffectInfo> transitionInfos) {
         this.transitionInfos = transitionInfos;
     }
-
     public List<Float> getTransitionCuts() {
         return transitionCuts;
     }
+
     public void setTransitionCuts(List<Float> transitionCuts) {
         this.transitionCuts = transitionCuts;
     }
-
     public List<String> getFilterNames() {
         return filterNames != null ? filterNames : new ArrayList<String>();
     }
+
     public void setFilterNames(List<String> filterNames) {
         this.filterNames = filterNames;
     }
@@ -120,31 +126,31 @@ public class MusicItem2 implements MusicItemDelegate{
     public String getFilterName() {
         return Predicates.isEmpty(filterNames) ? null : filterNames.get(0);
     }
-
     public List<EffectInfo> getEffectInfos() {
         return effectInfos;
     }
+
     public void setEffectInfos(List<EffectInfo> effectInfos) {
         this.effectInfos = effectInfos;
     }
-
     public List<CutInfo> getCutInfos() {
         return cutInfos;
     }
+
     public void setCutInfos(List<CutInfo> cutInfos) {
         this.cutInfos = cutInfos;
     }
-
     public int getDuration() {
         return duration;
     }
+
     public void setDuration(int duration) {
         this.duration = duration;
     }
-
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -157,10 +163,10 @@ public class MusicItem2 implements MusicItemDelegate{
         this.name = name;
     }
 
-
     public List<String> getDomains() {
         return domains;
     }
+
     public void setDomains(List<String> domains) {
         this.domains = domains;
     }
@@ -204,10 +210,10 @@ public class MusicItem2 implements MusicItemDelegate{
     public void setHigh_speed_areas(List<List<Float>> high_speed_areas) {
         this.high_speed_areas = high_speed_areas;
     }
-
     public void setLineNumber(int rowIndex) {
         this.rowIndex = rowIndex;
     }
+
     public int getLineNumber(){
         return rowIndex;
     }
@@ -216,16 +222,12 @@ public class MusicItem2 implements MusicItemDelegate{
         return Predicates.isEmpty(slow_speed_areas) && Predicates.isEmpty(middle_speed_areas)
                 && Predicates.isEmpty(high_speed_areas);
     }
-
     public void setRawFile(String musicName) {
         filePath = musicName;
     }
+
     public String getRawFile(){
         return filePath;
-    }
-
-    public String getUniqueKey(){
-        return getName() + ": " + getDuration();
     }
 
     public String getCategoryStr() {
@@ -263,7 +265,7 @@ public class MusicItem2 implements MusicItemDelegate{
     }
 
     public String genUniqueId() {
-        return getId() + "_" + duration;
+        return getMusicId() + "_" + duration;
     }
 
     public void addTransitionInfos(List<EffectInfo> infos) {
@@ -278,5 +280,12 @@ public class MusicItem2 implements MusicItemDelegate{
             effectInfos = new ArrayList<>();
         }
         effectInfos.addAll(infos);
+    }
+
+    public void setMusicId(String musicId) {
+        this.musicId = musicId;
+    }
+    public String getMusicId() {
+        return musicId;
     }
 }
