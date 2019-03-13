@@ -15,7 +15,8 @@ import java.util.List;
  */
 public class MusicItem2Helper {
 
-    public static EffectOutItem getEffectOutItem(List<EffectInfo> infos){
+    public static EffectOutItem getEffectOutItem(List<EffectInfo> infos,
+                                                 final EffectOutItem.Scope defaultImgScope,final boolean specialEffect){
         if(Predicates.isEmpty(infos)){
             return null;
         }
@@ -65,7 +66,9 @@ public class MusicItem2Helper {
                             case EffectInfo.NONE:
                                 //for none it can be used for low-middle-high score areas.
                                 List<String> effects = inflateEffects(pair);
-                                area.ensureNoScoreAreaNotNull().getVideoScope().addEffects(effects);
+                                EffectOutItem.ScoreArea sa = area.ensureNoScoreAreaNotNull();
+                                sa.getVideoScope().addEffects(effects);
+                                sa.setImageScope(specialEffect ? defaultImgScope : sa.getVideoScope());
                               /*  area.getLow_score_area().getVideoScope().addEffects(effects);
                                 area.getMiddle_score_area().getVideoScope().addEffects(effects);
                                 area.getHigh_score_area().getVideoScope().addEffects(effects);*/
@@ -74,6 +77,7 @@ public class MusicItem2Helper {
                                 throw new RuntimeException("wrong effect category. = " + pair.getKey());
                         }
                         scoreArea.setVideoScope(createScope(pair));
+                        scoreArea.setImageScope(specialEffect ? defaultImgScope : scoreArea.getVideoScope());
                         return null;
                     }
                 });

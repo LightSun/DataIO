@@ -82,7 +82,7 @@ public class EffectOutItem {
         }
     }
     public static class ScoreArea{
-        Scope imageScope = Scope.DEFAULT_IMAGE;
+        Scope imageScope;
         Scope videoScope = new Scope();
 
         public Scope getImageScope() {
@@ -103,7 +103,6 @@ public class EffectOutItem {
     }
 
     public static class Scope{
-        public static final Scope DEFAULT_IMAGE = ofDefaultImageScope();
         List<String> effects;
 
         public List<String> getEffects() {
@@ -121,11 +120,35 @@ public class EffectOutItem {
             this.effects.addAll(effects);
         }
     }
-
     public static Scope ofDefaultImageScope(){
         Scope scope = new Scope();
         scope.effects = new ArrayList<>(Arrays.asList("left_translation",
                 "right_translation", "zoom_in", "zoom_out"));
+        return scope;
+    }
+
+    public static Scope ofEffectImageScope(int rhythm){
+        Scope scope = new Scope();
+        switch (rhythm){
+            case 2: //快节奏
+                scope.effects = new ArrayList<>(Arrays.asList("position_left",
+                        "position_right", "none"));
+                break;
+            case 1: //中节奏
+                scope.effects = new ArrayList<>(Arrays.asList("zoom_in",
+                        "zoom_out", "none"));
+                break;
+            case 0: //慢节奏
+                scope.effects = new ArrayList<>(Arrays.asList(
+                        "zoom_in", "zoom_out",
+                        "move_up_slow", "move_down_slow", "move_left_slow", "move_right_slow",
+                        "position_left","position_right"
+                ));
+                break;
+
+            default:
+                throw new RuntimeException("wrong thythm(节奏) = " + rhythm);
+        }
         return scope;
     }
 }

@@ -82,6 +82,9 @@ public abstract class BaseExcelInput implements ExcelInput {
         try {
             workbook = onCreateWorkbook(getFilePath());
             final Sheet sheet = PoiUtils.getSheet(workbook, sheetParam);
+            if(sheet == null){
+                throw new RuntimeException("can't find sheet for " + sheetParam);
+            }
             visitor.startVisitSheet(workbook, sheet);
 
             int count = sheet.getLastRowNum() + 1;

@@ -30,7 +30,9 @@ import java.util.*;
  */
 public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
-    private final Gson mGson = new GsonBuilder().registerTypeAdapter(MusicItem2.class, new MusicItem2JsonAdapter()).create();
+    private final Gson mGson = new GsonBuilder().registerTypeAdapter(MusicItem2.class, new MusicItem2JsonAdapter())
+            .disableHtmlEscaping() // if not set: ' -> \u0027
+            .create();
     private final List<ServerMapBean> mServeBeans;
     private List<ServerPairBean> mServerPairBeans;
 
@@ -215,7 +217,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                 }
                 sf.nesting().newCell(9).apply(new Cell_StringApplier(mGson.toJson(item.getFilterNames())));
                 //link
-                sf.nesting().newCell(10).apply(new Cell_StringApplier(getLink(item.getId())));
+                sf.nesting().newCell(10).apply(new Cell_StringApplier(getLink(item.genUniqueId())));
                 //add index
                 rowIndex ++;
             }

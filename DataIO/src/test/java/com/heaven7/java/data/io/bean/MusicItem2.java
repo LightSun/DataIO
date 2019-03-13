@@ -6,15 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.data.io.bean.jsonAdapter.MusicItem2JsonAdapter;
 import com.heaven7.java.data.io.music.Configs;
-import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.PredicateVisitor;
-import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.heaven7.java.data.io.utils.MusicItem2Helper.getEffectOutItem;
@@ -90,11 +85,12 @@ public class MusicItem2 implements MusicItemDelegate{
     }
 
     public EffectOutItem getSpecialEffectItem(){
-        return getEffectOutItem(effectInfos);
+        return getEffectOutItem(effectInfos , EffectOutItem.ofEffectImageScope(getRhythm()), true);
     }
 
     public EffectOutItem getTransitionItem(){
-        return getEffectOutItem(transitionInfos);
+        //for transition .default image scope is diff
+        return getEffectOutItem(transitionInfos, EffectOutItem.ofDefaultImageScope(), false);
     }
     //----------------------------------------------
 
