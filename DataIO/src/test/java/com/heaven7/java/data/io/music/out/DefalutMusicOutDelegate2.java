@@ -70,7 +70,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                                 .map(new ResultVisitor<MusicItem2, String>() {
                                     @Override
                                     public String visit(MusicItem2 musicItem2, Object param) {
-                                        return musicItem2.getId();
+                                        return musicItem2.genUniqueId();
                                     }
                                 }).getAsList();
                         if (list.isEmpty()) {
