@@ -4,6 +4,7 @@ import com.heaven7.java.base.util.TextReadHelper;
 import com.heaven7.java.data.io.music.UniformNameHelper;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author heaven7
@@ -24,6 +25,11 @@ public class SimpleMusicNameSource implements MusicNameSource {
     @Override
     public List<String> getMusicNames() {
         return musicNames;
+    }
+
+    @Override
+    public Map<String, Integer> getSortMap() {
+        return null;
     }
 
     public static void main(String[] args) {

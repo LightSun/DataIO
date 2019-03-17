@@ -10,6 +10,7 @@ import com.heaven7.java.data.io.music.Configs;
 import com.heaven7.java.data.io.music.PartOutput;
 import com.heaven7.java.data.io.music.UniformNameHelper;
 import com.heaven7.java.data.io.music.in.ExcelSource;
+import com.heaven7.java.data.io.music.in.MusicNameSource;
 import com.heaven7.java.data.io.poi.ExcelCol;
 import com.heaven7.java.data.io.poi.ExcelRow;
 import com.heaven7.java.data.io.poi.apply.Cell_StringApplier;
@@ -34,17 +35,34 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             .disableHtmlEscaping() // if not set: ' -> \u0027
             .create();
     private final List<ServerMapBean> mServeBeans;
+    private final MusicNameSource mSortSource;
     private List<ServerPairBean> mServerPairBeans;
 
-    public DefalutMusicOutDelegate2(ExcelSource mServerSource) {
-        mServeBeans = readServerConfig(mServerSource);
+    public DefalutMusicOutDelegate2(ExcelSource mServerSource, MusicNameSource mSortSource) {
+        this.mServeBeans = readServerConfig(mServerSource);
+        this.mSortSource = mSortSource;
     }
 
     @Override
     public void start(String outDir, List<MusicItem2> items) {
         //attach: display name and singer
         mServerPairBeans = mapServerBean(outDir, items);
+        final Map<String, Integer> map = mSortSource.getSortMap();
+        if (map != null) {
+            Collections.sort(mServerPairBeans, new Comparator<ServerPairBean>() {
+                @Override
+                public int compare(ServerPairBean o1, ServerPairBean o2) {
+                    Integer weight1 = map.get(o1.getName());
+                    Integer weight2 = map.get(o2.getName());
+                    if (weight1 == null || weight2 == null) {
+                        System.out.println();
+                    }
+                    return Integer.compare(weight1, weight2);
+                }
+            });
+        }
     }
+
     @Override
     public void end() {
 
@@ -74,7 +92,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                                     }
                                 }).getAsList();
                         if (list.isEmpty()) {
-                            System.out.println("no items for '"+ po.getFormatFilename(duration) + ".json'");
+                            System.out.println("no items for '" + po.getFormatFilename(duration) + ".json'");
                             return false;
                         }
                         String partPath = outDir + File.separator + "parts" + File.separator + po.getFormatFilename(duration) + ".json";
@@ -115,14 +133,14 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
                 FileUtils.writeTo(infoFile, mGson.toJson(mi));
                 EffectOutItem item = mi.getSpecialEffectItem();
-                if(item != null){
+                if (item != null) {
                     FileUtils.writeTo(effectFile, mGson.toJson(item));
                 }
                 item = mi.getTransitionItem();
-                if(item != null){
+                if (item != null) {
                     FileUtils.writeTo(transitionFile, mGson.toJson(item));
                 }
-                if(!Predicates.isEmpty(mi.getFilterNames())){
+                if (!Predicates.isEmpty(mi.getFilterNames())) {
                     FileUtils.writeTo(filterFile, mGson.toJson(mi.getFilterNames()));
                 }
                 return null;
@@ -156,23 +174,23 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             }
         }).getAsList();
         //save mapping
-        final File file_mapping = new File(outDir, "mapping" +File.separator + "name_id_mapping.txt");
+        final File file_mapping = new File(outDir, "mapping" + File.separator + "name_id_mapping.txt");
         FileUtils.writeTo(file_mapping, mGson.toJson(maps));
     }
 
     private void writeServerExcel(String outDir, String simpleFileName, List<MusicItem2> items) {
-       // List<ServerPairBean> pairBeans = mapServerBean(outDir, items);
+        // List<ServerPairBean> pairBeans = mapServerBean(outDir, items);
         ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
                 .nesting()
                 .newSheet("server-data")
                 .apply(new Sheet_WidthHeightApplier(10000, 500, 4))
-                .apply(new TitleRowApplier(Arrays.asList("musicid","name", "timelen", "hashid", "category","categoryId",
+                .apply(new TitleRowApplier(Arrays.asList("musicid", "name", "timelen", "hashid", "category", "categoryId",
                         "music_info", "effects", "transitions", "filters",
                         "link")))
                 .nesting();
         int rowIndex = 1; // f0 is title
-        for (ServerPairBean bean : mServerPairBeans){
-            for(MusicItem2 item : bean.items){
+        for (ServerPairBean bean : mServerPairBeans) {
+            for (MusicItem2 item : bean.items) {
                 sf.newRow(rowIndex)
                         .nesting()
                         .newCell(0)
@@ -204,29 +222,29 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                         .end();
                 //effect, transition, filter
                 EffectOutItem eoi = item.getSpecialEffectItem();
-                if(eoi != null){
+                if (eoi != null) {
                     sf.nesting().newCell(7).apply(new Cell_StringApplier(mGson.toJson(eoi)));
-                }else {
+                } else {
                     sf.nesting().newCell(7).apply(new Cell_StringApplier("{}"));
                 }
                 eoi = item.getTransitionItem();
-                if(eoi != null){
+                if (eoi != null) {
                     sf.nesting().newCell(8).apply(new Cell_StringApplier(mGson.toJson(eoi)));
-                }else {
+                } else {
                     sf.nesting().newCell(8).apply(new Cell_StringApplier("{}"));
                 }
                 sf.nesting().newCell(9).apply(new Cell_StringApplier(mGson.toJson(item.getFilterNames())));
                 //link
                 sf.nesting().newCell(10).apply(new Cell_StringApplier(getLink(item.genUniqueId())));
                 //add index
-                rowIndex ++;
+                rowIndex++;
             }
         }
         String out = outDir + File.separator + simpleFileName + "_db.xlsx";
         sf.end().end().write(out);
     }
 
-    private List<ServerPairBean> mapServerBean(String outDir ,List<MusicItem2> items) {
+    private List<ServerPairBean> mapServerBean(String outDir, List<MusicItem2> items) {
         final StringBuilder sb_log = new StringBuilder();
         //make the same the music and diff duration for same id.
         List<ServerPairBean> serverBeans = VisitServices.from(items).groupService(new ResultVisitor<MusicItem2, String>() {
@@ -266,7 +284,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
                         return ServerPairBean.NULL;
                     }
                     //set singer
-                    for(MusicItem2 mi : pair.getValue()){
+                    for (MusicItem2 mi : pair.getValue()) {
                         mi.setSinger(bean.getSinger());
                         mi.setDisplayName(bean.getName());
                         mi.setMusicId(bean.getMusicId());
@@ -286,7 +304,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         return serverBeans;
     }
 
-    private static List<ServerMapBean> readServerConfig(ExcelSource mServerSource){
+    private static List<ServerMapBean> readServerConfig(ExcelSource mServerSource) {
         final int index_musicId = 0;
         final int index_name = 1;
         final int index_singer = 3;
@@ -311,25 +329,32 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
             }
         }).getAsList();
     }
-    private static String getLink(String md5){
-       // http://data.xiaoxiekeji.cn/musics/1cbda83aa0ba538b711fcae1dae5a0ea.mp3
-       return String.format("http://data.xiaoxiekeji.cn/musics/%s.mp3", md5);
+
+    private static String getLink(String md5) {
+        // http://data.xiaoxiekeji.cn/musics/1cbda83aa0ba538b711fcae1dae5a0ea.mp3
+        return String.format("http://data.xiaoxiekeji.cn/musics/%s.mp3", md5);
     }
 
-    static class ServerPairBean{
+    static class ServerPairBean {
         static final ServerPairBean NULL = new ServerPairBean();
         final ServerMapBean bean;
         final List<MusicItem2> items;
 
-        public ServerPairBean(){
+        public ServerPairBean() {
             this(null, null);
         }
+
         public ServerPairBean(ServerMapBean bean, List<MusicItem2> value) {
             this.bean = bean;
             this.items = value;
         }
-        public String getMusicId(){
+
+        public String getMusicId() {
             return bean.getMusicId();
+        }
+
+        public String getName() {
+            return items.get(0).getName();
         }
     }
 }

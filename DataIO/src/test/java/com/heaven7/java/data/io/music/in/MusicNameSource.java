@@ -1,6 +1,7 @@
 package com.heaven7.java.data.io.music.in;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author heaven7
@@ -8,5 +9,7 @@ import java.util.List;
 public interface MusicNameSource {
 
     List<String> getMusicNames();
+
+    Map<String, Integer> getSortMap();
 
 }

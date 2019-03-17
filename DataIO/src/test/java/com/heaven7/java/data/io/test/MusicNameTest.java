@@ -26,7 +26,7 @@ public class MusicNameTest {
                 .setSkipToRowIndex(1)
                 .setSheetName("线上音乐文件")
                 .build();
-        List<String> musicNames = new ExcelMusicNameSource(musicNameTables).getMusicNames();
+        List<String> musicNames = new ExcelMusicNameSource(musicNameTables, null).getMusicNames();
         System.out.println();
     }
 

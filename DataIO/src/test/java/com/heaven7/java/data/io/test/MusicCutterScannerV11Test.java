@@ -24,6 +24,7 @@ public class MusicCutterScannerV11Test {
                 .setSheetName("线上音乐文件")
                 .build();
         String dir = "E:\\tmp\\bugfinds\\music_cut3";
-        new MusicCutterScannerV11(dir, new ExcelMusicNameSource(musicNameTables)).serialize(dir + File.separator + "cut.txt");
+        new MusicCutterScannerV11(dir, new ExcelMusicNameSource(musicNameTables, null))
+                .serialize(dir + File.separator + "cut.txt");
     }
 }
