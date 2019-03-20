@@ -1,4 +1,4 @@
-package com.heaven7.java.data.io.os.producer;
+package com.heaven7.java.data.io.os.producers;
 
 import com.heaven7.java.data.io.os.Producer;
 import com.heaven7.java.data.io.os.Scheduler;
@@ -20,14 +20,12 @@ public class CollectionProducer<T> extends BaseProducer<T> implements Producer<T
 
     @Override
     protected void produce0(SourceContext context, Scheduler scheduler, Callback<T> callback) {
-        callback.onStart(context);
         for (T t : collection){
             scheduleImpl(context, scheduler, t, callback);
             if(isClosed()){
                 break;
             }
         }
-        callback.onEnd(context);
     }
 
 }

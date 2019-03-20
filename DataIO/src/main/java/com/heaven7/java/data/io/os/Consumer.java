@@ -6,17 +6,17 @@ package com.heaven7.java.data.io.os;
 public interface Consumer<T> {
 
     /**
-     * called on collector start
+     * called on consumers start
      */
     void onStart();
     /**
-     * collector the object
+     * consumers the object
      * @param obj the object
      */
     void onConsume(T  obj);
 
     /**
-     * called on collector end.
+     * called on consumers end.
      */
     void onEnd();
 }

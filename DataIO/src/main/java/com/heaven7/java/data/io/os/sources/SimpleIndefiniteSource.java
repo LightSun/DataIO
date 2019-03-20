@@ -1,4 +1,4 @@
-package com.heaven7.java.data.io.os.source;
+package com.heaven7.java.data.io.os.sources;
 
 import com.heaven7.java.base.anno.NonNull;
 import com.heaven7.java.data.io.os.*;

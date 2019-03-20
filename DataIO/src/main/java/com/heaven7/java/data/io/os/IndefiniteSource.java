@@ -8,15 +8,15 @@ public interface IndefiniteSource<T, R> {
     void setSourceContext(SourceContext context);
 
     /**
-     * open the source with transformer and collector
+     * open the sources with transformer and consumers
      * @param transformer the transformer
-     * @param collector the collector which used to collector result.
+     * @param collector the consumers which used to consumers result.
      * @return true if open success.
      */
     boolean open(Transformer<T, R> transformer, Consumer<? super R> collector);
 
     /**
-     * close the source. this make the collector end.
+     * close the sources. this make the consumers end.
      */
     void close();
 }

@@ -16,4 +16,24 @@ public interface Producer<T> {
         void onProduced(SourceContext context,T t);
         void onEnd(SourceContext context);
     }
+
+    class WrappedCallback<T> implements Callback<T>{
+        final Callback<T> base;
+
+        public WrappedCallback(Callback<T> base) {
+            this.base = base;
+        }
+        @Override
+        public void onStart(SourceContext context) {
+            base.onStart(context);
+        }
+        @Override
+        public void onProduced(SourceContext context, T t) {
+            base.onProduced(context, t);
+        }
+        @Override
+        public void onEnd(SourceContext context) {
+            base.onEnd(context);
+        }
+    }
 }

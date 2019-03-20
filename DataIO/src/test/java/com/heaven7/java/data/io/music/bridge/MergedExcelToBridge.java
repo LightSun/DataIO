@@ -41,6 +41,6 @@ public class MergedExcelToBridge extends ExcelToJsonBridge {
 
     @Override
     protected void launchBridge(ExcelHelper helper, MusicOutDelegate1 delegate, Parameters param) {
-        //empty source
+        //empty sources
     }
 }

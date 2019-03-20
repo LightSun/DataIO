@@ -31,7 +31,7 @@ public class OldMusicCutSource implements MusicCutSource {
         String key = item.genUniqueId();
         List<CutInfo> cutInfos = cache.get(key);
         if (cutInfos == null) {
-            //for old music source . duration is 0
+            //for old music sources . duration is 0
             CutConfigBeanV2.CutItem cutItem = mBean.getCutItem(item.getName(), item.getDuration());
             if (cutItem == null) {
                 return null;
