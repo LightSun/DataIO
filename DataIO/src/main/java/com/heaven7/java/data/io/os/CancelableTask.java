@@ -1,5 +1,8 @@
 package com.heaven7.java.data.io.os;
 
+import com.heaven7.java.data.io.os.utils.Exceptions;
+
+import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -12,6 +15,14 @@ public final class CancelableTask{
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final Runnable task;
     private final Callback callback;
+    private WeakReference<Producer.Callback<?>> weakCallback;
+
+    public interface Callback{
+        void onTaskPlan(CancelableTask wrapTask);
+        void onTaskBegin(CancelableTask wrapTask);
+        void onTaskEnd(CancelableTask wrapTask, boolean cancelled);
+        void onException(CancelableTask wrapTask, Throwable e);
+    }
 
     static {
         CANCELLED.cancel();
@@ -29,6 +40,13 @@ public final class CancelableTask{
         return new CancelableTask(task, callback);
     }
 
+    public Producer.Callback<?> getProducerCallback(){
+        return weakCallback != null ? weakCallback.get() : null;
+    }
+
+    public void setProducerCallback(Producer.Callback<?> callback){
+        this.weakCallback = new WeakReference<Producer.Callback<?>>(callback);
+    }
     public boolean isCancelled(){
         return cancelled.get();
     }
@@ -42,22 +60,28 @@ public final class CancelableTask{
 
     public Runnable toActuallyTask() {
         callback.onTaskPlan(this);
-        return new Runnable() {
-            @Override
-            public void run() {
-                callback.onTaskBegin(CancelableTask.this);
-                boolean cancelled = isCancelled();
-                if(!cancelled){
-                    task.run();
-                }
-                callback.onTaskEnd(CancelableTask.this, cancelled);
-            }
-        };
+        return new InternalTask(this);
     }
 
-    public interface Callback{
-        void onTaskPlan(CancelableTask wrapTask);
-        void onTaskBegin(CancelableTask wrapTask);
-        void onTaskEnd(CancelableTask wrapTask, boolean cancelled);
+    private static class InternalTask implements Runnable{
+        final CancelableTask wrapTask;
+        public InternalTask(CancelableTask task) {
+            this.wrapTask = task;
+        }
+        @Override
+        public void run() {
+            Callback callback = wrapTask.callback;
+            try {
+                callback.onTaskBegin(wrapTask);
+                boolean cancelled = wrapTask.isCancelled();
+                if(!cancelled){
+                    wrapTask.task.run();
+                }
+                callback.onTaskEnd(wrapTask, cancelled);
+            }catch (Throwable e){
+               callback.onException(wrapTask, Exceptions.cast(e));
+            }
+        }
     }
+
 }
