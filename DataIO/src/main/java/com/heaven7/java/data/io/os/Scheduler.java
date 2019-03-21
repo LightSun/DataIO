@@ -9,7 +9,7 @@ package com.heaven7.java.data.io.os;
 public interface Scheduler {
 	/**
 	 * post the task by target delay.
-	 * 
+	 *
 	 * @param delay
 	 *            the delay in mills
 	 * @param task
@@ -22,13 +22,5 @@ public interface Scheduler {
 	 * @param task the task.
 	 */
 	void post(Runnable task);
-
-	/**
-	 * remove the task from message pool.
-	 * 
-	 * @param task
-	 *            the task.
-	 */
-	void remove(Runnable task);
 
 }

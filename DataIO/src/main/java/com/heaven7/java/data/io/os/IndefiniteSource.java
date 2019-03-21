@@ -16,7 +16,7 @@ public interface IndefiniteSource<T, R> {
 
     /**
      * open the sources with transformer and consumers
-     * @param collector the consumers which used to consumers result.
+     * @param collector the consumers which used to consumer result.
      * @return true if open success.
      */
     boolean open(Consumer<? super R> collector);

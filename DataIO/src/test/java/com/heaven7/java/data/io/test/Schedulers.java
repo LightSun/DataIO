@@ -6,8 +6,6 @@ import com.heaven7.java.data.io.os.Scheduler;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.WeakHashMap;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -22,24 +20,17 @@ public class Schedulers {
 	}
 	
     private static class GroupAsyncScheduler implements Scheduler{
+
 		final ScheduledExecutorService pool = Executors2.newScheduledThreadPool(5);
-		final WeakHashMap<Runnable,Future<?>> map = new WeakHashMap<Runnable,Future<?>>();
-		
+
 		@Override
-		public void postDelay(long delay, Runnable task) {
-			map.put(task, pool.schedule(task, delay, TimeUnit.MILLISECONDS));
+		public void postDelay(long delay, final Runnable task) {
+			pool.schedule(task, delay, TimeUnit.MILLISECONDS);
 		}
 
 		@Override
-		public void post(Runnable task) {
-			map.put(task, pool.submit(task));
-		}
-		@Override
-		public void remove(Runnable task) {
-			Future<?> future = map.remove(task);
-			if(future != null){
-				future.cancel(true);
-			}
+		public void post(final Runnable task) {
+			pool.submit(task);
 		}
 	}
 	private static class DefaultScheduler implements Scheduler{
@@ -56,11 +47,6 @@ public class Schedulers {
 		public void post(Runnable task) {
 			task.run();
 		}
-		@Override
-		public void remove(Runnable task) {
-			
-		}
-		
 	}
 	
 }

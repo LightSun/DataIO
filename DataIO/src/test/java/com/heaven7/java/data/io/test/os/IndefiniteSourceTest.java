@@ -20,7 +20,7 @@ public class IndefiniteSourceTest {
         List<String> list = Arrays.asList("heaven7_1", "heaven7_2", "heaven7_3");
         SimpleIndefiniteSource<String,String> source = new SimpleIndefiniteSource<>(
                 new CollectionProducer<String>(list));
-        source.setScheduler(Schedulers.GROUP_ASYNC);
+        source.setScheduler(Schedulers.DEFAULT);
         source.setTransformer(Transformers.<String>unchangeTransformer());
 
         source.open(new TestConsumer<String>());
@@ -33,7 +33,6 @@ public class IndefiniteSourceTest {
 
 
     private static class TestConsumer<T> implements Consumer<T>{
-
         @Override
         public void onStart() {
             System.out.println("start -------");
