@@ -19,9 +19,11 @@ public class IndefiniteSourceTest {
     public void test1(){
         List<String> list = Arrays.asList("heaven7_1", "heaven7_2", "heaven7_3");
         SimpleIndefiniteSource<String,String> source = new SimpleIndefiniteSource<>(
-                new CollectionProducer<String>(list), Schedulers.GROUP_ASYNC);
+                new CollectionProducer<String>(list));
+        source.setScheduler(Schedulers.GROUP_ASYNC);
+        source.setTransformer(Transformers.<String>unchangeTransformer());
 
-        source.open(Transformers.<String>unchangeTransformer(), new TestConsumer<String>());
+        source.open(new TestConsumer<String>());
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {

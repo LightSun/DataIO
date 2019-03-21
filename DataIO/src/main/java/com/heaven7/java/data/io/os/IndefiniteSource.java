@@ -6,14 +6,20 @@ package com.heaven7.java.data.io.os;
 public interface IndefiniteSource<T, R> {
 
     void setSourceContext(SourceContext context);
+    SourceContext getSourceContext();
+
+    void setScheduler(Scheduler scheduler);
+    Scheduler getScheduler();
+
+    void setTransformer(Transformer<? super T, R> transformer);
+    Transformer<? super T, R> getTransformer();
 
     /**
      * open the sources with transformer and consumers
-     * @param transformer the transformer
      * @param collector the consumers which used to consumers result.
      * @return true if open success.
      */
-    boolean open(Transformer<T, R> transformer, Consumer<? super R> collector);
+    boolean open(Consumer<? super R> collector);
 
     /**
      * close the sources. this make the consumers end.
