@@ -69,9 +69,9 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         }
     }
 
-    protected void scheduleImpl(final SourceContext context, @Nullable Scheduler scheduler, final T t, final Callback<T> callback){
+    protected CancelableTask scheduleImpl(final SourceContext context, @Nullable Scheduler scheduler, final T t, final Callback<T> callback){
         if(scheduler != null){
-            post(scheduler, new Runnable() {
+            return post(scheduler, new Runnable() {
                 @Override
                 public void run() {
                     callback.onProduced(context, t);
@@ -80,6 +80,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         }else {
             callback.onProduced(context, t);
         }
+        return CancelableTask.CANCELLED;
     }
 
     protected CancelableTask post(Scheduler scheduler, Runnable task){
@@ -92,7 +93,6 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         scheduler.postDelay(delay, cancelableTask.toActuallyTask());
         return cancelableTask;
     }
-
 
     @Override
     public void onTaskPlan(CancelableTask wrapTask) {

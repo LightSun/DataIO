@@ -5,12 +5,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author heaven7
  */
-public class CancelableTask{
+public final class CancelableTask{
+
+    public static final CancelableTask CANCELLED = new CancelableTask(null, null);
 
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final Runnable task;
     private final Callback callback;
 
+    static {
+        CANCELLED.cancel();
+    }
+
+    private CancelableTask(){
+        this(null, null);
+    }
     private CancelableTask(Runnable task, Callback callback) {
         this.task = task;
         this.callback = callback;

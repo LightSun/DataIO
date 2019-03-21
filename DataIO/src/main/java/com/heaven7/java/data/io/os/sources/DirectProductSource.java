@@ -6,9 +6,9 @@ import com.heaven7.java.data.io.os.Transformers;
 /**
  * @author heaven7
  */
-public class DirectIndefiniteSource<T> extends SimpleIndefiniteSource<T,T> {
+public class DirectProductSource<T> extends SimpleProductSource<T,T> {
 
-    public DirectIndefiniteSource(Producer<T> producer) {
+    public DirectProductSource(Producer<T> producer) {
         super(producer);
         setTransformer(Transformers.<T>unchangeTransformer());
     }

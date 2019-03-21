@@ -3,7 +3,7 @@ package com.heaven7.java.data.io.os;
 /**
  * @author heaven7
  */
-public interface IndefiniteSource<T, R> {
+public interface ProductSource<T, R> {
 
     void setSourceContext(SourceContext context);
     SourceContext getSourceContext();

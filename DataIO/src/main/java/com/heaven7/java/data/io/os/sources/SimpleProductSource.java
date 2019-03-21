@@ -5,7 +5,7 @@ import com.heaven7.java.data.io.os.*;
 /**
  * @author heaven7
  */
-public class SimpleIndefiniteSource<T, R> implements IndefiniteSource<T, R> {
+public class SimpleProductSource<T, R> implements ProductSource<T, R> {
 
     private final Producer<T> producer;
     private SourceContext mContext;
@@ -13,7 +13,7 @@ public class SimpleIndefiniteSource<T, R> implements IndefiniteSource<T, R> {
     private Transformer<? super T, R> transformer;
 
 
-    public SimpleIndefiniteSource(Producer<T> producer) {
+    public SimpleProductSource(Producer<T> producer) {
         this.producer = producer;
     }
     @Override
@@ -59,11 +59,11 @@ public class SimpleIndefiniteSource<T, R> implements IndefiniteSource<T, R> {
 
     private static class Callback0<T, R> implements Producer.Callback<T>{
 
-        final IndefiniteSource<T, R> source;
+        final ProductSource<T, R> source;
         final Transformer<? super T, R> transformer;
         final Consumer<? super R> collector;
 
-        public Callback0(IndefiniteSource<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
+        public Callback0(ProductSource<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
             this.source = source;
             this.transformer = transformer;
             this.collector = collector;
