@@ -24,18 +24,23 @@ public class Schedulers {
 		final ScheduledExecutorService pool = Executors2.newScheduledThreadPool(5);
 
 		@Override
-		public void postDelay(long delay, final Runnable task) {
+		public void scheduleDelay(final Runnable task, long delay, TimeUnit unit) {
 			pool.schedule(task, delay, TimeUnit.MILLISECONDS);
 		}
 
 		@Override
-		public void post(final Runnable task) {
+		public void schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
+
+		}
+
+		@Override
+		public void schedule(final Runnable task) {
 			pool.submit(task);
 		}
 	}
 	private static class DefaultScheduler implements Scheduler{
 		@Override
-		public void postDelay(long delay, Runnable task) {
+		public void scheduleDelay(Runnable task, long delay, TimeUnit unit) {
 			try {
 				Thread.sleep(delay);
 				task.run();
@@ -44,7 +49,11 @@ public class Schedulers {
 			}
 		}
 		@Override
-		public void post(Runnable task) {
+		public void schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
+
+		}
+		@Override
+		public void schedule(Runnable task) {
 			task.run();
 		}
 	}

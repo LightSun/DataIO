@@ -18,7 +18,7 @@ public class RedirectConsumer<T> implements Consumer<T> {
 
     @Override
     public void onStart() {
-        scheduler.post(new Runnable() {
+        scheduler.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onStart();
@@ -28,7 +28,7 @@ public class RedirectConsumer<T> implements Consumer<T> {
 
     @Override
     public void onConsume(final T obj) {
-        scheduler.post(new Runnable() {
+        scheduler.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onConsume(obj);
@@ -38,7 +38,7 @@ public class RedirectConsumer<T> implements Consumer<T> {
 
     @Override
     public void onEnd() {
-        scheduler.post(new Runnable() {
+        scheduler.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onEnd();

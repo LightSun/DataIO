@@ -20,7 +20,7 @@ public class IndefiniteSourceTest {
         List<String> list = Arrays.asList("heaven7_1", "heaven7_2", "heaven7_3");
         SimpleProductSource<String,String> source = new SimpleProductSource<>(
                 new CollectionProducer<String>(list));
-        source.setScheduler(Schedulers.DEFAULT);
+        source.setScheduler(Schedulers.GROUP_ASYNC);
         source.setTransformer(Transformers.<String>unchangeTransformer());
 
         source.open(new TestConsumer<String>());

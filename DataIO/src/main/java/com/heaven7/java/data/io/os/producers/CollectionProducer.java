@@ -20,18 +20,20 @@ public class CollectionProducer<T> extends BaseProducer<T> implements Producer<T
     }
 
     @Override
-    protected void produce0(SourceContext context, Scheduler scheduler, Callback<T> callback) {
+    protected void produce0(final SourceContext context, final Scheduler scheduler, final Callback<T> callback) {
         if(collection instanceof List){
             List<T> list = (List<T>) this.collection;
             for(int i = 0, size = list.size() ; i < size ; i ++){
-                scheduleImpl(context, scheduler, list.get(i), callback);
+                scheduleImpl(context, scheduler, list.get(i), callback, i == size - 1);
                 if(isClosed()){
                     break;
                 }
             }
         }else {
+            int size = collection.size();
+            int count = 0;
             for (T t : collection){
-                scheduleImpl(context, scheduler, t, callback);
+                scheduleImpl(context, scheduler, t, callback, count++ == size - 1);
                 if(isClosed()){
                     break;
                 }

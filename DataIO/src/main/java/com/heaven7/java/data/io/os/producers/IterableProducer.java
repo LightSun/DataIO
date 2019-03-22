@@ -23,7 +23,7 @@ public class IterableProducer<T> extends BaseProducer<T> implements Producer<T> 
     protected void produce0(final SourceContext context, @Nullable Scheduler scheduler, final Callback<T> callback) {
         Iterator<T> it = this.it.iterator();
         while (it.hasNext() && !isClosed()){
-            scheduleImpl(context, scheduler, it.next(), callback);
+            scheduleImpl(context, scheduler, it.next(), callback, !it.hasNext());
         }
     }
 }

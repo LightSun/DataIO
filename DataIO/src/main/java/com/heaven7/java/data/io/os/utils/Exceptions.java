@@ -5,8 +5,8 @@ package com.heaven7.java.data.io.os.utils;
  */
 public final class Exceptions {
 
-    public static Throwable cast(Throwable e){
+    public static RuntimeException cast(Throwable e){
         //TODO latter will changed
-        return e;
+        return e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e);
     }
 }

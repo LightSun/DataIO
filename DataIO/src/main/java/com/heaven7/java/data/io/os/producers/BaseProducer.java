@@ -17,7 +17,30 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
 
     private final AtomicBoolean mClosed = new AtomicBoolean(true);
     private final Set<CancelableTask> mTasks = Collections.synchronizedSet(new HashSet<CancelableTask>());
+    private ExceptionHandleStrategy<T> mExceptionStrategy;
 
+    protected static class BaseProductionProcess implements ProductionFlow{
+
+        private final byte type;
+        private final Object extra;
+        public BaseProductionProcess(byte type, Object extra) {
+            this.type = type;
+            this.extra = extra;
+        }
+        @Override
+        public byte getType() {
+            return type;
+        }
+        @Override
+        public Object getExtra() {
+            return extra;
+        }
+    }
+
+    @Override
+    public void setExceptionHandleStrategy(ExceptionHandleStrategy<T> strategy) {
+        this.mExceptionStrategy = strategy;
+    }
     @Override
     public boolean open() {
         return mClosed.compareAndSet(true, false);
@@ -30,6 +53,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         if(mClosed.compareAndSet(false, true)){
             for (CancelableTask task : mTasks){
                 task.cancel();
+                task.reset();
             }
             mTasks.clear();
         }
@@ -37,40 +61,45 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
 
     @Override
     public final void produce(final SourceContext context, final Scheduler scheduler, final Callback<T> callback) {
-        post(scheduler, callback, new Runnable() {
+        post(scheduler, new Runnable() {
             @Override
             public void run() {
                 callback.onStart(context);
                 produce0(context, scheduler, callback);
-                endImpl(context, scheduler, callback);
             }
-        });
+        }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_START, null), callback));
     }
 
-    private void endImpl(final SourceContext context, Scheduler scheduler,final Callback<T> callback) {
-        post(scheduler, callback, new Runnable() {
+    protected CancelableTask scheduleImpl(final SourceContext context, final Scheduler scheduler, final T t,
+                                          final Callback<T> callback, final boolean end){
+        return post(scheduler, new Runnable() {
+            @Override
+            public void run() {
+                callback.onProduced(context, t);
+                //if is closed or end. dispatch end
+                if(isClosed() || end){
+                    endImpl(context, scheduler, callback);
+                }
+            }
+        }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_DO_PRODUCE, t), callback));
+    }
+
+    public CancelableTask post(Scheduler scheduler, Runnable task, Params params){
+        CancelableTask cancelableTask = CancelableTask.of(task, this);
+        cancelableTask.setProduceParams(params);
+        scheduler.schedule(cancelableTask.toActuallyTask());
+        return cancelableTask;
+    }
+
+    private void endImpl(final SourceContext context, Scheduler scheduler, final Callback<T> callback) {
+        post(scheduler, new Runnable() {
             @Override
             public void run() {
                 close();
                 callback.onEnd(context);
             }
-        });
-    }
-
-    protected CancelableTask scheduleImpl(final SourceContext context, Scheduler scheduler, final T t, final Callback<T> callback){
-        return post(scheduler, callback, new Runnable() {
-            @Override
-            public void run() {
-                callback.onProduced(context, t);
-            }
-        });
-    }
-
-    protected CancelableTask post(Scheduler scheduler, Callback<T> callback, Runnable task){
-        CancelableTask cancelableTask = CancelableTask.of(task, this);
-        cancelableTask.setProducerCallback(callback);
-        scheduler.schedule(cancelableTask.toActuallyTask());
-        return cancelableTask;
+        }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_END, null),
+                callback));
     }
     @Override
     public void onTaskPlan(CancelableTask wrapTask) {
@@ -85,10 +114,18 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     @Override
     public void onTaskEnd(CancelableTask wrapTask, boolean cancelled) {
         mTasks.remove(wrapTask);
+        wrapTask.reset();
     }
     @Override
-    public void onException(CancelableTask wrapTask, Throwable e) {
-//TODO  todo strictly or not.
+    public void onException(CancelableTask wrapTask, RuntimeException e) {
+        Params params = wrapTask.getProduceParams();
+        mTasks.remove(wrapTask);
+        wrapTask.reset();
+        if(mExceptionStrategy != null){
+            mExceptionStrategy.handleException(this, params, e);
+        }else {
+            throw e;
+        }
     }
 
     /**
@@ -98,4 +135,5 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
      * @param callback the callback
      */
     protected abstract void produce0(SourceContext context, Scheduler scheduler, Callback<T> callback);
+
 }

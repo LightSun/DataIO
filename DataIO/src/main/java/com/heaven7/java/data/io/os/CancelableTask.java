@@ -2,7 +2,6 @@ package com.heaven7.java.data.io.os;
 
 import com.heaven7.java.data.io.os.utils.Exceptions;
 
-import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -15,15 +14,15 @@ public final class CancelableTask{
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final Runnable task;
     private final Callback callback;
-    private WeakReference<Producer.Callback<?>> weakCallback;
+    private Producer.Params params;
 
     public interface Callback{
+
         void onTaskPlan(CancelableTask wrapTask);
         void onTaskBegin(CancelableTask wrapTask);
         void onTaskEnd(CancelableTask wrapTask, boolean cancelled);
-        void onException(CancelableTask wrapTask, Throwable e);
+        void onException(CancelableTask wrapTask, RuntimeException e);
     }
-
     static {
         CANCELLED.cancel();
     }
@@ -31,21 +30,26 @@ public final class CancelableTask{
     private CancelableTask(){
         this(null, null);
     }
+
     private CancelableTask(Runnable task, Callback callback) {
         this.task = task;
         this.callback = callback;
     }
-
     public static CancelableTask of(Runnable task, Callback callback){
         return new CancelableTask(task, callback);
     }
-
-    public Producer.Callback<?> getProducerCallback(){
-        return weakCallback != null ? weakCallback.get() : null;
+    public void reset() {
+       if(this.params != null){
+           this.params = null;
+       }
     }
 
-    public void setProducerCallback(Producer.Callback<?> callback){
-        this.weakCallback = new WeakReference<Producer.Callback<?>>(callback);
+    public void setProduceParams(Producer.Params params) {
+        this.params = params;
+    }
+
+    public Producer.Params getProduceParams() {
+        return params;
     }
     public boolean isCancelled(){
         return cancelled.get();
@@ -53,11 +57,6 @@ public final class CancelableTask{
     public boolean cancel(){
         return cancelled.compareAndSet(false, true);
     }
-
-    public Runnable getBaseTask() {
-        return task;
-    }
-
     public Runnable toActuallyTask() {
         callback.onTaskPlan(this);
         return new InternalTask(this);
