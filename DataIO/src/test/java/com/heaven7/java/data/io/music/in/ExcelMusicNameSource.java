@@ -50,6 +50,13 @@ public class ExcelMusicNameSource implements MusicNameSource {
         return map;
     }
 
+    protected int getMusicNameIndex(){
+        return 1;
+    }
+    protected boolean filterRow(ExcelRow row){
+        return false;
+    }
+
     @Override
     public List<String> getMusicNames() {
         if (musicNames == null) {
@@ -59,8 +66,11 @@ public class ExcelMusicNameSource implements MusicNameSource {
                                     new ResultVisitor<ExcelRow, String>() {
                                         @Override
                                         public String visit(ExcelRow row, Object param) {
+                                            if(filterRow(row)){
+                                                return null;
+                                            }
                                             // the name of 60s
-                                            String str = row.getColumns().get(1).getColumnString();
+                                            String str = row.getColumns().get(getMusicNameIndex()).getColumnString();
                                             if (str.endsWith(".mp3")) {
                                                 str = str.substring(0, str.length() - 4);
                                             }

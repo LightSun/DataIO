@@ -135,12 +135,19 @@ public class MusicSourceMediatorTest {
         String musicDir = "E:\\tmp\\bugfinds\\right_music2";
         String outDir = "E:\\tmp\\bugfinds\\新版\\out_part";
 
+        //String musicNameTable = "E:\\tmp\\bugfinds\\musiclist.txt";
+        String musicNameTable = "E:\\tmp\\bugfinds\\本地音乐列表.xlsx";
         String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
-        String musicNameTable = "E:\\tmp\\bugfinds\\musiclist.txt";
         String mainExcelPath = "E:\\tmp\\bugfinds\\测试006.xlsx";
         String oldExcelPath = "E:\\tmp\\bugfinds\\music9.xlsx";
 
-        SimpleMusicNameSource nameSource = new SimpleMusicNameSource(musicNameTable);
+        //SimpleMusicNameSource nameSource = new SimpleMusicNameSource(musicNameTable);
+        ExcelMusicNameSource2 nameSource = new ExcelMusicNameSource2(new ExcelHelper.Builder()
+                .setSheetName("工作表 2")
+                .setSkipToRowIndex(0)
+                .setUseXlsx(true)
+                .setExcelPath(musicNameTable)
+                .build(), null);
         MusicOutDelegate2 delegate2 = new DefalutMusicOutDelegate2(new SimpleExcelSource(
                 new ExcelHelper.Builder()
                         .setSheetName("工作表3")
