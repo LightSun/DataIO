@@ -35,7 +35,7 @@ dependencies {
    // testCompile files('libs/commons-dbutils-1.6.jar')
   //  testCompile files('libs/commons-dbutils-1.6-sources.jar')
     testCompile 'junit:junit:4.8.2'
-   
+    testCompile "io.reactivex.rxjava2:rxjava:2.0.0"
 }
 
 publish {

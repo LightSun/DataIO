@@ -4,6 +4,8 @@ import com.heaven7.java.base.anno.Nullable;
 import com.heaven7.java.data.io.os.Producer;
 import com.heaven7.java.data.io.os.Scheduler;
 import com.heaven7.java.data.io.os.SourceContext;
+import com.heaven7.java.data.io.os.TaskNode;
+import com.heaven7.java.data.io.os.internal.Utils;
 
 import java.util.Iterator;
 
@@ -25,5 +27,11 @@ public class IterableProducer<T> extends BaseProducer<T> implements Producer<T> 
         while (it.hasNext() && !isClosed()){
             scheduleImpl(context, scheduler, it.next(), callback, !it.hasNext());
         }
+    }
+
+    @Override
+    protected void produceOrdered(SourceContext context, Scheduler scheduler, Callback<T> callback) {
+        TaskNode node = Utils.generateOrderedTasks(this, it, context, scheduler, callback);
+        node.scheduleOrdered();
     }
 }

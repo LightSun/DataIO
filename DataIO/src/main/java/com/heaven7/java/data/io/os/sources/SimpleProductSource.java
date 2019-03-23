@@ -69,10 +69,11 @@ public class SimpleProductSource<T, R> implements ProductSource<T, R> {
             this.collector = collector;
         }
         @Override
-        public void onStart(SourceContext context) {
+        public void onStart(SourceContext context, Runnable next) {
             if(collector != null){
                 collector.onStart();
             }
+            next.run();
         }
         @Override
         public void onProduced(SourceContext context, T t) {

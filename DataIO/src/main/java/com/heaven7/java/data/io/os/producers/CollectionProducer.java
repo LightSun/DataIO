@@ -3,6 +3,8 @@ package com.heaven7.java.data.io.os.producers;
 import com.heaven7.java.data.io.os.Producer;
 import com.heaven7.java.data.io.os.Scheduler;
 import com.heaven7.java.data.io.os.SourceContext;
+import com.heaven7.java.data.io.os.TaskNode;
+import com.heaven7.java.data.io.os.internal.Utils;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,4 +43,10 @@ public class CollectionProducer<T> extends BaseProducer<T> implements Producer<T
         }
     }
 
+    @Override @SuppressWarnings("unchecked")
+    protected void produceOrdered(SourceContext context, Scheduler scheduler, Callback<T> callback) {
+        TaskNode taskNode = collection instanceof List ? Utils.generateOrderedTasks(this, (List)collection, context, scheduler, callback)
+                 : Utils.generateOrderedTasks(this, collection, context, scheduler, callback);
+        taskNode.scheduleOrdered();
+    }
 }

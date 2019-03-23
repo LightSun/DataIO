@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * the file utils
+ * the file internal
  */
 public class FileUtils {
 

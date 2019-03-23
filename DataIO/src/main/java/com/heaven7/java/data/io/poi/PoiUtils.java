@@ -9,7 +9,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.util.Collection;
 
 /**
- * the poi utils.
+ * the poi internal.
  * 
  * @author heaven7
  *

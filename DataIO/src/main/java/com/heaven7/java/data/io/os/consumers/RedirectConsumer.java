@@ -9,16 +9,16 @@ import com.heaven7.java.data.io.os.Scheduler;
 public class RedirectConsumer<T> implements Consumer<T> {
 
     private final Consumer<T> base;
-    private final Scheduler scheduler;
+    private final Scheduler.Worker worker;
 
-    public RedirectConsumer(Consumer<T> base, Scheduler scheduler) {
+    public RedirectConsumer(Consumer<T> base, Scheduler.Worker worker) {
         this.base = base;
-        this.scheduler = scheduler;
+        this.worker = worker;
     }
 
     @Override
     public void onStart() {
-        scheduler.schedule(new Runnable() {
+        worker.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onStart();
@@ -28,7 +28,7 @@ public class RedirectConsumer<T> implements Consumer<T> {
 
     @Override
     public void onConsume(final T obj) {
-        scheduler.schedule(new Runnable() {
+        worker.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onConsume(obj);
@@ -38,7 +38,7 @@ public class RedirectConsumer<T> implements Consumer<T> {
 
     @Override
     public void onEnd() {
-        scheduler.schedule(new Runnable() {
+        worker.schedule(new Runnable() {
             @Override
             public void run() {
                 base.onEnd();

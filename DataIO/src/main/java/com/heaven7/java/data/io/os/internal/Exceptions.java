@@ -1,4 +1,4 @@
-package com.heaven7.java.data.io.os.utils;
+package com.heaven7.java.data.io.os.internal;
 
 /**
  * @author heaven7

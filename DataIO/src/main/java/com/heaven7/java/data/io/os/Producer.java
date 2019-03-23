@@ -7,6 +7,9 @@ import com.heaven7.java.data.io.os.producers.BaseProducer;
  */
 public interface Producer<T> {
 
+    int FLAG_SCHEDULE_ORDERED       = 1;
+    int FLAG_SCHEDULE_ORDERED_MULTI = 1 << 1;
+
     boolean open();
 
     void produce(SourceContext context, Scheduler scheduler, Callback<T> callback);
@@ -15,9 +18,29 @@ public interface Producer<T> {
 
     void setExceptionHandleStrategy(ExceptionHandleStrategy<T> strategy);
 
+    void addFlags(int flags);
+    boolean hasFlags(int flags);
+    void deleteFlags(int flags);
+
     interface Callback<T>{
-        void onStart(SourceContext context);
+        /**
+         * called on start produce
+         * @param context the context
+         * @param next the core produce task.
+         */
+        void onStart(SourceContext context, Runnable next);
+
+        /**
+         * called on produced
+         * @param context the context
+         * @param t the product
+         */
         void onProduced(SourceContext context,T t);
+
+        /**
+         * called on produce end
+         * @param context the context
+         */
         void onEnd(SourceContext context);
     }
     class WrappedCallback<T> implements Callback<T>{
@@ -27,8 +50,8 @@ public interface Producer<T> {
             this.base = base;
         }
         @Override
-        public void onStart(SourceContext context) {
-            base.onStart(context);
+        public void onStart(SourceContext context,  Runnable next) {
+            base.onStart(context, next);
         }
         @Override
         public void onProduced(SourceContext context, T t) {

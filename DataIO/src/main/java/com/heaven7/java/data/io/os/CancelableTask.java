@@ -1,6 +1,6 @@
 package com.heaven7.java.data.io.os;
 
-import com.heaven7.java.data.io.os.utils.Exceptions;
+import com.heaven7.java.data.io.os.internal.Exceptions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

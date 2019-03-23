@@ -1,5 +1,7 @@
 package com.heaven7.java.data.io.os;
 
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,29 +12,36 @@ import java.util.concurrent.TimeUnit;
  */
 public interface Scheduler {
 
-	/**
-	 * schedule the task right now
-	 * @param task the task to schedule
-	 */
-	void schedule(Runnable task);
-	/**
-	 * schedule the task by target delay.
-	 *
-	 * @param delay
-	 *            the delay in mills
-	 * @param task
-	 *            the runnable task,
-	 * @param unit the time unit
-	 */
-	void scheduleDelay(Runnable task, long delay, TimeUnit unit);
-	
-	/**
-	 * schedule a task run periodically
-	 * @param task the task.
-	 * @param initDelay the init delay
-	 * @param period the period
-	 * @param unit the time unit
-	 */
-	void schedulePeriodically(Runnable task, long initDelay,long period, TimeUnit unit);
+	Worker newWorker();
+
+	interface Worker{
+		/**
+		 * schedule the task right now
+		 * @param task the task to schedule
+		 * @return  the future
+		 */
+		Future<?> schedule(Runnable task);
+		/**
+		 * schedule the task by target delay.
+		 *
+		 * @param delay
+		 *            the delay in mills
+		 * @param task
+		 *            the runnable task,
+		 * @param unit the time unit
+		 * @return  the future
+		 */
+		ScheduledFuture<?> scheduleDelay(Runnable task, long delay, TimeUnit unit);
+
+		/**
+		 * schedule a task run periodically
+		 * @param task the task.
+		 * @param initDelay the init delay
+		 * @param period the period
+		 * @param unit the time unit
+		 * @return  the future
+		 */
+		ScheduledFuture<?> schedulePeriodically(Runnable task, long initDelay,long period, TimeUnit unit);
+	}
 
 }
