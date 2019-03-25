@@ -5,8 +5,8 @@ package com.heaven7.java.data.io.os;
  */
 public interface ProductManager<T, R> {
 
-    void setSourceContext(ProductContext context);
-    ProductContext getSourceContext();
+    void setProductContext(ProductContext context);
+    ProductContext getProductContext();
 
     void setScheduler(Scheduler scheduler);
     Scheduler getScheduler();

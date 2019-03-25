@@ -17,11 +17,11 @@ public class SimpleProductManager<T, R> implements ProductManager<T, R> {
         this.producer = producer;
     }
     @Override
-    public void setSourceContext(ProductContext context) {
+    public void setProductContext(ProductContext context) {
         this.mContext = context;
     }
     @Override
-    public ProductContext getSourceContext() {
+    public ProductContext getProductContext() {
         return mContext;
     }
     @Override
