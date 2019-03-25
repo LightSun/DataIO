@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.os.producers;
 
+import com.heaven7.java.base.util.Scheduler;
 import com.heaven7.java.data.io.os.*;
 
 import java.util.Collections;
@@ -206,7 +207,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
 
     /**
      * call this to produce all products really. no this may not in order
-     * @param context the source context
+     * @param context the product context
      * @param scheduler the scheduler. can be null
      * @param callback the callback
      */

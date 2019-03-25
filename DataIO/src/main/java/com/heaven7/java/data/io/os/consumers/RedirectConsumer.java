@@ -1,7 +1,7 @@
 package com.heaven7.java.data.io.os.consumers;
 
+import com.heaven7.java.base.util.Scheduler;
 import com.heaven7.java.data.io.os.Consumer;
-import com.heaven7.java.data.io.os.Scheduler;
 
 /**
  * @author heaven7

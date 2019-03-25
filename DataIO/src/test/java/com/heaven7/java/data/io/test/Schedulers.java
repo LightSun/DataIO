@@ -1,9 +1,9 @@
 package com.heaven7.java.data.io.test;
 
+import com.heaven7.java.base.util.Disposable;
+import com.heaven7.java.base.util.Scheduler;
 import com.heaven7.java.base.util.threadpool.Executors2;
-import com.heaven7.java.data.io.os.Scheduler;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,7 +13,13 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class Schedulers {
-	
+
+	public static final Disposable EMPTY = new Disposable() {
+		@Override
+		public void dispose() {
+
+		}
+	};
 	public static final DateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final Scheduler DEFAULT = new DefaultScheduler();
 	public static final Scheduler GROUP_ASYNC = new GroupAsyncScheduler();
@@ -29,21 +35,18 @@ public class Schedulers {
 		}
 	}
 	private static class GroupWorker implements Scheduler.Worker{
-
 		final ScheduledExecutorService pool = Executors2.newScheduledThreadPool(5);
-
 		@Override
-		public ScheduledFuture<?> scheduleDelay(final Runnable task, long delay, TimeUnit unit) {
-			return pool.schedule(task, delay, unit);
-		}
-
-		@Override
-		public ScheduledFuture<?> schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
-			return pool.scheduleAtFixedRate(task, initDelay, period, unit);
+		public Disposable scheduleDelay(final Runnable task, long delay, TimeUnit unit) {
+			return new Disposable.FutureDisposable(pool.schedule(task, delay, unit));
 		}
 		@Override
-		public Future<?> schedule(final Runnable task) {
-			return pool.submit(task);
+		public Disposable schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
+			return new Disposable.FutureDisposable(pool.scheduleAtFixedRate(task, initDelay, period, unit));
+		}
+		@Override
+		public Disposable schedule(final Runnable task) {
+			return new Disposable.FutureDisposable(pool.submit(task));
 		}
 	}
 	private static class DefaultScheduler implements Scheduler{
@@ -55,17 +58,17 @@ public class Schedulers {
 	}
 	private static class DefaultWorker implements Scheduler.Worker{
 		@Override
-		public ScheduledFuture<?> scheduleDelay(Runnable task, long delay, TimeUnit unit) {
+		public Disposable scheduleDelay(Runnable task, long delay, TimeUnit unit) {
 			try {
 				Thread.sleep(delay);
 				task.run();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			return null;
+			return EMPTY;
 		}
 		@Override
-		public ScheduledFuture<?> schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
+		public Disposable schedulePeriodically(Runnable task, long initDelay, long period, TimeUnit unit) {
 			try {
 				Thread.sleep(unit.toMillis(initDelay));
 				do {
@@ -75,12 +78,12 @@ public class Schedulers {
 			}catch (InterruptedException e){
 				e.printStackTrace();
 			}
-			return null;
+			return EMPTY;
 		}
 		@Override
-		public Future<?> schedule(Runnable task) {
+		public Disposable schedule(Runnable task) {
 			task.run();
-			return null;
+			return EMPTY;
 		}
 	}
 	
