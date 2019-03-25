@@ -3,7 +3,7 @@ package com.heaven7.java.data.io.test.os;
 import com.heaven7.java.data.io.os.Consumer;
 import com.heaven7.java.data.io.os.Transformers;
 import com.heaven7.java.data.io.os.producers.CollectionProducer;
-import com.heaven7.java.data.io.os.sources.SimpleProductManager;
+import com.heaven7.java.data.io.os.pm.SimpleProductManager;
 import com.heaven7.java.data.io.test.Schedulers;
 import org.junit.Test;
 

@@ -14,7 +14,7 @@ public interface Transformer<T,R> {
 
     /**
      * onConsume the product
-     * @param context the sources context
+     * @param context the pm context
      * @param t the product
      * @return the result of onConsume
      */

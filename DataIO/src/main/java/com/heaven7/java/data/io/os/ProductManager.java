@@ -15,14 +15,14 @@ public interface ProductManager<T, R> {
     Transformer<? super T, R> getTransformer();
 
     /**
-     * open the sources with transformer and consumers
+     * open the pm with transformer and consumers
      * @param collector the consumers which used to consumer result.
      * @return true if open success.
      */
     boolean open(Consumer<? super R> collector);
 
     /**
-     * close the sources. this make the consumers end.
+     * close the pm. this make the consumers end.
      */
     void close();
 }

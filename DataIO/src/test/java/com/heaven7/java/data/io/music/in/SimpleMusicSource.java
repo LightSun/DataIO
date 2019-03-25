@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * if dir is e:/ the music sources , 60s should be : e:/60s
+ * if dir is e:/ the music pm , 60s should be : e:/60s
  * @author heaven7
  */
 public class SimpleMusicSource implements MusicSource {

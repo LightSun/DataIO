@@ -8,21 +8,25 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class CollectionConsumer<T> implements Consumer<T> {
+public class ZipConsumer<T> implements Consumer<T> {
 
-    private final List<T> products = new ArrayList<>();
+    private final ArrayList<T> products = new ArrayList<>();
     @Override
     public void onStart() {
 
     }
     @Override
     public void onConsume(T obj) {
-        products.add(obj);
+        synchronized (products) {
+            products.add(obj);
+        }
     }
     @Override
     public void onEnd() {
-        ArrayList<T> list = new ArrayList<>(products);
-        products.clear();
+        ArrayList<T> list = (ArrayList<T>) products.clone();
+        synchronized (products){
+            products.clear();
+        }
         fire(list);
     }
     protected void fire(List<T> products) {

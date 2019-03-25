@@ -18,9 +18,9 @@ import org.junit.Test;
  */
 public class MusicSourceMediatorTest {
 
-    @Test //contains old music cut sources.
+    @Test //contains old music cut pm.
     public void test1(){
-        //new MultiMusicCutSource(oldMusicCutSrc, sources)
+        //new MultiMusicCutSource(oldMusicCutSrc, pm)
     }
 
     @Test

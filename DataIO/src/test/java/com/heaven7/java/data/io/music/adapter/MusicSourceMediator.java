@@ -100,7 +100,7 @@ public class MusicSourceMediator {
         }).getAsList();
         debug(items);
 
-        //set effect mapping sources.
+        //set effect mapping pm.
         setEffectMappingSource();
         //transfer other.
         speedEffectTransfer.transfer(excelSources.getSpeedEffectSource(), items);
