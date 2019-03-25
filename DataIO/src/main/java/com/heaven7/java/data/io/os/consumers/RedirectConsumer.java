@@ -17,21 +17,21 @@ public class RedirectConsumer<T> implements Consumer<T> {
     }
 
     @Override
-    public void onStart() {
+    public void onStart(final Runnable next) {
         worker.schedule(new Runnable() {
             @Override
             public void run() {
-                base.onStart();
+                base.onStart(next);
             }
         });
     }
 
     @Override
-    public void onConsume(final T obj) {
+    public void onConsume(final T obj,final Runnable next) {
         worker.schedule(new Runnable() {
             @Override
             public void run() {
-                base.onConsume(obj);
+                base.onConsume(obj, next);
             }
         });
     }

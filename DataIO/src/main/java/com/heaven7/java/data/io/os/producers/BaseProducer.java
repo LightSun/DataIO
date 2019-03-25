@@ -8,10 +8,17 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * the producer which can schedule the tasks in order or not.
  * @author heaven7
  */
 public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Callback {
 
+    public static final Runnable EMPTY = new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    };
     private final AtomicBoolean mClosed = new AtomicBoolean(true);
     private final Set<CancelableTask> mTasks = Collections.synchronizedSet(new HashSet<CancelableTask>());
     private ExceptionHandleStrategy<T> mExceptionStrategy;
@@ -97,13 +104,21 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_START, null), callback));
     }
 
-    //may not in order
+    /**
+     * schedule the task , but may not in order.
+     * @param context the context
+     * @param scheduler the scheduler
+     * @param t the product
+     * @param callback the callback
+     * @param end true if next is end.
+     * @return the the scheduled task. which can be cancelled.
+     */
     public final CancelableTask scheduleImpl(final ProductContext context, final Scheduler scheduler, final T t,
                                              final Callback<T> callback, final boolean end){
         return post(scheduler, new Runnable() {
             @Override
             public void run() {
-                callback.onProduced(context, t);
+                callback.onProduced(context, t, EMPTY);
                 //if is closed or end. dispatch end
                 if(isClosed() || end){
                     endImpl(context, scheduler, callback);
@@ -112,13 +127,20 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_DO_PRODUCE, t), callback));
     }
 
-    //if next == null. means edn
+    /**
+     * schedule the task as ordered. if producer is closed or next is null. will dispatch end.
+     * @param context the context
+     * @param scheduler the scheduler
+     * @param t the product to schedule
+     * @param callback the callback
+     * @param next the next. if is null. means will end.
+     * @return the the scheduled task. which can be cancelled.
+     */
     public final CancelableTask scheduleOrdered(final ProductContext context, final Scheduler scheduler, final T t,
                                                 final Callback<T> callback, final Runnable next){
-        return post(scheduler, new Runnable() {
+        final Runnable nextRun = new Runnable() {
             @Override
             public void run() {
-                callback.onProduced(context, t);
                 //if is closed or end. dispatch end
                 if(isClosed() || next == null){
                     if(next != null && next instanceof TaskNode){
@@ -128,6 +150,12 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
                 }else {
                     next.run();
                 }
+            }
+        };
+        return post(scheduler, new Runnable() {
+            @Override
+            public void run() {
+                callback.onProduced(context, t, nextRun);
             }
         }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_DO_PRODUCE, t), callback));
     }

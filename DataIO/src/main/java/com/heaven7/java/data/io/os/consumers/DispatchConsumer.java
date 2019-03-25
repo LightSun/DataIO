@@ -8,25 +8,25 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class ZipConsumer<T> implements Consumer<T> {
+public class DispatchConsumer<T> implements Consumer<T> {
 
     private final ArrayList<T> products = new ArrayList<>();
-    @Override
-    public void onStart() {
 
-    }
     @Override
-    public void onConsume(T obj) {
-        synchronized (products) {
-            products.add(obj);
-        }
+    public void onStart(Runnable next) {
+        next.run();
     }
+
+    @Override
+    public void onConsume(T obj, Runnable next) {
+        products.add(obj);
+        next.run();
+    }
+
     @Override
     public void onEnd() {
         ArrayList<T> list = (ArrayList<T>) products.clone();
-        synchronized (products){
-            products.clear();
-        }
+        products.clear();
         fire(list);
     }
     protected void fire(List<T> products) {

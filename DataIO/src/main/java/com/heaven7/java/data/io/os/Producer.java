@@ -25,7 +25,7 @@ public interface Producer<T> {
         /**
          * called on start produce
          * @param context the context
-         * @param next the core produce task.
+         * @param next the core produce task. never be null.
          */
         void onStart(ProductContext context, Runnable next);
 
@@ -33,33 +33,15 @@ public interface Producer<T> {
          * called on produced
          * @param context the context
          * @param t the product
+         * @param next the next task. never be null
          */
-        void onProduced(ProductContext context, T t);
+        void onProduced(ProductContext context, T t, Runnable next);
 
         /**
          * called on produce end
          * @param context the context
          */
         void onEnd(ProductContext context);
-    }
-    class WrappedCallback<T> implements Callback<T>{
-        final Callback<T> base;
-
-        public WrappedCallback(Callback<T> base) {
-            this.base = base;
-        }
-        @Override
-        public void onStart(ProductContext context, Runnable next) {
-            base.onStart(context, next);
-        }
-        @Override
-        public void onProduced(ProductContext context, T t) {
-            base.onProduced(context, t);
-        }
-        @Override
-        public void onEnd(ProductContext context) {
-            base.onEnd(context);
-        }
     }
     interface ExceptionHandleStrategy<T>{
         void handleException(BaseProducer<T> producer, Params params, RuntimeException e);

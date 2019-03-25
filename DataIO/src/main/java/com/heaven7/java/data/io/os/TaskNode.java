@@ -2,6 +2,10 @@ package com.heaven7.java.data.io.os;
 
 import com.heaven7.java.data.io.os.producers.BaseProducer;
 
+/**
+ * the task node which indicate a list of tasks.
+ * @param <T> the product type.
+ */
 public class TaskNode<T> implements Runnable {
 
     public static final TaskNode<?> EMPTY = new TaskNode<>(null, null, null, null);
@@ -23,7 +27,8 @@ public class TaskNode<T> implements Runnable {
 
     public void scheduleOrdered() {
         if (current != null) {
-            producer.scheduleOrdered(context, scheduler, current, callback, this);
+            producer.scheduleOrdered(context, scheduler, current, callback,
+                    nextTask != null ? this : null);
         }
     }
 

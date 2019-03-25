@@ -26,11 +26,6 @@ public final class CancelableTask{
     static {
         CANCELLED.cancel();
     }
-
-    private CancelableTask(){
-        this(null, null);
-    }
-
     private CancelableTask(Runnable task, Callback callback) {
         this.task = task;
         this.callback = callback;

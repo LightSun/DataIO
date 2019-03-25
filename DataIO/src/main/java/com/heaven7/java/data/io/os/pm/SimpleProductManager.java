@@ -63,30 +63,23 @@ public class SimpleProductManager<T, R> implements ProductManager<T, R> {
         final Transformer<? super T, R> transformer;
         final Consumer<? super R> collector;
 
-        public Callback0(ProductManager<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
+        Callback0(ProductManager<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
             this.source = source;
             this.transformer = transformer;
             this.collector = collector;
         }
         @Override
         public void onStart(ProductContext context, Runnable next) {
-            if(collector != null){
-                collector.onStart();
-            }
-            next.run();
+            collector.onStart(next);
         }
         @Override
-        public void onProduced(ProductContext context, T t) {
+        public void onProduced(ProductContext context, T t, Runnable next) {
             R result = transformer.consume(context, t);
-            if(collector != null){
-                collector.onConsume(result);
-            }
+            collector.onConsume(result, next);
         }
         @Override
         public void onEnd(ProductContext context) {
-            if(collector != null){
-                collector.onEnd();
-            }
+            collector.onEnd();
         }
     }
 }
