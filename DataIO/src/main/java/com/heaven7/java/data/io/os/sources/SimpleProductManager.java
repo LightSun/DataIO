@@ -5,23 +5,23 @@ import com.heaven7.java.data.io.os.*;
 /**
  * @author heaven7
  */
-public class SimpleProductSource<T, R> implements ProductSource<T, R> {
+public class SimpleProductManager<T, R> implements ProductManager<T, R> {
 
     private final Producer<T> producer;
-    private SourceContext mContext;
+    private ProductContext mContext;
     private Scheduler scheduler;
     private Transformer<? super T, R> transformer;
 
 
-    public SimpleProductSource(Producer<T> producer) {
+    public SimpleProductManager(Producer<T> producer) {
         this.producer = producer;
     }
     @Override
-    public void setSourceContext(SourceContext context) {
+    public void setSourceContext(ProductContext context) {
         this.mContext = context;
     }
     @Override
-    public SourceContext getSourceContext() {
+    public ProductContext getSourceContext() {
         return mContext;
     }
     @Override
@@ -59,31 +59,31 @@ public class SimpleProductSource<T, R> implements ProductSource<T, R> {
 
     private static class Callback0<T, R> implements Producer.Callback<T>{
 
-        final ProductSource<T, R> source;
+        final ProductManager<T, R> source;
         final Transformer<? super T, R> transformer;
         final Consumer<? super R> collector;
 
-        public Callback0(ProductSource<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
+        public Callback0(ProductManager<T, R> source, Transformer<? super T, R> transformer, Consumer<? super R> collector) {
             this.source = source;
             this.transformer = transformer;
             this.collector = collector;
         }
         @Override
-        public void onStart(SourceContext context, Runnable next) {
+        public void onStart(ProductContext context, Runnable next) {
             if(collector != null){
                 collector.onStart();
             }
             next.run();
         }
         @Override
-        public void onProduced(SourceContext context, T t) {
+        public void onProduced(ProductContext context, T t) {
             R result = transformer.consume(context, t);
             if(collector != null){
                 collector.onConsume(result);
             }
         }
         @Override
-        public void onEnd(SourceContext context) {
+        public void onEnd(ProductContext context) {
             if(collector != null){
                 collector.onEnd();
             }

@@ -2,7 +2,7 @@ package com.heaven7.java.data.io.os.internal;
 
 import com.heaven7.java.data.io.os.Producer;
 import com.heaven7.java.data.io.os.Scheduler;
-import com.heaven7.java.data.io.os.SourceContext;
+import com.heaven7.java.data.io.os.ProductContext;
 import com.heaven7.java.data.io.os.TaskNode;
 import com.heaven7.java.data.io.os.producers.BaseProducer;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class Utils {
 
     public static <T> TaskNode<T> generateOrderedTasks(BaseProducer<T> producer, Iterable<T> ita,
-                                                       SourceContext context, Scheduler scheduler, Producer.Callback<T> callback){
+                                                       ProductContext context, Scheduler scheduler, Producer.Callback<T> callback){
         final Iterator<T> it = ita.iterator();
         TaskNode<T> head = producer.createTaskNode(context, scheduler, callback);
         TaskNode<T> last = head;
@@ -31,7 +31,7 @@ public class Utils {
         return head;
     }
     public static <T> TaskNode<T> generateOrderedTasks(BaseProducer<T> producer, List<T> list,
-                                                                 SourceContext context, Scheduler scheduler, Producer.Callback<T> callback){
+                                                       ProductContext context, Scheduler scheduler, Producer.Callback<T> callback){
         int size = list.size();
         if(size == 0){
             return producer.createTaskNode(null, null, null);

@@ -55,7 +55,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         this.mExceptionStrategy = strategy;
     }
 
-    public TaskNode<T> createTaskNode(SourceContext context, Scheduler scheduler, Callback<T> callback){
+    public TaskNode<T> createTaskNode(ProductContext context, Scheduler scheduler, Callback<T> callback){
          return new TaskNode<T>(this, context, scheduler, callback);
     }
     @Override
@@ -77,7 +77,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     }
 
     @Override
-    public final void produce(final SourceContext context, final Scheduler scheduler, final Callback<T> callback) {
+    public final void produce(final ProductContext context, final Scheduler scheduler, final Callback<T> callback) {
         final boolean ordered = hasFlags(FLAG_SCHEDULE_ORDERED);
         final Runnable produce = new Runnable() {
             @Override
@@ -98,8 +98,8 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     }
 
     //may not in order
-    public final CancelableTask scheduleImpl(final SourceContext context, final Scheduler scheduler, final T t,
-                                          final Callback<T> callback, final boolean end){
+    public final CancelableTask scheduleImpl(final ProductContext context, final Scheduler scheduler, final T t,
+                                             final Callback<T> callback, final boolean end){
         return post(scheduler, new Runnable() {
             @Override
             public void run() {
@@ -113,25 +113,20 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     }
 
     //if next == null. means edn
-    public final CancelableTask scheduleOrdered(final SourceContext context, final Scheduler scheduler, final T t,
-                                          final Callback<T> callback, final Runnable next){
-        final Runnable realNext = (next != null && hasFlags(FLAG_SCHEDULE_ORDERED_MULTI)) ? new Runnable() {
-            @Override
-            public void run() {
-                post(scheduler ,next,
-                        new Params(context, scheduler,
-                        new BaseProductionProcess(ProductionFlow.TYPE_DO_PRODUCE, t), callback));
-            }
-        } : next;
+    public final CancelableTask scheduleOrdered(final ProductContext context, final Scheduler scheduler, final T t,
+                                                final Callback<T> callback, final Runnable next){
         return post(scheduler, new Runnable() {
             @Override
             public void run() {
                 callback.onProduced(context, t);
                 //if is closed or end. dispatch end
-                if(isClosed() || realNext == null){
+                if(isClosed() || next == null){
+                    if(next != null && next instanceof TaskNode){
+                        ((TaskNode) next).reset();
+                    }
                     endImpl(context, scheduler, callback);
                 }else {
-                    realNext.run();
+                    next.run();
                 }
             }
         }, new Params(context, scheduler, new BaseProductionProcess(ProductionFlow.TYPE_DO_PRODUCE, t), callback));
@@ -144,7 +139,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         return cancelableTask;
     }
 
-    private void endImpl(final SourceContext context, Scheduler scheduler, final Callback<T> callback) {
+    private void endImpl(final ProductContext context, Scheduler scheduler, final Callback<T> callback) {
         post(scheduler, new Runnable() {
             @Override
             public void run() {
@@ -187,7 +182,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
      * @param scheduler the scheduler. can be null
      * @param callback the callback
      */
-    protected abstract void produce0(SourceContext context, Scheduler scheduler, Callback<T> callback);
+    protected abstract void produce0(ProductContext context, Scheduler scheduler, Callback<T> callback);
 
     /**
      * produce the product in ordered
@@ -195,7 +190,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
      * @param scheduler the scheduler
      * @param callback the callback
      */
-    protected void produceOrdered(SourceContext context, Scheduler scheduler, Callback<T> callback) {
+    protected void produceOrdered(ProductContext context, Scheduler scheduler, Callback<T> callback) {
 
     }
 }

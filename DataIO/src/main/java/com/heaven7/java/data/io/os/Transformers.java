@@ -7,7 +7,7 @@ public class Transformers {
 
     private static final Transformer<Object, Object> UNCHANGED = new Transformer<Object, Object>() {
         @Override
-        public Object consume(SourceContext context, Object t) {
+        public Object consume(ProductContext context, Object t) {
             return t;
         }
     };

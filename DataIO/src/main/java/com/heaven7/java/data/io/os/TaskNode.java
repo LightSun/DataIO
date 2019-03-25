@@ -7,14 +7,14 @@ public class TaskNode<T> implements Runnable {
     public static final TaskNode<?> EMPTY = new TaskNode<>(null, null, null, null);
 
     private final BaseProducer<T> producer;
-    private final SourceContext context;
+    private final ProductContext context;
     private final Scheduler scheduler;
     private final Producer.Callback<T> callback;
 
     public T current;
     public TaskNode nextTask;
 
-    public TaskNode(BaseProducer<T> producer, SourceContext context, Scheduler scheduler, Producer.Callback<T> callback) {
+    public TaskNode(BaseProducer<T> producer, ProductContext context, Scheduler scheduler, Producer.Callback<T> callback) {
         this.producer = producer;
         this.context = context;
         this.scheduler = scheduler;
@@ -24,6 +24,14 @@ public class TaskNode<T> implements Runnable {
     public void scheduleOrdered() {
         if (current != null) {
             producer.scheduleOrdered(context, scheduler, current, callback, this);
+        }
+    }
+
+    public void reset(){
+        current = null;
+        if(nextTask != null){
+            nextTask.reset();
+            nextTask = null;
         }
     }
 

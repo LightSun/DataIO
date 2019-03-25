@@ -7,7 +7,7 @@ public interface Transformer<T,R> {
 
     Transformer<Object, Object> UNCHANGED = new Transformer<Object, Object>() {
         @Override
-        public Object consume(SourceContext context, Object t) {
+        public Object consume(ProductContext context, Object t) {
             return t;
         }
     };
@@ -18,6 +18,6 @@ public interface Transformer<T,R> {
      * @param t the product
      * @return the result of onConsume
      */
-    R consume(SourceContext context, T t);
+    R consume(ProductContext context, T t);
 
 }

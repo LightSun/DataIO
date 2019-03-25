@@ -3,10 +3,10 @@ package com.heaven7.java.data.io.os;
 /**
  * @author heaven7
  */
-public interface ProductSource<T, R> {
+public interface ProductManager<T, R> {
 
-    void setSourceContext(SourceContext context);
-    SourceContext getSourceContext();
+    void setSourceContext(ProductContext context);
+    ProductContext getSourceContext();
 
     void setScheduler(Scheduler scheduler);
     Scheduler getScheduler();
