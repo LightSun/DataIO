@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author heaven7
@@ -23,6 +24,10 @@ public interface ExcelWriter {
     void write(String file);
 
     void writeIO(String file) throws IOException;
+
+    void writeIO(OutputStream out) throws IOException;
+
+    void write(OutputStream out);
 
     interface WorkbookFactory{
         WorkbookFactory newSheet(String name);

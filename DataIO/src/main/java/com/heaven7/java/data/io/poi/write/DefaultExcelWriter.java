@@ -36,6 +36,28 @@ public class DefaultExcelWriter implements ExcelWriter {
     }
 
     @Override
+    public void write(OutputStream out) {
+        try {
+            writeIO(out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void writeIO(OutputStream out) throws IOException {
+        if (mWorkbook == null) {
+            throw new NullPointerException();
+        }
+        try {
+            mWorkbook.write(out);
+            out.flush();
+        } finally {
+            StreamUtils.closeQuietly(out);
+        }
+    }
+
+    @Override
     public void writeIO(String file) throws IOException {
         if (mWorkbook == null) {
             throw new NullPointerException();

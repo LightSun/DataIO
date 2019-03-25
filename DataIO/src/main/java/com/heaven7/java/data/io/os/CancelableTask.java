@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.os;
 
+import com.heaven7.java.base.util.Disposable;
 import com.heaven7.java.data.io.os.internal.Exceptions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,7 +15,9 @@ public final class CancelableTask{
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
     private final Runnable task;
     private final Callback callback;
+
     private Producer.Params params;
+    private Disposable disposable;
 
     public interface Callback{
 
@@ -37,6 +40,12 @@ public final class CancelableTask{
        if(this.params != null){
            this.params = null;
        }
+       if(disposable != null){
+           disposable = null;
+       }
+    }
+    public void setDisposable(Disposable disposable) {
+        this.disposable = disposable;
     }
 
     public void setProduceParams(Producer.Params params) {
@@ -50,7 +59,14 @@ public final class CancelableTask{
         return cancelled.get();
     }
     public boolean cancel(){
-        return cancelled.compareAndSet(false, true);
+        if(cancelled.compareAndSet(false, true)){
+            if(disposable !=null){
+                disposable.dispose();
+                disposable = null;
+            }
+            return true;
+        }
+        return false;
     }
     public Runnable toActuallyTask() {
         callback.onTaskPlan(this);
@@ -74,6 +90,8 @@ public final class CancelableTask{
                 callback.onTaskEnd(wrapTask, cancelled);
             }catch (Throwable e){
                callback.onException(wrapTask, Exceptions.cast(e));
+            }finally {
+                wrapTask.reset();
             }
         }
     }

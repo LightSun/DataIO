@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.os.producers;
 
+import com.heaven7.java.base.util.Disposable;
 import com.heaven7.java.base.util.Scheduler;
 import com.heaven7.java.data.io.os.*;
 
@@ -164,7 +165,8 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     public CancelableTask post(Scheduler scheduler, Runnable task, Params params){
         CancelableTask cancelableTask = CancelableTask.of(task, this);
         cancelableTask.setProduceParams(params);
-        scheduler.newWorker().schedule(cancelableTask.toActuallyTask());
+        Disposable disposable = scheduler.newWorker().schedule(cancelableTask.toActuallyTask());
+        cancelableTask.setDisposable(disposable);
         return cancelableTask;
     }
 
@@ -191,13 +193,11 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
     @Override
     public void onTaskEnd(CancelableTask wrapTask, boolean cancelled) {
         mTasks.remove(wrapTask);
-        wrapTask.reset();
     }
     @Override
     public void onException(CancelableTask wrapTask, RuntimeException e) {
         Params params = wrapTask.getProduceParams();
         mTasks.remove(wrapTask);
-        wrapTask.reset();
         if(mExceptionStrategy != null){
             mExceptionStrategy.handleException(this, params, e);
         }else {
