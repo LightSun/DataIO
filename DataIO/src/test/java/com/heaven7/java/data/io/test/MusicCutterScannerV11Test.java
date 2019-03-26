@@ -1,8 +1,6 @@
 package com.heaven7.java.data.io.test;
 
 import com.heaven7.java.data.io.music.in.ExcelMusicNameSource;
-import com.heaven7.java.data.io.music.in.SimpleMusicNameSource;
-import com.heaven7.java.data.io.music.scan.MusicCutterScannerV10;
 import com.heaven7.java.data.io.music.scan.MusicCutterScannerV11;
 import com.heaven7.java.data.io.poi.ExcelHelper;
 import org.junit.Test;
