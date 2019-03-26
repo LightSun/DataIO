@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * read excel.
@@ -14,8 +15,8 @@ import java.io.IOException;
 public class HSSFExcelInput extends BaseExcelInput implements ExcelInput {
 
 	@Override
-	protected Workbook onCreateWorkbook(String filePath) throws IOException {
-		return new HSSFWorkbook(new FileInputStream(filePath));
+	protected Workbook onCreateWorkbook(InputStream in) throws IOException {
+		return new HSSFWorkbook(in);
 	}
 
 

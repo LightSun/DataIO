@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class FileLinesTableSource<T> implements TableSource<T> {
+public class FileLinesTableSource<T> extends TableSource<T> {
 
     private final Object context;
     private final String file;

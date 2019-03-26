@@ -1,6 +1,8 @@
 package com.heaven7.java.data.io.poi;
 
 import com.heaven7.java.base.anno.Nullable;
+import com.heaven7.java.base.util.IOUtils;
+import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.data.io.poi.adapter.ExcelVisitorAdapter;
 import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.ListVisitService;
@@ -10,6 +12,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +23,18 @@ public abstract class BaseExcelInput implements ExcelInput {
     private int startRowIndex;
     private RowInterceptor interceptor;
     private ExcelVisitor visitor = ExcelVisitorAdapter.EMPTY;
+    private InputStream in;
+    private Object mContext;
 
     @Override
     public ExcelInput visitor(@Nullable ExcelVisitor visitor) {
         this.visitor = visitor != null ? visitor : ExcelVisitorAdapter.EMPTY;
+        return this;
+    }
+
+    @Override
+    public ExcelInput setContext(Object context) {
+        this.mContext = context;
         return this;
     }
 
@@ -58,6 +69,12 @@ public abstract class BaseExcelInput implements ExcelInput {
     }
 
     @Override
+    public ExcelInput input(InputStream in) {
+        this.in = in;
+        return this;
+    }
+
+    @Override
     public List<ExcelRow> read() {
         return read(null);
     }
@@ -79,8 +96,12 @@ public abstract class BaseExcelInput implements ExcelInput {
 
         final List<ExcelRow> rows = new ArrayList<ExcelRow>();
         Workbook workbook = null;
+        InputStream in = this.in;
         try {
-            workbook = onCreateWorkbook(getFilePath());
+            if(in == null){
+                in = ResourceLoader.getDefault().loadFileAsStream(mContext, filePath);
+            }
+            workbook = onCreateWorkbook(in);
             final Sheet sheet = PoiUtils.getSheet(workbook, sheetParam);
             if(sheet == null){
                 throw new RuntimeException("can't find sheet for " + sheetParam);
@@ -111,19 +132,15 @@ public abstract class BaseExcelInput implements ExcelInput {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            if (workbook != null) {
-                try {
-                    workbook.close();
-                } catch (IOException e) {
-                }
-            }
+            IOUtils.closeQuietly(workbook);
+            IOUtils.closeQuietly(in);
         }
     }
 
   /**
    * called on create workbook
-   * @param filePath the excel path
+   * @param in the input
    * @return the excel Workbook
    */
-    protected abstract Workbook onCreateWorkbook(String filePath) throws IOException;
+    protected abstract Workbook onCreateWorkbook(InputStream in) throws IOException;
 }

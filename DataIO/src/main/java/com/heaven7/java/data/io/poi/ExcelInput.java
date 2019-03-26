@@ -2,11 +2,13 @@ package com.heaven7.java.data.io.poi;
 
 import com.heaven7.java.visitor.collection.ListVisitService;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface ExcelInput {
-	
-	
+
+
+	ExcelInput setContext(Object context);
 	/*
 	 * prepare the input of excel
 	 * @param in the input of excel
@@ -33,6 +35,9 @@ public interface ExcelInput {
 	 * @param filePath the file path
 	 */
 	ExcelInput filePath(String filePath);
+
+
+	ExcelInput input(InputStream in);
 
 	/**
 	 * read the excel with default sheet index = 0.
