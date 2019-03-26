@@ -1,7 +1,5 @@
 package com.heaven7.java.data.io.os.sources;
 
-import com.heaven7.java.base.util.Predicates;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +11,10 @@ import java.util.List;
  */
 public abstract class TableSource<T>{
 
+    /**
+     * get the table the out as rows. the inner as columns.
+     * @return the table.
+     */
     public abstract List<List<T>> getTable();
 
     public final ListSource<T> getListSource(int index){
@@ -20,10 +22,11 @@ public abstract class TableSource<T>{
         if(this instanceof TitleSource){
             title = ((TitleSource) this).getTitles().get(index);
         }
-        if(Predicates.isEmpty(title)){
+        if(title == null){
             return new DirectListSource<>(getTable().get(index));
         }
-        return new TitleListSource<>(Arrays.asList(title), new DirectListSource<>(getTable().get(index)));
+        return new TitleListSource<>(new ArrayList<String>(Arrays.asList(title)),
+                new DirectListSource<>(getTable().get(index)));
     }
 
     public final TableSource<T> transpose(){
