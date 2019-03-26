@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class TitleTableSource<T> extends DirectTableSource<T>{
+public class TitleTableSource<T> extends DirectTableSource<T> implements TitleSource{
 
     private List<String> titles;
 
@@ -14,6 +14,7 @@ public class TitleTableSource<T> extends DirectTableSource<T>{
         this.titles = titles;
     }
 
+    @Override
     public List<String> getTitles() {
         return titles;
     }

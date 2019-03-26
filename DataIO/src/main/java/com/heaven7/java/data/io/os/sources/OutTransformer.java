@@ -8,7 +8,7 @@ public interface OutTransformer<T> {
             return s.toString();
         }
     };
-    OutTransformer<String> DEFAUULT = new OutTransformer<String>() {
+    OutTransformer<String> STRING = new OutTransformer<String>() {
         @Override
         public String transform(String s) {
             return s;
