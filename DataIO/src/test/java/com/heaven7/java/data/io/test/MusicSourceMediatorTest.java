@@ -32,7 +32,7 @@ public class MusicSourceMediatorTest {
 
         String serverConfigFile = "E:\\tmp\\bugfinds\\server_mapping.xlsx";
         String musicNameTable = "E:\\tmp\\bugfinds\\music_name_table.xlsx";
-        String mainExcelPath = "E:\\tmp\\bugfinds\\测试007.xlsx";
+        String mainExcelPath = "E:\\tmp\\bugfinds\\测试008.xlsx";
         String oldExcelPath = "E:\\tmp\\bugfinds\\music9.xlsx";
         String sortExcelPath = "E:\\tmp\\bugfinds\\音乐排序.xlsx";
 
