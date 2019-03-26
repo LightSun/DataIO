@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class FileLinesListSource<T> implements ListSource<T> {
+public class FileLinesListSource<T> extends ListSource<T> {
 
     private final Object context;
     private final String file;

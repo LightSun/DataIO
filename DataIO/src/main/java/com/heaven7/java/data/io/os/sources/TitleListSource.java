@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class TitleListSource<T> implements ListSource<T>, TitleSource{
+public class TitleListSource<T> extends ListSource<T> implements TitleSource{
 
     private final ListSource<T> base;
     private final List<String> title;

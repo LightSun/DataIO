@@ -16,7 +16,6 @@ import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.ResultIndexedVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.StartEndVisitor;
-import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.io.*;
@@ -64,7 +63,7 @@ public abstract class SourceIO {
             }
         };
         try{
-            final List<String> titles = new ArrayList<>();
+            final List<String> titles = hasTitle ? new ArrayList<String>() : null;
             List<String> list = IOUtils.readStringLines(in);
             List<List<T>> tables = VisitServices.from(list).mapIndexed(null, new ResultIndexedVisitor<String, List<T>>() {
                 boolean titleHandled = !hasTitle;
@@ -95,7 +94,7 @@ public abstract class SourceIO {
         return readTextFile((Object)null, file, hasTitle, transformer);
     }
     public static <T> ListSource<T> readTextFile(Object context, String file, final boolean hasTitle, final InTransformer<T> transformer){
-        final List<String> titles = new ArrayList<>();
+        final List<String> titles = hasTitle ? new ArrayList<String>() : null;
         List<T> list = new FileLinesListSource<>(context, file, new TextReadHelper.Callback<T>() {
             boolean titleHandled = !hasTitle;
             @Override
@@ -121,7 +120,7 @@ public abstract class SourceIO {
                 return transformer.transform(s);
             }
         };
-        final  List<String> titles = new ArrayList<>();
+        final List<String> titles = hasTitle ? new ArrayList<String>() : null;
         List<List<T>> tables = new FileLinesTableSource<>(context, file, new TextReadHelper.Callback<List<T>>() {
             boolean titleHandled = !hasTitle;
             @Override
@@ -133,7 +132,7 @@ public abstract class SourceIO {
                 }
                 return VisitServices.from(line.split(separator)).map(inVisitor).getAsList();
             }
-        }).getList();
+        }).getTable();
         if(hasTitle){
             return new TitleTableSource<>(titles, tables);
         }
@@ -173,7 +172,7 @@ public abstract class SourceIO {
                 return transformer.transform(s);
             }
         };
-        final List<String> titles = new ArrayList<>();
+        final List<String> titles = hasTitle ? new ArrayList<String>() : null;
         //VisitServices.from(row.getColumns()).map(inVisitor).getAsList();
         List<List<T>> tables = VisitServices.from(helper.read()).mapIndexed(null, new ResultIndexedVisitor<ExcelRow, List<T>>() {
             boolean titleHandled = !hasTitle;
@@ -287,7 +286,7 @@ public abstract class SourceIO {
                 return false;
             }
         };
-        VisitServices.from(source.getList()).map(new ResultVisitor<List<T>, List<String>>() {
+        VisitServices.from(source.getTable()).map(new ResultVisitor<List<T>, List<String>>() {
             @Override
             public List<String> visit(List<T> ts, Object param) {
                 return VisitServices.from(ts).map(rs).getAsList();
@@ -364,7 +363,7 @@ public abstract class SourceIO {
                 .apply(new TitleRowApplier(names))
                 .nesting();
         final AtomicInteger excelIndex = new AtomicInteger(1);
-        VisitServices.from(source.getList()).fireWithIndex(new FireIndexedVisitor<List<T>>() {
+        VisitServices.from(source.getTable()).fireWithIndex(new FireIndexedVisitor<List<T>>() {
             @Override
             public Void visit(Object param, List<T> ts, int index, int size) {
                 final ExcelWriter.RowFactory rowF = sf.newRow(excelIndex.getAndIncrement()).nesting();
@@ -381,7 +380,7 @@ public abstract class SourceIO {
         sf.end().end().write(out);
     }
 
-    private static <T> List<String> getTitles(ListSource<T> source, ExcelOutConfig config) {
+    private static List<String> getTitles(Object source, ExcelOutConfig config) {
         List<String> names = config.getColumnNames();
         if(Predicates.isEmpty(names) && source instanceof TitleSource){
             names = ((TitleSource) source).getTitles();

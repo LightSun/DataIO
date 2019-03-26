@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author heaven7
  */
-public class DirectTableSource<T> implements TableSource<T> {
+public class DirectTableSource<T> extends TableSource<T> {
 
     private List<List<T>> list;
 
@@ -13,7 +13,7 @@ public class DirectTableSource<T> implements TableSource<T> {
         this.list = list;
     }
     @Override
-    public List<List<T>> getList() {
+    public List<List<T>> getTable() {
         return list;
     }
 }

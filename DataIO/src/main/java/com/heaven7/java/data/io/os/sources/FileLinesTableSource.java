@@ -22,7 +22,7 @@ public class FileLinesTableSource<T> implements TableSource<T> {
 
 
     @Override
-    public List<List<T>> getList() {
+    public List<List<T>> getTable() {
         return ResourceLoader.getDefault().readLines(context, file, callback);
     }
 }

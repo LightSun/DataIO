@@ -44,7 +44,7 @@ public class SourceIOTest {
         String out = FileUtils.createFilePath(dir, "2.txt");
         SourceIO.writeTextFile(new TableSource<String>() {
             @Override
-            public List<List<String>> getList() {
+            public List<List<String>> getTable() {
                 return list;
             }
         }, out, " " ,OutTransformer.TO_STRING);
@@ -59,7 +59,7 @@ public class SourceIOTest {
         String out = FileUtils.createFilePath(dir, "2.xlsx");
         SourceIO.writeExcelFile(new TableSource<String>() {
             @Override
-            public List<List<String>> getList() {
+            public List<List<String>> getTable() {
                 return list;
             }
         }, out, new ExcelOutConfig.Builder()
@@ -80,7 +80,7 @@ public class SourceIOTest {
     public void testReadText2(){
         String out = FileUtils.createFilePath(dir, "2.txt");
         TableSource<String> source = SourceIO.readTextFile(out, " ", false, InTransformer.STRING);
-        assetTableEquals(source.getList(), createTableList());
+        assetTableEquals(source.getTable(), createTableList());
     }
     @Test
     public void testReadExcel1(){
@@ -113,7 +113,7 @@ public class SourceIOTest {
 
         Assert.assertTrue(tts.getTitles().equals(Arrays.asList("name", "age", "sax")));
 
-        assetTableEquals(tts.getList(), createTableList());
+        assetTableEquals(tts.getTable(), createTableList());
     }
     private List<List<String>> createTableList() {
         final List<List<String>> list = new ArrayList<>();
