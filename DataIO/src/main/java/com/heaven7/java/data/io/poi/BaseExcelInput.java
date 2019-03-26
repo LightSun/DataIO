@@ -33,7 +33,7 @@ public abstract class BaseExcelInput implements ExcelInput {
     }
 
     @Override
-    public ExcelInput setContext(Object context) {
+    public ExcelInput context(Object context) {
         this.mContext = context;
         return this;
     }

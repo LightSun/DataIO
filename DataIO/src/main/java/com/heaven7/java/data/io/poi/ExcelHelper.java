@@ -5,6 +5,7 @@ import com.heaven7.java.visitor.collection.ListVisitService;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Collections2;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class ExcelHelper {
     private String sheetName;
     private String excelPath;
     private int skipToRowIndex = -1;
+    private Object context;
+    private InputStream inputStream;
     private ExcelVisitor visitor;
 
     protected ExcelHelper(ExcelHelper.Builder builder) {
@@ -26,12 +29,16 @@ public class ExcelHelper {
         this.sheetName = builder.sheetName;
         this.excelPath = builder.excelPath;
         this.skipToRowIndex = builder.skipToRowIndex;
+        this.context = builder.context;
+        this.inputStream = builder.inputStream;
         this.visitor = builder.visitor;
     }
 
     public List<ExcelRow> read(){
         ExcelInput input = (useXlsx ? new XSSFExcelInput(): new HSSFExcelInput())
                 .filePath(excelPath)
+                .input(inputStream)
+                .context(context)
                 .visitor(visitor);
         if(skipToRowIndex >= 0){
             input.skipToRow(skipToRowIndex);
@@ -80,6 +87,14 @@ public class ExcelHelper {
         return this.skipToRowIndex;
     }
 
+    public Object getContext() {
+        return this.context;
+    }
+
+    public InputStream getInputStream() {
+        return this.inputStream;
+    }
+
     public ExcelVisitor getVisitor() {
         return this.visitor;
     }
@@ -90,6 +105,8 @@ public class ExcelHelper {
         private String sheetName;
         private String excelPath;
         private int skipToRowIndex = -1;
+        private Object context;
+        private InputStream inputStream;
         private ExcelVisitor visitor;
 
         public Builder setUseXlsx(boolean useXlsx) {
@@ -114,6 +131,16 @@ public class ExcelHelper {
 
         public Builder setSkipToRowIndex(int skipToRowIndex) {
             this.skipToRowIndex = skipToRowIndex;
+            return this;
+        }
+
+        public Builder setContext(Object context) {
+            this.context = context;
+            return this;
+        }
+
+        public Builder setInputStream(InputStream inputStream) {
+            this.inputStream = inputStream;
             return this;
         }
 

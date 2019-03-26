@@ -8,7 +8,7 @@ import java.util.List;
 public interface ExcelInput {
 
 
-	ExcelInput setContext(Object context);
+	ExcelInput context(Object context);
 	/*
 	 * prepare the input of excel
 	 * @param in the input of excel
