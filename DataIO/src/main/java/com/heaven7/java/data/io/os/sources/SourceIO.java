@@ -255,27 +255,7 @@ public abstract class SourceIO {
     }
     public static <T> void writeTextFile(TableSource<T> source, Writer writer, final String separator, final OutTransformer<? super T> transformer){
         final StringBuilder sb = new StringBuilder();
-        //title
-        final boolean hasTitle = source instanceof TitleSource;
-        if(hasTitle){
-            VisitServices.from(((TitleSource) source).getTitles()).fireWithStartEnd(new StartEndVisitor<String>() {
-                @Override
-                public boolean visit(Object param, String s, boolean start, boolean end) {
-                    sb.append(s);
-                    if (!end) {
-                        sb.append(separator);
-                    }
-                    return false;
-                }
-            });
-        }
 
-        final ResultVisitor<T,String> rs = new ResultVisitor<T, String>() {
-            @Override
-            public String visit(T t, Object param) {
-                return transformer.transform(t);
-            }
-        };
         final StartEndVisitor<String> lineVisitor = new StartEndVisitor<String>() {
             @Override
             public boolean visit(Object param, String s, boolean start, boolean end) {
@@ -284,6 +264,18 @@ public abstract class SourceIO {
                     sb.append(separator);
                 }
                 return false;
+            }
+        };
+        //title
+        final boolean hasTitle = source instanceof TitleSource;
+        if(hasTitle){
+            VisitServices.from(((TitleSource) source).getTitles()).fireWithStartEnd(lineVisitor);
+        }
+
+        final ResultVisitor<T,String> rs = new ResultVisitor<T, String>() {
+            @Override
+            public String visit(T t, Object param) {
+                return transformer.transform(t);
             }
         };
         VisitServices.from(source.getTable()).map(new ResultVisitor<List<T>, List<String>>() {

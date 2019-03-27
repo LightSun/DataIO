@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Callback {
 
-    public static final Runnable EMPTY = new Runnable() {
+    public static final Runnable EMPTY_TASK = new Runnable() {
         @Override
         public void run() {
 
@@ -120,7 +120,7 @@ public abstract class BaseProducer<T> implements Producer<T>, CancelableTask.Cal
         return post(scheduler, new Runnable() {
             @Override
             public void run() {
-                callback.onProduced(context, t, EMPTY);
+                callback.onProduced(context, t, EMPTY_TASK);
                 //if is closed or end. dispatch end
                 if(isClosed() || end){
                     endImpl(context, scheduler, callback);
