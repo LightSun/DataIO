@@ -1,16 +1,16 @@
 package com.heaven7.java.data.io.temp;
 
 import com.heaven7.java.base.util.Predicates;
+import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author heaven7
  */
-public class Person<E> {
+public class Person<E, P> {
 
     public List<Number> list1;
     public List<? extends Number> list2;
@@ -23,7 +23,7 @@ public class Person<E> {
     public List<Number>[] array1;
     public List<? super Number>[] array2;
 
-    public List<E> params; //类上的泛型只支持单泛型
+    public List<E> params; //类上的泛型这里只支持单泛型
 
     public static void main(String[] args) throws Exception{
 
@@ -48,7 +48,7 @@ public class Person<E> {
         parseNodeImpl(null, type, node);
         return node;
     }
-    private static GenericNode parseField(Person<?> p, String fieldName) throws Exception{
+    private static GenericNode parseField(Person p, String fieldName) throws Exception{
         Field field = p.getClass().getField(fieldName);
         Type type = field.getGenericType();
         GenericNode node = new GenericNode();
@@ -56,14 +56,14 @@ public class Person<E> {
         return node;
     }
 
-    private static void parseNodeImpl(Class clazz,Type type, GenericNode parent) {
+    private static Class parseNodeImpl(final Class clazz, Type type,GenericNode parent) {
         if(type instanceof ParameterizedType){
             Type[] types = ((ParameterizedType) type).getActualTypeArguments();
             List<GenericNode> subs = new ArrayList<>();
             GenericNode node;
             for (Type t : types){
                 node = new GenericNode();
-                parseNodeImpl(clazz, t, node);
+                parseNodeImpl(clazz, t,  node);
                 subs.add(node);
             }
             parent.type = (Class<?>) ((ParameterizedType) type).getRawType();
@@ -72,41 +72,68 @@ public class Person<E> {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
             parent.isArray = true;
             GenericNode node = new GenericNode();
-            parseNodeImpl(clazz, componentType, node);
+            parseNodeImpl(clazz, componentType,  node);
             parent.addNode(node);
         }else if(type instanceof WildcardType){
             Type[] lowerBounds = ((WildcardType) type).getLowerBounds();
             Type[] upperBounds = ((WildcardType) type).getUpperBounds();
             if(Predicates.isEmpty(lowerBounds)){
-                parseNodeImpl(clazz, upperBounds[0], parent);
+                parseNodeImpl(clazz, upperBounds[0],  parent);
             }else {
                 parseNodeImpl(clazz, lowerBounds[0], parent);
             }
         }else if(type instanceof TypeVariable){
             //indicates  Wildcard from object. that means only can be known as runtime.
-            //TypeVariable<?>[] types = ((TypeVariable) type).getGenericDeclaration().getTypeParameters();
-            ParameterizedType pt = (ParameterizedType) clazz.getGenericSuperclass();
-            if(pt == null){
-                throw new UnsupportedOperationException("must extend the generic super class");
+            String name = ((TypeVariable) type).getName();
+            if(sTypeVars.get(clazz) == null){
+                ParameterizedType pt = (ParameterizedType) clazz.getGenericSuperclass();
+                if(pt == null){
+                    throw new UnsupportedOperationException("must extend the generic super class");
+                }
+                final TypeVariable<?>[] types = ((TypeVariable) type).getGenericDeclaration().getTypeParameters();
+                final List<TypeVariablePair> pairs = new ArrayList<>();
+                VisitServices.from(pt.getActualTypeArguments()).fireWithIndex(new FireIndexedVisitor<Type>() {
+                    @Override
+                    public Void visit(Object param, Type t, int index, int size) {
+                        GenericNode node = new GenericNode();
+                        parseNodeImpl(clazz, t, node);
+                        pairs.add(new TypeVariablePair(types[index].getName(), node));
+                        return null;
+                    }
+                });
+                sTypeVars.put(clazz, pairs);
             }
-            if(pt.getActualTypeArguments().length > 1){
-                //or else can't map them.
-                throw new UnsupportedOperationException("generic class. can only have one.");
-            }
-            parent.declareName = type.toString();
-            parseNodeImpl(clazz, pt.getActualTypeArguments()[0], parent);
+            TypeVariablePair pair = getTypeVariablePair(clazz, name);
+            parent.addTypeVariablePair(pair);
         } else if(type instanceof Class){
             parent.type =(Class<?>) type;
+            return parent.type;
         }else {
             throw new RuntimeException("" + type);
         }
+        return null;
+    }
+
+    private static WeakHashMap<Class<?>, List<TypeVariablePair>> sTypeVars = new WeakHashMap<>();
+
+    private static TypeVariablePair getTypeVariablePair(Class<?> clazz, String declareName){
+        List<TypeVariablePair> pairs = sTypeVars.get(clazz);
+        if(pairs.isEmpty()){
+            return null;
+        }
+        for (TypeVariablePair pair : pairs){
+            if(pair.declareName.equals(declareName)){
+                return pair;
+            }
+        }
+        return null;
     }
 }
 
 //List<Number> -> type = List.class, subType = GenericNode(Number)
 class GenericNode{
     Class<?> type;
-    String declareName;
+    List<TypeVariablePair> pairs;
     List<GenericNode> subType;
     boolean isArray;
 
@@ -116,9 +143,23 @@ class GenericNode{
         }
         subType.add(node);
     }
+    public void addTypeVariablePair(TypeVariablePair pair){
+        if(pairs == null){
+            pairs = new ArrayList<>();
+        }
+        pairs.add(pair);
+    }
+}
+class TypeVariablePair{
+    final String declareName;
+    final GenericNode node;
+    public TypeVariablePair(String declareName, GenericNode node) {
+        this.declareName = declareName;
+        this.node = node;
+    }
 }
 //Person<String, Integer>
-class Student extends Person<String>{
+class Student extends Person<String, List<Integer>>{
 
 }
 
