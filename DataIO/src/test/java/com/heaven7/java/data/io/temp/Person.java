@@ -39,6 +39,11 @@ public class Person<E, P> {
         Student person = new Student();
         //
         GenericNode node = parseField(person, "params");
+        System.out.println(1 << 8 );
+        System.out.println(1 + 11 << 8 );
+        int value = 1 + (11 << 8);
+        System.out.println( value & 0xff);
+        System.out.println( (value & 0xff00) >> 8);
     }
 
     private static GenericNode parseField(String fieldName) throws Exception{
