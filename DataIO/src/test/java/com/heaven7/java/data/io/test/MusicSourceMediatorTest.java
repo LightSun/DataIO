@@ -272,14 +272,14 @@ public class MusicSourceMediatorTest {
                 .build();
         ExcelMusicNameSource nameSource = new ExcelMusicNameSource(musicNameTables, sortNameTable);
 
-        DefalutMusicOutDelegate3 outDelegate = new DefalutMusicOutDelegate3(new SimpleExcelSource(
+        DefalutMusicOutDelegate2 outDelegate = new DefalutMusicOutDelegate2(new SimpleExcelSource(
                 new ExcelHelper.Builder()
                         .setSheetName("工作表3")
                         .setSkipToRowIndex(1)
                         .setUseXlsx(true)
                         .setExcelPath(serverConfigFile)
                         .build()), nameSource);
-        outDelegate.setFilterDuration(0); //0 s means full-time
+       // DefalutMusicOutDelegate3.setFilterDuration(0); //0 s means full-time
 
 
         SimpleMusicCutSource cutSource = new SimpleMusicCutSource(newMusicCutFile);
