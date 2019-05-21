@@ -8,6 +8,7 @@ import com.heaven7.java.data.io.music.in.LogWriter;
 import java.util.List;
 
 /**
+ * used to set filer/effect/transition and etc,
  * @author heaven7
  */
 public interface AdditionalTransfer {

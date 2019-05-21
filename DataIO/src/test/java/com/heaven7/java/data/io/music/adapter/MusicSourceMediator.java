@@ -79,6 +79,13 @@ public class MusicSourceMediator {
         filterTransfer.setEffectMappingSource(effectMappingSource);
     }
 
+    /*
+    1,  filter music names
+    2, transfers
+    3, check music file exists
+    4, set md5 and file path
+     *
+     */
     public void normalize(){
         if(logWriter == null){
             logWriter = DefaultLogWriter.INSTANCE;
@@ -123,7 +130,7 @@ public class MusicSourceMediator {
                 return true;
             }
         }, noMusicItems).getAsList();
-         // write no musics.
+         // write no musics(file not exist).
         StringBuilder sb = new StringBuilder();
         for (MusicItem2 mi : noMusicItems){
             sb.append(mi.getName()).append(Platforms.getNewLine());
@@ -148,6 +155,7 @@ public class MusicSourceMediator {
         logWriter.end();
     }
 
+    //TODO 全时长2
     private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {
         OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource, indexDelegate, outDir);
         standTransfer.setLogWriter(logWriter);

@@ -243,7 +243,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         String out = outDir + File.separator + simpleFileName + "_db.xlsx";
         sf.end().end().write(out);
     }
-
+    //TODO 全时长1
     private List<ServerPairBean> mapServerBean(String outDir, List<MusicItem2> items) {
         final StringBuilder sb_log = new StringBuilder();
         //make the same the music and diff duration for same id.
