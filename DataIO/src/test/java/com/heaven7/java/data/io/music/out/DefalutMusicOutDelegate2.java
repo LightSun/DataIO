@@ -43,10 +43,20 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         this.mSortSource = mSortSource;
     }
 
+    protected List<ServerPairBean> filterServerPair(List<ServerPairBean> beans) {
+        return beans;
+    }
+
+    @Override
+    public List<MusicItem2> filterMusicItems(List<MusicItem2> beans) {
+        return beans;
+    }
+
     @Override
     public void start(String outDir, List<MusicItem2> items) {
         //attach: display name and singer
         mServerPairBeans = mapServerBean(outDir, items);
+        mServerPairBeans = filterServerPair(mServerPairBeans);
         final Map<String, Integer> map = mSortSource.getSortMap();
         if (map != null) {
             Collections.sort(mServerPairBeans, new Comparator<ServerPairBean>() {
@@ -69,7 +79,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
     }
 
     @Override
-    public void writePart(final String outDir, final List<MusicItem2> items) {
+    public void writePart(final String outDir, List<MusicItem2> items) {
         //domain_music_thythm_duration
         final List<PartOutput> parts = Configs.getPartsOfDomainRhythm();
         VisitServices.from(items).groupService(new ResultVisitor<MusicItem2, Integer>() {
@@ -112,7 +122,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         FileUtils.writeTo(outJsonFile, json);
 
         //write server excel
-        writeServerExcel(outDir, simpleFileName, items);
+        writeServerExcel(outDir, simpleFileName);
     }
 
     @Override
@@ -150,6 +160,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
 
     @Override
     public void copyValidMusics(String outDir, List<MusicItem2> items) {
+
         final File out = new File(outDir, "musics");
         FileUtils.deleteDir(out);
         out.mkdirs();
@@ -178,7 +189,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         FileUtils.writeTo(file_mapping, mGson.toJson(maps));
     }
 
-    private void writeServerExcel(String outDir, String simpleFileName, List<MusicItem2> items) {
+    private void writeServerExcel(String outDir, String simpleFileName) {
         // List<ServerPairBean> pairBeans = mapServerBean(outDir, items);
         ExcelWriter.SheetFactory sf = new DefaultExcelWriter().newWorkbook(ExcelWriter.TYPE_XSSF)
                 .nesting()
@@ -243,7 +254,6 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
         String out = outDir + File.separator + simpleFileName + "_db.xlsx";
         sf.end().end().write(out);
     }
-    //TODO 全时长1
     private List<ServerPairBean> mapServerBean(String outDir, List<MusicItem2> items) {
         final StringBuilder sb_log = new StringBuilder();
         //make the same the music and diff duration for same id.
@@ -338,7 +348,7 @@ public class DefalutMusicOutDelegate2 implements MusicOutDelegate2 {
     static class ServerPairBean {
         static final ServerPairBean NULL = new ServerPairBean();
         final ServerMapBean bean;
-        final List<MusicItem2> items;
+        public final List<MusicItem2> items;
 
         public ServerPairBean() {
             this(null, null);

@@ -25,4 +25,18 @@ public class MusicCutterScannerV11Test {
         new MusicCutterScannerV11(dir, new ExcelMusicNameSource(musicNameTables, null))
                 .serialize(dir + File.separator + "cut.txt");
     }
+
+    @Test
+    public void test2(){
+        String musicNameTable = "E:\\tmp\\bugfinds\\music_name_table.xlsx";
+        ExcelHelper musicNameTables = new ExcelHelper.Builder()
+                .setUseXlsx(true)
+                .setExcelPath(musicNameTable)
+                .setSkipToRowIndex(1)
+                .setSheetName("线上音乐文件")
+                .build();
+        String dir = "E:\\tmp\\bugfinds\\music_cut_全时长";
+        new MusicCutterScannerV11(dir, new ExcelMusicNameSource(musicNameTables, null))
+                .serialize(dir + File.separator + "cut.txt");
+    }
 }

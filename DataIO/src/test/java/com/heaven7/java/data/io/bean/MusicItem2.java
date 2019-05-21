@@ -70,6 +70,26 @@ public class MusicItem2 implements MusicItemDelegate{
     @SerializedName("transition_cuts")
     private List<Float> transitionCuts;
 
+    public MusicItem2 copyBase(){
+        MusicItem2 item = new MusicItem2();
+        item.setId(id);
+        item.setName(name);
+        item.setMusicId(musicId);
+        item.setDisplayName(displayName);
+        item.setSinger(singer);
+        item.setDomains(domains);
+
+        item.setDuration(duration);
+        item.setProperty(property);
+        item.setRhythm(rhythm);
+
+        item.setCategory(category);
+        item.setCategoryStr(categoryStr);
+        item.rowIndex = -1;
+        return item;
+    }
+
+
     public String getDisplayName() {
         return displayName;
     }

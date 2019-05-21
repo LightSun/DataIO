@@ -10,6 +10,14 @@ import java.util.List;
  */
 public interface MusicOutDelegate2 extends MusicOutDelegate<MusicItem2>{
 
+
+    /**
+     * call this to final filter music items. this is called after {@linkplain #start(String, List)}.
+     * @param beans the all items
+     * @return the filtered items
+     */
+    List<MusicItem2> filterMusicItems(List<MusicItem2> beans);
+
     /**
      * write music items as  parts output. see {@linkplain PartOutput}
      * @param items the music items

@@ -1,8 +1,9 @@
 package com.heaven7.java.data.io.music.adapter;
 
 import com.heaven7.java.base.util.Platforms;
-import com.heaven7.java.base.util.TextUtils;
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.data.io.bean.CutConfigBeanV10;
+import com.heaven7.java.data.io.bean.CutInfo;
 import com.heaven7.java.data.io.bean.MusicItem2;
 import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
@@ -11,15 +12,12 @@ import com.heaven7.java.data.io.music.transfer.OldStandExcelSourceTransfer;
 import com.heaven7.java.data.io.utils.Debugger;
 import com.heaven7.java.data.io.utils.FileMd5Helper;
 import com.heaven7.java.data.io.utils.FileUtils;
-import com.heaven7.java.visitor.*;
-import com.heaven7.java.visitor.collection.KeyValuePair;
-import com.heaven7.java.visitor.collection.MapVisitService;
+import com.heaven7.java.visitor.PredicateVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
-import com.heaven7.java.visitor.util.Map;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author heaven7
@@ -28,6 +26,11 @@ public class MusicSourceMediator {
 
     private ExcelSources excelSources;
     private MusicCutSource musicCutSource;
+
+    private MusicCutSource fullTimeCutSource;
+    private MusicNameSource fullTimeMusicNameSource;
+    private SpeedAreaSource fullTimeSpeedAreaSource;
+
     private SpeedAreaSource speedAreaSource;
     private MusicSource musicSource;
     private MusicOutDelegate2 musicOutDelegate;
@@ -50,6 +53,11 @@ public class MusicSourceMediator {
         this.excelSources = builder.excelSources;
         this.speedAreaSource = builder.speedAreaSource;
         this.musicCutSource = builder.musicCutSource;
+
+        this.fullTimeCutSource = builder.fullTimeCutSource;
+        this.fullTimeMusicNameSource = builder.fullTimeMusicNameSource;
+        this.fullTimeSpeedAreaSource = builder.fullTimeSpeedAreaSource;
+
         this.musicSource = builder.musicSource;
         this.musicNameSource = builder.musicNameSource;
         this.effectMappingSource = builder.effectMappingSource;
@@ -80,7 +88,7 @@ public class MusicSourceMediator {
     }
 
     /*
-    1,  filter music names
+    1, filter music names
     2, transfers
     3, check music file exists
     4, set md5 and file path
@@ -95,6 +103,13 @@ public class MusicSourceMediator {
         //transfer.
         StringBuilder sb_warn = new StringBuilder();
         List<MusicItem2> items = getMusicItems(sb_warn);
+        //处理全时长
+        if(fullTimeMusicNameSource != null){
+            List<String> names = fullTimeMusicNameSource.getMusicNames();
+            List<MusicItem2> fullTimeItems = createFullTimeItems(names, items);
+            items.addAll(fullTimeItems);
+        }
+
         items = VisitServices.from(items).filter(new PredicateVisitor<MusicItem2>() {
             @Override
             public Boolean visit(MusicItem2 musicItem2, Object param) {
@@ -140,6 +155,9 @@ public class MusicSourceMediator {
 
         String simpleFileName = "music_v10";
         musicOutDelegate.start(outDir, items);
+
+        //before write out. filter
+        items = musicOutDelegate.filterMusicItems(items);
         //part outputs
         musicOutDelegate.writePart(outDir, items);
         //total
@@ -155,7 +173,43 @@ public class MusicSourceMediator {
         logWriter.end();
     }
 
-    //TODO 全时长2
+    //create full time items. from old items. because full-time-time use the base info.
+    private List<MusicItem2> createFullTimeItems(final List<String> names, List<MusicItem2> items) {
+        if(Predicates.isEmpty(names) || Predicates.isEmpty(items)){
+            return Collections.emptyList();
+        }
+        return VisitServices.from(items).filter(new PredicateVisitor<MusicItem2>() {
+            final Set<String> alreadyNames = new HashSet<>();
+            @Override
+            public Boolean visit(MusicItem2 musicItem2, Object param) {
+                if(alreadyNames.contains(musicItem2.getName())){
+                    return false;
+                }
+                if(!names.contains(musicItem2.getName())){
+                   return false;
+                }
+                alreadyNames.add(musicItem2.getName());
+                return true;
+            }
+        }).map(new ResultVisitor<MusicItem2, MusicItem2>() {
+            @Override
+            public MusicItem2 visit(MusicItem2 musicItem2, Object param) {
+                MusicItem2 item2 = musicItem2.copyBase();
+                item2.setDuration(0);
+                List<CutInfo> cutInfos = fullTimeCutSource.getCutInfos(item2);
+                if(cutInfos == null){
+                    return null;
+                }
+                item2.setCutInfos(cutInfos);
+                //check cut-info ?
+                item2.setSlow_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_LOW));
+                item2.setMiddle_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_MIDDLE));
+                item2.setHigh_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_HIGH));
+                return item2;
+            }
+        }).getAsList();
+    }
+
     private List<MusicItem2> getMusicItems(StringBuilder sb_warn) {
         OldStandExcelSourceTransfer standTransfer = new OldStandExcelSourceTransfer(musicCutSource, speedAreaSource, indexDelegate, outDir);
         standTransfer.setLogWriter(logWriter);
@@ -237,7 +291,23 @@ public class MusicSourceMediator {
         private LogWriter logWriter;
         private MusicNameSource musicNameSource;
         private EffectMappingSource effectMappingSource;
+        private MusicCutSource fullTimeCutSource;
+        private MusicNameSource fullTimeMusicNameSource;
+        private SpeedAreaSource fullTimeSpeedAreaSource;
 
+        public Builder setFullTimeSpeedAreaSource(SpeedAreaSource source) {
+            this.fullTimeSpeedAreaSource = source;
+            return this;
+        }
+        public Builder setFullTimeMusicNameSource(MusicNameSource source) {
+            this.fullTimeMusicNameSource = source;
+            return this;
+        }
+        //设置全时长切点source
+        public Builder setFullTimeCutSource(MusicCutSource source) {
+            this.fullTimeCutSource = source;
+            return this;
+        }
         public Builder setEffectMappingSource(EffectMappingSource source) {
             this.effectMappingSource = source;
             return this;

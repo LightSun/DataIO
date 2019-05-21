@@ -79,6 +79,9 @@ public abstract class SimpleExcelSourceTransfer implements StandTransfer {
             logWriter = DefaultLogWriter.INSTANCE;
         }
         sb_warn.delete(0, sb_warn.length());
+        //1，base filter
+        //2, name filter
+        //3, cut filter
         List<MusicItem2> items = VisitServices.from(source.getRows()).map(new ResultVisitor<ExcelRow, MusicItem2>() {
             @Override
             public MusicItem2 visit(ExcelRow row, Object param) {
