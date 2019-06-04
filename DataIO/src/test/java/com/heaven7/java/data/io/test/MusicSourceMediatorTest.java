@@ -4,7 +4,6 @@ import com.heaven7.java.data.io.music.adapter.IndexDelegateV3;
 import com.heaven7.java.data.io.music.adapter.MusicSourceMediator;
 import com.heaven7.java.data.io.music.in.*;
 import com.heaven7.java.data.io.music.out.DefalutMusicOutDelegate2;
-import com.heaven7.java.data.io.music.out.DefalutMusicOutDelegate3;
 import com.heaven7.java.data.io.music.out.FileLogWriter;
 import com.heaven7.java.data.io.music.out.MusicOutDelegate2;
 import com.heaven7.java.data.io.music.transfer.TransitionTransfer;
@@ -348,7 +347,8 @@ public class MusicSourceMediatorTest {
                 .setIndexDelegate(new IndexDelegateV3())
 
                 .setFullTimeCutSource(fullTimeCutSource)
-                .setFullTimeMusicNameSource(new SimpleMusicNameSource(fullTimeMusicNameTable))
+               // .setFullTimeMusicNameSource(new SimpleMusicNameSource(fullTimeMusicNameTable))
+                .setFullTimeMusicNameSource(nameSource)
                 .setFullTimeSpeedAreaSource(new SimpleSpeedAreaSource(fullTimeCutSource.getBean()))
 
                 .setTransitionTransfer(new TransitionTransfer())

@@ -108,6 +108,9 @@ public class MusicSourceMediator {
             List<String> names = fullTimeMusicNameSource.getMusicNames();
             List<MusicItem2> fullTimeItems = createFullTimeItems(names, items);
             items.addAll(fullTimeItems);
+        }else if(fullTimeCutSource != null){
+            List<MusicItem2> fullTimeItems = createFullTimeItems(items);
+            items.addAll(fullTimeItems);
         }
 
         items = VisitServices.from(items).filter(new PredicateVisitor<MusicItem2>() {
@@ -187,6 +190,39 @@ public class MusicSourceMediator {
                 }
                 if(!names.contains(musicItem2.getName())){
                    return false;
+                }
+                alreadyNames.add(musicItem2.getName());
+                return true;
+            }
+        }).map(new ResultVisitor<MusicItem2, MusicItem2>() {
+            @Override
+            public MusicItem2 visit(MusicItem2 musicItem2, Object param) {
+                MusicItem2 item2 = musicItem2.copyBase();
+                item2.setDuration(0);
+                List<CutInfo> cutInfos = fullTimeCutSource.getCutInfos(item2);
+                if(cutInfos == null){
+                    return null;
+                }
+                item2.setCutInfos(cutInfos);
+                //check cut-info ?
+                item2.setSlow_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_LOW));
+                item2.setMiddle_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_MIDDLE));
+                item2.setHigh_speed_areas(fullTimeSpeedAreaSource.getSpeedArea(item2, CutConfigBeanV10.AREA_TYPE_HIGH));
+                return item2;
+            }
+        }).getAsList();
+    }
+
+    private List<MusicItem2> createFullTimeItems(List<MusicItem2> items) {
+        if(Predicates.isEmpty(items)){
+            return Collections.emptyList();
+        }
+        return VisitServices.from(items).filter(new PredicateVisitor<MusicItem2>() {
+            final Set<String> alreadyNames = new HashSet<>();
+            @Override
+            public Boolean visit(MusicItem2 musicItem2, Object param) {
+                if(alreadyNames.contains(musicItem2.getName())){
+                    return false;
                 }
                 alreadyNames.add(musicItem2.getName());
                 return true;
