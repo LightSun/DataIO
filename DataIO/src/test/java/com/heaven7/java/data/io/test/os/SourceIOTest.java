@@ -1,5 +1,6 @@
 package com.heaven7.java.data.io.test.os;
 
+import com.google.gson.Gson;
 import com.heaven7.java.base.util.ResourceLoader;
 import com.heaven7.java.data.io.os.sources.*;
 import com.heaven7.java.data.io.poi.ExcelHelper;
@@ -115,6 +116,28 @@ public class SourceIOTest {
 
         assetTableEquals(tts.getTable(), createTableList());
     }
+
+    @Test
+    public void testReadExcel3(){
+        String out = "E:\\work\\ui4\\小蟹v6.5.xlsx";
+        ExcelHelper helper = new ExcelHelper.Builder()
+                .setSheetName("领域模型（旅行）")
+                .setUseXlsx(true)
+                .setExcelPath(out)
+                .build();
+        TableSource<String> source = SourceIO.readExcelAsTable(helper, 4, false, InTransformer.STRING);
+        List<List<String>> table = source.getTable();
+        System.out.println(table);
+        // filter 0, 6
+        List<TravelTag> outList = new ArrayList<>();
+        for (List<String> list : table){
+            list.remove(6);
+            list.remove(0);
+            outList.add(new TravelTag(list));
+        }
+        System.out.println(new Gson().toJson(outList));
+    }
+
     private List<List<String>> createTableList() {
         final List<List<String>> list = new ArrayList<>();
         for(int i = 0 ; i < 3 ; i ++){
@@ -144,5 +167,22 @@ public class SourceIOTest {
         List<String> lines = ResourceLoader.getDefault().loadFileAsStringLines(null, file);
         String str = VisitServices.from(lines).joinToString("\n");
         Assert.assertTrue(str.equals(content));
+    }
+
+    public static class TravelTag{
+        String tag;
+        float evaluation;
+        String shotType;
+        int shotLevel;
+        String desc;
+        String desc2;
+        public TravelTag(List<String> list){
+            tag = list.get(0).trim();
+            evaluation = Float.valueOf(list.get(1).trim());
+            shotType = list.get(2).trim();
+            shotLevel =  Integer.valueOf(list.get(3).trim());
+            desc =  list.get(4);
+            desc2 =  list.get(5);
+        }
     }
 }
